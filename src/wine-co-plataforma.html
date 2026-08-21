@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Wine&amp;Co</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#FDFBF8; --surface:#FFFFFF; --ink:#332B24; --muted:#8A7C6A;
+  --wine:#8C2E4C; --wine-deep:#5C2036; --sidebar:#7A2E45; --sidebar-ink:#F3E9DF;
+  --gold:#C7A06B; --line:#ECE4D6; --sage:#5F7A52; --rust:#B5533C;
+  --shadow: 0 1px 2px rgba(51,43,36,.04);
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1D1815; --surface:#251E1A; --ink:#F1E7DC; --muted:#B3A392;
+    --wine:#C4547A; --wine-deep:#3A1523; --sidebar:#241014; --sidebar-ink:#F3E9DF;
+    --gold:#D8B583; --line:#3A312B; --sage:#7FA070; --rust:#D07359;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1D1815; --surface:#251E1A; --ink:#F1E7DC; --muted:#B3A392;
+  --wine:#C4547A; --wine-deep:#3A1523; --sidebar:#241014; --sidebar-ink:#F3E9DF;
+  --gold:#D8B583; --line:#3A312B; --sage:#7FA070; --rust:#D07359;
+  --shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:'IBM Plex Sans', system-ui, sans-serif;
+  font-size:14px; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{ background:var(--wine); color:#fff; }
+a{ color:inherit; }
+button{ font-family:inherit; }
+input,select,textarea{ font-family:inherit; font-size:14px; }
+input:focus, select:focus, textarea:focus, button:focus-visible{
+  outline:2px solid var(--gold); outline-offset:1px;
+}
+.mono{ font-family:'IBM Plex Mono', monospace; font-variant-numeric:tabular-nums; }
+.display{ font-family:'Fraunces', serif; }
+
+/* ---------- layout ---------- */
+.app{ display:flex; min-height:100vh; }
+.sidebar{
+  width:230px; flex-shrink:0; background:var(--sidebar); color:var(--sidebar-ink);
+  display:flex; flex-direction:column; padding:24px 16px;
+  position:sticky; top:0; height:100vh;
+}
+.brand{ display:flex; align-items:center; gap:10px; padding:0 4px 22px; border-bottom:1px solid rgba(243,233,223,.14); margin-bottom:18px; }
+.brand-mark{ width:36px; height:36px; border-radius:10px; background:rgba(199,160,107,.22); display:flex; align-items:center; justify-content:center; color:var(--gold); flex-shrink:0; }
+.brand-name{ font-family:'Fraunces', serif; font-size:18px; font-weight:600; }
+.brand-sub{ font-size:10.5px; color:rgba(243,233,223,.55); margin-top:2px; }
+.nav{ display:flex; flex-direction:column; gap:4px; flex:1; }
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px;
+  background:transparent; border:none; color:rgba(243,233,223,.72); cursor:pointer; text-align:left;
+}
+.nav-item:hover{ background:rgba(243,233,223,.08); }
+.nav-item.active{ background:rgba(243,233,223,.1); color:#FBF8F3; }
+.nav-ic{ width:28px; height:28px; border-radius:8px; background:rgba(243,233,223,.06); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.nav-item.active .nav-ic{ background:var(--gold); color:var(--sidebar); }
+.nav-label{ font-size:13px; font-weight:600; }
+.nav-sub{ font-size:10.5px; color:rgba(243,233,223,.5); }
+.sidebar-foot{ display:flex; align-items:center; gap:8px; font-size:11px; color:rgba(243,233,223,.55); padding-top:14px; border-top:1px solid rgba(243,233,223,.14); }
+.save-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+.main{ flex:1; min-width:0; padding:26px 30px 60px; }
+.topbar-mobile{ display:none; }
+.topbar-tabs{ display:none; }
+
+.page-header{ display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:20px; }
+.eyebrow{ font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--gold); font-weight:700; margin-bottom:6px; }
+h1{ font-family:'Fraunces', serif; font-size:26px; font-weight:600; margin:0 0 6px; text-wrap:balance; }
+.page-desc{ font-size:13px; color:var(--muted); max-width:56ch; margin:0; }
+
+.btn{ display:inline-flex; align-items:center; gap:6px; border-radius:9px; padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; white-space:nowrap; }
+.btn-primary{ background:var(--wine); color:#fff; }
+.btn-primary:hover{ filter:brightness(1.06); }
+.btn-ghost{ background:transparent; border-color:var(--line); color:var(--ink); }
+.btn-ghost:hover{ background:var(--surface); }
+.btn-ghost-sm{ display:inline-flex; align-items:center; gap:5px; background:transparent; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:5px 10px; font-size:12px; cursor:pointer; }
+.btn-sm{ padding:6px 10px; font-size:12px; }
+.icon-link{ background:none; border:none; color:var(--wine); font-size:12.5px; font-weight:600; cursor:pointer; padding:4px 8px; display:inline-flex; align-items:center; gap:3px; }
+.icon-link.danger{ color:var(--rust); }
+
+.warn-banner{ background:rgba(181,83,60,.12); border:1px solid rgba(181,83,60,.35); color:var(--rust); border-radius:10px; padding:10px 14px; font-size:12.5px; margin-bottom:18px; }
+
+.stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+.stat-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:15px 17px; box-shadow:var(--shadow); }
+.stat-label{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+.stat-value{ font-family:'Fraunces', serif; font-size:21px; font-weight:600; }
+.stat-value.mono{ font-family:'IBM Plex Mono', monospace; }
+
+.filter-bar{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+.filter-label{ display:flex; flex-direction:column; gap:4px; font-size:11px; color:var(--muted); font-weight:600; }
+.filter-select{ border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-size:13px; background:var(--surface); color:var(--ink); min-width:160px; }
+
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; margin-bottom:18px; box-shadow:var(--shadow); }
+.card-title{ font-size:14.5px; font-weight:700; }
+.card-sub{ font-size:12px; color:var(--muted); margin-top:2px; }
+.card-head-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+
+.table-wrap{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+.table-scroll{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; }
+th{ text-align:left; padding:11px 14px; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); border-bottom:1px solid var(--line); font-weight:700; background:var(--paper); white-space:nowrap; }
+td{ padding:10px 14px; font-size:12.5px; border-bottom:1px solid var(--line); }
+tbody tr:last-child td{ border-bottom:none; }
+tbody tr.clickable{ cursor:pointer; }
+tbody tr.clickable:hover{ background:var(--paper); }
+.td-strong{ font-weight:600; }
+.td-mono{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink); }
+.empty-row{ text-align:center; padding:26px; color:var(--muted); font-size:13px; }
+
+.badge{ display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge.paid{ background:rgba(95,122,82,.15); color:var(--sage); }
+.badge.pending{ background:rgba(181,83,60,.13); color:var(--rust); }
+.badge-dot{ width:5px; height:5px; border-radius:50%; background:currentColor; }
+
+.form-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:20px; box-shadow:var(--shadow); }
+.form-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px 16px; }
+.field{ display:flex; flex-direction:column; gap:5px; }
+.field-label{ font-size:11.5px; font-weight:600; color:var(--muted); }
+.field-label .req{ color:var(--rust); }
+.field input, .field select{ border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; color:var(--ink); background:var(--paper); width:100%; }
+.form-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+
+.gasto-section{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:var(--shadow); }
+.gasto-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.gasto-title{ font-weight:700; font-size:13.5px; }
+.gasto-sub{ font-size:11.5px; color:var(--muted); }
+.dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.gasto-list{ margin-top:12px; display:flex; flex-direction:column; gap:2px; }
+.gasto-row{ display:grid; grid-template-columns:1.4fr 1fr 1fr auto; gap:10px; align-items:center; padding:9px 4px; border-top:1px solid var(--line); }
+.gasto-row:first-child{ border-top:none; }
+
+.rank-row{ display:grid; grid-template-columns:1.6fr 1fr auto; align-items:center; gap:14px; padding:9px 0; border-top:1px solid var(--line); }
+.rank-row:first-child{ border-top:none; }
+.rank-label-row{ display:flex; align-items:baseline; gap:8px; min-width:0; }
+.rank-index{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--gold); font-weight:700; flex-shrink:0; }
+.rank-name{ font-weight:600; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rank-meta{ font-size:11px; color:var(--muted); flex-shrink:0; }
+.rank-value{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; font-weight:600; text-align:right; }
+.bar-track{ height:7px; background:var(--paper); border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+.bar-fill{ height:100%; background:linear-gradient(90deg, var(--wine), var(--gold)); border-radius:6px; }
+
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.dynamic-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px; }
+.dynamic-block{ border:1px solid var(--line); border-radius:10px; padding:13px 15px; background:var(--paper); }
+.dynamic-head{ display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:8px; }
+.dynamic-count{ color:var(--muted); font-weight:500; }
+.dynamic-foot{ display:flex; justify-content:space-between; font-size:11px; margin-top:8px; gap:8px; }
+.dynamic-foot .pend{ color:var(--rust); }
+.progress-track{ height:8px; background:var(--paper); border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+.progress-fill{ height:100%; background:var(--sage); border-radius:6px; }
+.progress-caption{ font-size:11.5px; color:var(--muted); margin-top:6px; }
+.summary-line{ display:flex; justify-content:space-between; font-size:13px; }
+.summary-line .lbl{ color:var(--muted); }
+.summary-line .val{ font-family:'IBM Plex Mono', monospace; font-weight:600; }
+.trophy-badge{ width:30px; height:30px; border-radius:9px; background:rgba(199,160,107,.18); color:var(--gold); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+/* area chart */
+.area-chart{ width:100%; height:220px; margin-top:10px; }
+.area-chart svg{ width:100%; height:100%; overflow:visible; }
+.chart-axis-label{ font-size:10px; fill:var(--muted); font-family:'IBM Plex Mono', monospace; }
+
+/* bar chart (comisiones) */
+.mchart{ display:flex; align-items:flex-end; gap:6px; padding:14px 4px 4px; height:190px; margin-top:6px; }
+.mbar{ display:flex; flex-direction:column; align-items:center; flex:1; height:100%; min-width:0; }
+.mbar-track{ flex:1; width:100%; display:flex; align-items:flex-end; max-width:26px; margin:0 auto; }
+.mbar-fill{ width:100%; background:var(--gold); border-radius:3px 3px 0 0; min-height:2px; }
+.mbar-lbl{ font-size:9.5px; color:var(--muted); margin-top:6px; font-family:'IBM Plex Mono', monospace; white-space:nowrap; }
+.mbar-val{ font-size:9px; color:var(--ink); margin-bottom:3px; font-family:'IBM Plex Mono', monospace; }
+
+/* drawer */
+.drawer-overlay{ position:fixed; inset:0; background:rgba(29,24,21,.45); display:flex; justify-content:flex-end; z-index:200; }
+.drawer{ width:420px; max-width:92vw; height:100%; background:var(--surface); box-shadow:-8px 0 30px rgba(0,0,0,.2); padding:24px; overflow-y:auto; }
+.drawer-head{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; }
+.drawer-eyebrow{ font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--gold); font-weight:700; }
+.drawer-title{ font-family:'Fraunces', serif; font-size:20px; font-weight:600; margin-top:2px; }
+.drawer-close{ background:var(--paper); border:none; border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); flex-shrink:0; }
+.drawer-amounts{ display:grid; grid-template-columns:1fr 1fr; gap:12px; background:var(--paper); border-radius:12px; padding:14px 16px; margin-bottom:20px; }
+.drawer-amount-label{ font-size:11px; color:var(--muted); margin-bottom:4px; }
+.drawer-amount-value{ font-family:'Fraunces', serif; font-size:19px; font-weight:600; }
+.drawer-section{ margin-bottom:20px; }
+.drawer-section-title{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-bottom:10px; }
+.drawer-section-hint{ font-size:11.5px; color:var(--muted); margin:-4px 0 10px; }
+.detail-row{ display:flex; align-items:center; gap:10px; padding:7px 0; font-size:13px; }
+.detail-ic{ width:26px; height:26px; border-radius:7px; background:var(--paper); display:flex; align-items:center; justify-content:center; color:var(--muted); flex-shrink:0; }
+.detail-label{ font-size:12px; color:var(--muted); flex:1; }
+.detail-value{ font-weight:600; text-align:right; }
+.drawer-link{ display:inline-block; margin-top:6px; font-size:12.5px; color:var(--wine); font-weight:600; }
+.status-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); }
+.status-row:first-of-type{ border-top:none; }
+.status-label{ font-size:13px; font-weight:600; }
+.status-hint{ font-size:11px; color:var(--muted); }
+.status-select{ border-radius:8px; padding:6px 9px; font-size:12.5px; font-weight:600; border:1px solid var(--line); }
+.drawer-actions{ display:flex; gap:10px; margin-top:6px; }
+
+/* backup modal */
+.modal-overlay{ position:fixed; inset:0; background:rgba(29,24,21,.45); display:flex; align-items:center; justify-content:center; z-index:300; padding:20px; }
+.modal{ background:var(--surface); border-radius:14px; padding:20px; width:520px; max-width:100%; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+.modal textarea{ width:100%; height:200px; margin-top:10px; border:1px solid var(--line); border-radius:8px; padding:10px; font-family:'IBM Plex Mono', monospace; font-size:11px; background:var(--paper); color:var(--ink); }
+
+/* mobile */
+@media (max-width: 780px){
+  .app{ flex-direction:column; }
+  .sidebar{ display:none; }
+  .topbar-mobile{
+    display:flex; position:sticky; top:0; z-index:50; background:var(--sidebar); color:var(--sidebar-ink);
+    padding:12px 14px; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .topbar-brand{ display:flex; align-items:center; gap:8px; font-family:'Fraunces', serif; font-weight:600; font-size:15px; }
+  .topbar-tabs{ display:flex; gap:6px; padding:8px 10px; overflow-x:auto; background:var(--sidebar); }
+  .topbar-tabs button{ flex-shrink:0; background:rgba(243,233,223,.08); border:none; color:rgba(243,233,223,.75); padding:7px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+  .topbar-tabs button.active{ background:var(--gold); color:var(--sidebar); }
+  .main{ padding:18px 14px 44px; }
+  .stats{ grid-template-columns:repeat(2,1fr); }
+  .two-col{ grid-template-columns:1fr; }
+  .form-grid{ grid-template-columns:1fr; }
+  .dynamic-grid{ grid-template-columns:1fr; }
+  .gasto-row{ grid-template-columns:1fr auto; }
+  .gasto-row .td-mono:nth-child(2){ display:none; }
+  .rank-row{ grid-template-columns:1fr; gap:6px; }
+  .rank-value{ text-align:left; }
+  .drawer{ width:100%; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+
+/* ============================================================ */
+/* SEED DATA — importado desde Ventas.xlsx (Drive · carpeta Wine&Co) */
+/* ============================================================ */
+var SEED_PEDIDOS = [{"id": "hist-1", "fechaOrdenCompra": "2023-08-21", "fechaEntrega": "", "fechaPagoFactura": "2023-08-21", "numeroFactura": "123", "facturaLink": "", "cliente": "M&M", "montoVenta": 4037325, "montoComision": 1840000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-2", "fechaOrdenCompra": "2023-08-21", "fechaEntrega": "", "fechaPagoFactura": "2023-08-21", "numeroFactura": "121", "facturaLink": "", "cliente": "M&M", "montoVenta": 3195908, "montoComision": 0, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-3", "fechaOrdenCompra": "2023-08-21", "fechaEntrega": "", "fechaPagoFactura": "2023-08-21", "numeroFactura": "122", "facturaLink": "", "cliente": "M&M", "montoVenta": 7027451, "montoComision": 0, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-4", "fechaOrdenCompra": "2023-08-24", "fechaEntrega": "", "fechaPagoFactura": "2023-08-24", "numeroFactura": "", "facturaLink": "", "cliente": "Héctor Aranda", "montoVenta": 2640560, "montoComision": 482800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-5", "fechaOrdenCompra": "2023-09-05", "fechaEntrega": "", "fechaPagoFactura": "2023-09-05", "numeroFactura": "", "facturaLink": "", "cliente": "Héctor Aranda", "montoVenta": 2851800, "montoComision": 512800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-6", "fechaOrdenCompra": "2023-09-06", "fechaEntrega": "", "fechaPagoFactura": "2023-09-06", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-7", "fechaOrdenCompra": "2023-11-16", "fechaEntrega": "", "fechaPagoFactura": "2023-11-16", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-8", "fechaOrdenCompra": "2023-11-10", "fechaEntrega": "", "fechaPagoFactura": "2023-11-10", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 10782519, "montoComision": 1281000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-9", "fechaOrdenCompra": "2024-01-12", "fechaEntrega": "", "fechaPagoFactura": "2024-01-12", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-10", "fechaOrdenCompra": "2024-04-11", "fechaEntrega": "", "fechaPagoFactura": "2024-04-11", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 11848650, "montoComision": 1436200, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-11", "fechaOrdenCompra": "2024-05-07", "fechaEntrega": "", "fechaPagoFactura": "2024-05-07", "numeroFactura": "", "facturaLink": "", "cliente": "Pachi Pap", "montoVenta": 2424000, "montoComision": 432000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-12", "fechaOrdenCompra": "2024-05-08", "fechaEntrega": "", "fechaPagoFactura": "2024-05-08", "numeroFactura": "", "facturaLink": "", "cliente": "Pachi Pap", "montoVenta": 2424000, "montoComision": 432000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-13", "fechaOrdenCompra": "2024-04-30", "fechaEntrega": "", "fechaPagoFactura": "2024-04-30", "numeroFactura": "", "facturaLink": "", "cliente": "Super Oferta", "montoVenta": 2520000, "montoComision": 240000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-14", "fechaOrdenCompra": "2024-05-09", "fechaEntrega": "", "fechaPagoFactura": "2024-05-09", "numeroFactura": "", "facturaLink": "", "cliente": "Héctor Aranda", "montoVenta": 1737600, "montoComision": 297600, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-15", "fechaOrdenCompra": "2024-05-08", "fechaEntrega": "", "fechaPagoFactura": "2024-05-08", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 4656000, "montoComision": 720000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-16", "fechaOrdenCompra": "2024-07-10", "fechaEntrega": "", "fechaPagoFactura": "2024-07-10", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 6984000, "montoComision": 1080000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-17", "fechaOrdenCompra": "2024-07-10", "fechaEntrega": "", "fechaPagoFactura": "2024-07-10", "numeroFactura": "", "facturaLink": "", "cliente": "Pachi Pap", "montoVenta": 2688000, "montoComision": 504000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-18", "fechaOrdenCompra": "2024-07-10", "fechaEntrega": "", "fechaPagoFactura": "2024-07-10", "numeroFactura": "", "facturaLink": "", "cliente": "Pachi Pap", "montoVenta": 1992000, "montoComision": 360000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-19", "fechaOrdenCompra": "2024-07-10", "fechaEntrega": "", "fechaPagoFactura": "2024-07-10", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 524999, "montoComision": 75000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-20", "fechaOrdenCompra": "2024-07-12", "fechaEntrega": "", "fechaPagoFactura": "2024-07-12", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-21", "fechaOrdenCompra": "2024-07-10", "fechaEntrega": "", "fechaPagoFactura": "2024-07-10", "numeroFactura": "", "facturaLink": "", "cliente": "Héctor Aranda", "montoVenta": 1424280, "montoComision": 282000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-22", "fechaOrdenCompra": "2024-08-08", "fechaEntrega": "", "fechaPagoFactura": "2024-08-08", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 15385819, "montoComision": 2048000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-23", "fechaOrdenCompra": "2024-08-16", "fechaEntrega": "", "fechaPagoFactura": "2024-08-16", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/1oMneUH5U7CDIBRSHOkHuxuX8f75Gu_E7/view?usp=drive_link", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-24", "fechaOrdenCompra": "2024-08-19", "fechaEntrega": "", "fechaPagoFactura": "2024-08-19", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/1Bn9ws-ziABJdNV8sOdyyea_lAuBuNgy7/view?usp=drive_link", "cliente": "El Trebol", "montoVenta": 9751943, "montoComision": 1712000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-25", "fechaOrdenCompra": "2024-08-14", "fechaEntrega": "", "fechaPagoFactura": "2024-08-14", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/1y38VjBoxPgTHXMva2LKMtw7lOF1D3s2j/view?usp=drive_link", "cliente": "M&M", "montoVenta": 11447989, "montoComision": 1800000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-26", "fechaOrdenCompra": "2024-08-19", "fechaEntrega": "", "fechaPagoFactura": "2024-08-19", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/162H9qQylSLT0ypWqm8dUYZcXa6wrg5o7/view?usp=drive_link", "cliente": "Héctor Aranda", "montoVenta": 1737600, "montoComision": 297600, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-27", "fechaOrdenCompra": "2024-08-29", "fechaEntrega": "", "fechaPagoFactura": "2024-08-29", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 8157882, "montoComision": 1374900, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-28", "fechaOrdenCompra": "2024-09-16", "fechaEntrega": "", "fechaPagoFactura": "2024-09-16", "numeroFactura": "", "facturaLink": "", "cliente": "El manzano", "montoVenta": 960000, "montoComision": 240000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-29", "fechaOrdenCompra": "2024-09-09", "fechaEntrega": "", "fechaPagoFactura": "2024-09-09", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/1vYoydOnYusIT9OhlGNkxEPPW5jU_zkde/view?usp=drive_link", "cliente": "M&M", "montoVenta": 2923585, "montoComision": 512000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-30", "fechaOrdenCompra": "2024-09-10", "fechaEntrega": "", "fechaPagoFactura": "2024-09-10", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/1TsVvuSSS7oPBu1iOofOaaSchCl0FgV-n/view?usp=drive_link", "cliente": "M&M", "montoVenta": 1033995, "montoComision": 176000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-31", "fechaOrdenCompra": "2024-09-12", "fechaEntrega": "", "fechaPagoFactura": "2024-09-12", "numeroFactura": "", "facturaLink": "https://drive.google.com/file/d/1sgXV_o_Cr7bERNyvL58naMsYdhgdSsln/view?usp=drive_link", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-32", "fechaOrdenCompra": "2024-10-23", "fechaEntrega": "", "fechaPagoFactura": "2024-10-23", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 6336000, "montoComision": 960000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-33", "fechaOrdenCompra": "2024-10-23", "fechaEntrega": "", "fechaPagoFactura": "2024-10-23", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 3168000, "montoComision": 480000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-34", "fechaOrdenCompra": "2024-10-23", "fechaEntrega": "", "fechaPagoFactura": "2024-10-23", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 3168000, "montoComision": 480000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-35", "fechaOrdenCompra": "2024-10-23", "fechaEntrega": "", "fechaPagoFactura": "2024-10-23", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 3168000, "montoComision": 480000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-36", "fechaOrdenCompra": "2024-10-23", "fechaEntrega": "", "fechaPagoFactura": "2024-10-23", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 7743000, "montoComision": 450000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-37", "fechaOrdenCompra": "2024-10-11", "fechaEntrega": "", "fechaPagoFactura": "2024-10-11", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-38", "fechaOrdenCompra": "2024-11-22", "fechaEntrega": "", "fechaPagoFactura": "2024-11-22", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16473600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-39", "fechaOrdenCompra": "2024-12-16", "fechaEntrega": "", "fechaPagoFactura": "2024-12-16", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 7983333, "montoComision": 998400, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-40", "fechaOrdenCompra": "2024-12-16", "fechaEntrega": "", "fechaPagoFactura": "2024-12-16", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 5987499, "montoComision": 748800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-41", "fechaOrdenCompra": "2024-12-30", "fechaEntrega": "", "fechaPagoFactura": "2024-12-30", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-42", "fechaOrdenCompra": "2025-02-21", "fechaEntrega": "", "fechaPagoFactura": "2025-02-21", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-43", "fechaOrdenCompra": "2025-03-10", "fechaEntrega": "", "fechaPagoFactura": "2025-03-10", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 10857600, "montoComision": 1459200, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-44", "fechaOrdenCompra": "2025-03-14", "fechaEntrega": "", "fechaPagoFactura": "2025-03-14", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-45", "fechaOrdenCompra": "2025-04-09", "fechaEntrega": "", "fechaPagoFactura": "2025-04-09", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-46", "fechaOrdenCompra": "2025-05-15", "fechaEntrega": "", "fechaPagoFactura": "2025-05-15", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 9372251, "montoComision": 1329600, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-47", "fechaOrdenCompra": "2025-05-30", "fechaEntrega": "", "fechaPagoFactura": "2025-05-30", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-48", "fechaOrdenCompra": "2025-06-12", "fechaEntrega": "", "fechaPagoFactura": "2025-06-12", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 10584000, "montoComision": 1440000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-49", "fechaOrdenCompra": "2025-06-23", "fechaEntrega": "", "fechaPagoFactura": "2025-06-23", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-50", "fechaOrdenCompra": "2025-07-04", "fechaEntrega": "", "fechaPagoFactura": "2025-07-04", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-51", "fechaOrdenCompra": "2025-07-21", "fechaEntrega": "", "fechaPagoFactura": "2025-07-21", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-52", "fechaOrdenCompra": "2025-07-31", "fechaEntrega": "", "fechaPagoFactura": "2025-07-31", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 10584000, "montoComision": 1440000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-53", "fechaOrdenCompra": "2025-07-31", "fechaEntrega": "", "fechaPagoFactura": "2025-07-31", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 955996, "montoComision": 150000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-54", "fechaOrdenCompra": "2025-08-14", "fechaEntrega": "", "fechaPagoFactura": "2025-08-14", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 2719200, "montoComision": 491200, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-55", "fechaOrdenCompra": "2025-08-14", "fechaEntrega": "", "fechaPagoFactura": "2025-08-14", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 14903900, "montoComision": 2602700, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-56", "fechaOrdenCompra": "2025-09-03", "fechaEntrega": "", "fechaPagoFactura": "2025-09-03", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-57", "fechaOrdenCompra": "2025-09-01", "fechaEntrega": "", "fechaPagoFactura": "2025-09-01", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 7776000, "montoComision": 1080000, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-58", "fechaOrdenCompra": "2025-09-01", "fechaEntrega": "", "fechaPagoFactura": "2025-09-01", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 819000, "montoComision": 105000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-59", "fechaOrdenCompra": "2025-09-09", "fechaEntrega": "", "fechaPagoFactura": "2025-09-09", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 4423600, "montoComision": 707200, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-60", "fechaOrdenCompra": "2025-09-09", "fechaEntrega": "", "fechaPagoFactura": "2025-09-09", "numeroFactura": "", "facturaLink": "", "cliente": "Sin especificar", "montoVenta": 1008000, "montoComision": 192000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-61", "fechaOrdenCompra": "2025-10-28", "fechaEntrega": "", "fechaPagoFactura": "2025-10-28", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 8956800, "montoComision": 1209600, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-62", "fechaOrdenCompra": "2025-10-28", "fechaEntrega": "", "fechaPagoFactura": "2025-10-28", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 1111500, "montoComision": 142500, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-63", "fechaOrdenCompra": "2025-10-15", "fechaEntrega": "", "fechaPagoFactura": "2025-10-15", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-64", "fechaOrdenCompra": "2025-12-03", "fechaEntrega": "", "fechaPagoFactura": "2025-12-03", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 1169998, "montoComision": 150000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-65", "fechaOrdenCompra": "2025-12-03", "fechaEntrega": "", "fechaPagoFactura": "2025-12-03", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18969600, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-66", "fechaOrdenCompra": "2025-12-03", "fechaEntrega": "", "fechaPagoFactura": "2025-12-03", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 7776000, "montoComision": 1080000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-67", "fechaOrdenCompra": "2026-01-09", "fechaEntrega": "", "fechaPagoFactura": "2026-01-09", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-68", "fechaOrdenCompra": "2026-03-02", "fechaEntrega": "", "fechaPagoFactura": "", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pendiente", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-69", "fechaOrdenCompra": "2026-01-21", "fechaEntrega": "", "fechaPagoFactura": "2026-01-21", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 4475000, "montoComision": 447500, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-70", "fechaOrdenCompra": "2026-01-21", "fechaEntrega": "", "fechaPagoFactura": "2026-01-21", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 7056000, "montoComision": 960000, "estadoFactura": "Pagado", "estadoComision": "Pagado", "comisionTitinPagada": "Pagado"}, {"id": "hist-71", "fechaOrdenCompra": "2026-03-20", "fechaEntrega": "", "fechaPagoFactura": "2026-03-20", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 9051840, "montoComision": 1459200, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-72", "fechaOrdenCompra": "2026-03-30", "fechaEntrega": "", "fechaPagoFactura": "2026-03-30", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-73", "fechaOrdenCompra": "2026-04-01", "fechaEntrega": "", "fechaPagoFactura": "2026-04-01", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 997920, "montoComision": 131040, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-74", "fechaOrdenCompra": "2026-04-14", "fechaEntrega": "", "fechaPagoFactura": "2026-04-14", "numeroFactura": "", "facturaLink": "", "cliente": "Ekomas", "montoVenta": 1521000, "montoComision": 195000, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-75", "fechaOrdenCompra": "2026-05-04", "fechaEntrega": "", "fechaPagoFactura": "2026-05-04", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-76", "fechaOrdenCompra": "2026-06-01", "fechaEntrega": "", "fechaPagoFactura": "2026-06-01", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-77", "fechaOrdenCompra": "2026-06-26", "fechaEntrega": "", "fechaPagoFactura": "2026-06-26", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-78", "fechaOrdenCompra": "2026-07-09", "fechaEntrega": "", "fechaPagoFactura": "", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pendiente", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-79", "fechaOrdenCompra": "2026-07-24", "fechaEntrega": "", "fechaPagoFactura": "", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pendiente", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-80", "fechaOrdenCompra": "2026-07-30", "fechaEntrega": "", "fechaPagoFactura": "2026-07-30", "numeroFactura": "", "facturaLink": "", "cliente": "M&M", "montoVenta": 5936400, "montoComision": 840000, "estadoFactura": "Pagado", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-81", "fechaOrdenCompra": "2026-08-12", "fechaEntrega": "", "fechaPagoFactura": "", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 16441000, "montoComision": 2869000, "estadoFactura": "Pendiente", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}, {"id": "hist-82", "fechaOrdenCompra": "2026-08-14", "fechaEntrega": "", "fechaPagoFactura": "", "numeroFactura": "", "facturaLink": "", "cliente": "El Trebol", "montoVenta": 18996800, "montoComision": 1996800, "estadoFactura": "Pendiente", "estadoComision": "Pendiente", "comisionTitinPagada": "Pendiente"}];
+var SEED_GASTOS = { sueldos: [], mercaderistas: [], otros: [] };
+
+/* ============================================================ */
+/* UTILIDADES */
+/* ============================================================ */
+var CLP = function(n){ return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(n||0); };
+var fmtDate = function(iso){
+  if(!iso) return "—";
+  var parts = iso.split("-");
+  return parts[2]+"-"+parts[1]+"-"+parts[0];
+};
+var monthKey = function(iso){ return iso ? iso.slice(0,7) : null; };
+var MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+var monthLabel = function(key){
+  if(!key) return "";
+  var p = key.split("-");
+  return MESES[parseInt(p[1],10)-1] + " " + p[0].slice(2);
+};
+var uid = function(){ return "p-" + Date.now() + "-" + Math.random().toString(36).slice(2,8); };
+var pct = function(part,total){ return total ? Math.round((part/total)*100) : 0; };
+var esc = function(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+};
+
+/* ============================================================ */
+/* PERSISTENCIA (localStorage real — antes usaba una API inexistente) */
+/* ============================================================ */
+var STORAGE_KEY_PEDIDOS = "wineco.pedidos";
+var STORAGE_KEY_GASTOS = "wineco.gastos";
+var saveStatus = "idle"; // idle | saved | error | unavailable
+
+function loadState(){
+  try{
+    var p = localStorage.getItem(STORAGE_KEY_PEDIDOS);
+    var g = localStorage.getItem(STORAGE_KEY_GASTOS);
+    return {
+      pedidos: p ? JSON.parse(p) : SEED_PEDIDOS,
+      gastos: g ? JSON.parse(g) : SEED_GASTOS
+    };
+  }catch(e){
+    console.error("Error cargando datos", e);
+    saveStatus = "unavailable";
+    return { pedidos: SEED_PEDIDOS, gastos: SEED_GASTOS };
+  }
+}
+
+function persist(){
+  try{
+    localStorage.setItem(STORAGE_KEY_PEDIDOS, JSON.stringify(STATE.pedidos));
+    localStorage.setItem(STORAGE_KEY_GASTOS, JSON.stringify(STATE.gastos));
+    saveStatus = "saved";
+  }catch(e){
+    console.error("Error guardando", e);
+    saveStatus = "error";
+  }
+}
+
+/* ============================================================ */
+/* ESTADO GLOBAL */
+/* ============================================================ */
+var loaded = loadState();
+var STATE = {
+  tab: "pedidos",
+  pedidos: loaded.pedidos,
+  gastos: loaded.gastos,
+  filtroCliente: "todos",
+  filtroTitin: "todos",
+  showForm: false,
+  editId: null,
+  detailId: null,
+  gastoOpenForm: null,
+  backupModal: null // "export" | "import" | null
+};
+
+function setState(patch){
+  Object.assign(STATE, patch);
+  render();
+}
+
+function savePedidos(next){
+  STATE.pedidos = next;
+  persist();
+  render();
+}
+function saveGastos(next){
+  STATE.gastos = next;
+  persist();
+  render();
+}
+
+/* ============================================================ */
+/* ICONOS (inline SVG) */
+/* ============================================================ */
+function icon(paths, size){
+  size = size || 18;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';
+}
+var ICONS = {
+  grape: icon('<circle cx="12" cy="6" r="2.4"/><circle cx="8" cy="10" r="2.4"/><circle cx="16" cy="10" r="2.4"/><circle cx="6" cy="14.5" r="2.4"/><circle cx="12" cy="14.5" r="2.4"/><circle cx="18" cy="14.5" r="2.4"/><circle cx="9" cy="19" r="2.4"/><circle cx="15" cy="19" r="2.4"/><path d="M12 6V2"/>', 22),
+  box: icon('<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>', 17),
+  coins: icon('<ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v5c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M3 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M15 10.2c2.9.4 5 1.5 5 2.8s-2.1 2.4-5 2.8"/><path d="M15 15v2c0 1.3 2.1 2.4 5 2.8v-5"/>', 17),
+  chart: icon('<path d="M4 20V10"/><path d="M11 20V4"/><path d="M18 20v-7"/>', 17),
+  plus: icon('<path d="M12 5v14"/><path d="M5 12h14"/>', 15),
+  trash: icon('<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>', 14),
+  trophy: icon('<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v6a5 5 0 01-10 0V4z"/><path d="M7 5H4a3 3 0 003 5"/><path d="M17 5h3a3 3 0 01-3 5"/>', 16),
+  close: icon('<path d="M18 6L6 18"/><path d="M6 6l12 12"/>', 18),
+  file: icon('<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>', 15),
+  truck: icon('<path d="M2 8h11v8H2z"/><path d="M13 11h4l3 3v2h-7z"/><circle cx="6" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>', 15)
+};
+
+/* ============================================================ */
+/* CÁLCULOS COMPARTIDOS */
+/* ============================================================ */
+function computeResultados(pedidos, gastos){
+  var totalVenta=0, totalComision=0, facturaPagada=0, comisionRecibida=0, comisionPagadaTitin=0;
+  pedidos.forEach(function(p){
+    var venta = Number(p.montoVenta||0), comision = Number(p.montoComision||0);
+    totalVenta += venta; totalComision += comision;
+    if(p.estadoFactura==="Pagado") facturaPagada += venta;
+    if(p.estadoComision==="Pagado") comisionRecibida += comision;
+    if(p.comisionTitinPagada==="Pagado") comisionPagadaTitin += comision;
+  });
+  var facturaPendiente = totalVenta - facturaPagada;
+  var comisionPorRecibir = totalComision - comisionRecibida;
+  var comisionPendienteTitin = totalComision - comisionPagadaTitin;
+  var totalGastos = ["sueldos","mercaderistas","otros"].reduce(function(s,k){
+    return s + gastos[k].reduce(function(a,x){ return a+Number(x.monto||0); },0);
+  },0);
+  var utilidadNeta = totalComision - totalGastos;
+
+  var mapCliente = {};
+  pedidos.forEach(function(p){
+    var c = p.cliente || "Sin especificar";
+    if(!mapCliente[c]) mapCliente[c] = { cliente:c, venta:0, comision:0, pedidos:0 };
+    mapCliente[c].venta += Number(p.montoVenta||0);
+    mapCliente[c].comision += Number(p.montoComision||0);
+    mapCliente[c].pedidos += 1;
+  });
+  var porCliente = Object.values(mapCliente).sort(function(a,b){ return b.venta-a.venta; });
+
+  var mapMes = {};
+  pedidos.forEach(function(p){
+    var key = monthKey(p.fechaOrdenCompra);
+    if(!key) return;
+    if(!mapMes[key]) mapMes[key] = { mes:key, venta:0, comision:0 };
+    mapMes[key].venta += Number(p.montoVenta||0);
+    mapMes[key].comision += Number(p.montoComision||0);
+  });
+  var evolutivo = Object.values(mapMes).sort(function(a,b){ return a.mes.localeCompare(b.mes); })
+    .map(function(x){ return Object.assign({}, x, { label: monthLabel(x.mes) }); });
+
+  return {
+    totalVenta:totalVenta, totalComision:totalComision, facturaPagada:facturaPagada, facturaPendiente:facturaPendiente,
+    comisionRecibida:comisionRecibida, comisionPorRecibir:comisionPorRecibir,
+    comisionPagadaTitin:comisionPagadaTitin, comisionPendienteTitin:comisionPendienteTitin,
+    totalGastos:totalGastos, utilidadNeta:utilidadNeta, porCliente:porCliente, evolutivo:evolutivo
+  };
+}
+
+/* ============================================================ */
+/* RENDER: SHELL */
+/* ============================================================ */
+var NAV_ITEMS = [
+  { id:"pedidos", label:"Pedidos", sub:"Ventas & comisiones", icon:ICONS.box },
+  { id:"gastos", label:"Gastos", sub:"Sueldos & costos", icon:ICONS.coins },
+  { id:"resultados", label:"Resultados", sub:"Panel & evolutivo", icon:ICONS.chart }
+];
+var SAVE_LABEL = { idle:"Datos cargados", saved:"Datos guardados", error:"Error al guardar", unavailable:"Sin almacenamiento" };
+var SAVE_COLOR = { idle:"var(--gold)", saved:"var(--sage)", error:"var(--rust)", unavailable:"var(--rust)" };
+
+function renderSidebar(){
+  var items = NAV_ITEMS.map(function(it){
+    var active = STATE.tab===it.id;
+    return '<button class="nav-item'+(active?' active':'')+'" data-action="tab" data-tab="'+it.id+'">'
+      +'<span class="nav-ic">'+it.icon+'</span>'
+      +'<span><div class="nav-label">'+it.label+'</div><div class="nav-sub">'+it.sub+'</div></span>'
+      +'</button>';
+  }).join("");
+  return '<aside class="sidebar">'
+    +'<div class="brand"><div class="brand-mark">'+ICONS.grape+'</div><div><div class="brand-name">Wine&amp;Co</div><div class="brand-sub">Gestión de ventas al por mayor</div></div></div>'
+    +'<nav class="nav">'+items+'</nav>'
+    +'<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">'
+      +'<button class="btn-ghost-sm" style="color:var(--sidebar-ink);border-color:rgba(243,233,223,.25)" data-action="openBackupExport">Copiar respaldo</button>'
+      +'<button class="btn-ghost-sm" style="color:var(--sidebar-ink);border-color:rgba(243,233,223,.25)" data-action="openBackupImport">Cargar respaldo</button>'
+    +'</div>'
+    +'<div class="sidebar-foot"><span class="save-dot" style="background:'+SAVE_COLOR[saveStatus]+'"></span><span>'+SAVE_LABEL[saveStatus]+'</span></div>'
+    +'</aside>';
+}
+
+function renderTopbarMobile(){
+  var tabs = NAV_ITEMS.map(function(it){
+    return '<button class="'+(STATE.tab===it.id?'active':'')+'" data-action="tab" data-tab="'+it.id+'">'+it.label+'</button>';
+  }).join("") + '<button data-action="openBackupExport">Respaldo</button>';
+  return '<div class="topbar-mobile"><div class="topbar-brand">'+ICONS.grape+' Wine&amp;Co</div>'
+    +'<span class="save-dot" style="background:'+SAVE_COLOR[saveStatus]+'"></span></div>'
+    +'<div class="topbar-tabs">'+tabs+'</div>';
+}
+
+function pageHeader(eyebrow, title, desc, actionHtml){
+  return '<div class="page-header"><div><div class="eyebrow">'+esc(eyebrow)+'</div><h1>'+esc(title)+'</h1><p class="page-desc">'+esc(desc)+'</p></div>'+(actionHtml||"")+'</div>';
+}
+function statCard(label, value, accent, mono){
+  var color = accent==="wine" ? "var(--wine)" : accent==="rust" ? "var(--rust)" : accent==="sage" ? "var(--sage)" : "var(--ink)";
+  return '<div class="stat-card"><div class="stat-label">'+esc(label)+'</div><div class="stat-value'+(mono?' mono':'')+'" style="color:'+color+'">'+value+'</div></div>';
+}
+function badge(status){
+  var paid = status==="Pagado";
+  return '<span class="badge '+(paid?'paid':'pending')+'"><span class="badge-dot"></span>'+esc(status||"Pendiente")+'</span>';
+}
+
+/* ============================================================ */
+/* RENDER: PEDIDOS */
+/* ============================================================ */
+function renderPedidos(){
+  var clientes = Array.from(new Set(STATE.pedidos.map(function(p){ return p.cliente; }))).sort();
+  var filtrados = STATE.pedidos
+    .filter(function(p){ return STATE.filtroCliente==="todos" || p.cliente===STATE.filtroCliente; })
+    .filter(function(p){ return STATE.filtroTitin==="todos" || p.comisionTitinPagada===STATE.filtroTitin; })
+    .sort(function(a,b){ return (b.fechaOrdenCompra||"").localeCompare(a.fechaOrdenCompra||""); });
+
+  var venta=0, comision=0, pendienteTitin=0;
+  filtrados.forEach(function(p){
+    venta += Number(p.montoVenta||0);
+    comision += Number(p.montoComision||0);
+    if(p.comisionTitinPagada==="Pendiente") pendienteTitin += Number(p.montoComision||0);
+  });
+
+  var stats = statCard("Pedidos filtrados", filtrados.length, null, true)
+    + statCard("Venta total", CLP(venta))
+    + statCard("Comisión total", CLP(comision), "wine")
+    + statCard("Comisión Titin pendiente", CLP(pendienteTitin), "rust");
+
+  var filterBar = '<div class="filter-bar">'
+    + '<label class="filter-label">Cliente<select class="filter-select" data-action="filtroCliente">'
+      + ['todos'].concat(clientes).map(function(c){ return '<option value="'+esc(c)+'"'+(STATE.filtroCliente===c?' selected':'')+'>'+(c==="todos"?"Todos":esc(c))+'</option>'; }).join("")
+      + '</select></label>'
+    + '<label class="filter-label">Comisión Titin<select class="filter-select" data-action="filtroTitin">'
+      + ['todos','Pagado','Pendiente'].map(function(c){ return '<option value="'+c+'"'+(STATE.filtroTitin===c?' selected':'')+'>'+(c==="todos"?"Todos":c)+'</option>'; }).join("")
+      + '</select></label>'
+    + '</div>';
+
+  var rows = filtrados.map(function(p){
+    return '<tr class="clickable" data-action="openDetail" data-id="'+p.id+'">'
+      + '<td class="td-strong">'+esc(p.cliente)+'</td>'
+      + '<td class="td-mono">'+esc(p.numeroFactura||"—")+'</td>'
+      + '<td class="td-mono">'+fmtDate(p.fechaOrdenCompra)+'</td>'
+      + '<td class="td-mono" style="text-align:right">'+CLP(p.montoVenta)+'</td>'
+      + '<td class="td-mono" style="text-align:right;color:var(--wine);font-weight:600">'+CLP(p.montoComision)+'</td>'
+      + '<td style="text-align:center">'+badge(p.estadoFactura)+'</td>'
+      + '<td style="text-align:center">'+badge(p.estadoComision)+'</td>'
+      + '<td style="text-align:center">'+badge(p.comisionTitinPagada)+'</td>'
+      + '<td style="text-align:right;white-space:nowrap">'
+        + '<button class="icon-link" data-action="openDetail" data-id="'+p.id+'" data-stop="1">Detalle</button>'
+        + '<button class="icon-link danger" data-action="deletePedido" data-id="'+p.id+'" data-stop="1">'+ICONS.trash+'</button>'
+      + '</td></tr>';
+  }).join("");
+  if(filtrados.length===0) rows = '<tr><td colspan="9" class="empty-row">No hay pedidos que calcen con este filtro.</td></tr>';
+
+  var table = '<div class="table-wrap"><div class="table-scroll"><table><thead><tr>'
+    + '<th>Cliente</th><th>N° Factura</th><th>Orden compra</th><th style="text-align:right">Venta</th>'
+    + '<th style="text-align:right">Comisión</th><th style="text-align:center">Factura</th>'
+    + '<th style="text-align:center">Comisión</th><th style="text-align:center">Titin</th><th></th>'
+    + '</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+
+  var action = '<button class="btn btn-primary" data-action="newPedido">'+ICONS.plus+' Nuevo pedido</button>';
+  var header = pageHeader("Libro de pedidos", "Pedidos",
+    "Cada fila es una venta cerrada. Haz clic en una fila para abrir el detalle y actualizar el pago de la factura, de la comisión y de Titin.", action);
+
+  var formHtml = STATE.showForm ? pedidoFormHtml(clientes) : "";
+  var drawerHtml = STATE.detailId ? detailDrawerHtml() : "";
+
+  return header + '<div class="stats">'+stats+'</div>' + filterBar + formHtml + table + drawerHtml;
+}
+
+function pedidoFormHtml(clientesExistentes){
+  var editing = STATE.editId ? STATE.pedidos.find(function(p){ return p.id===STATE.editId; }) : null;
+  var f = editing || { cliente:"", numeroFactura:"", fechaOrdenCompra:"", fechaEntrega:"", fechaPagoFactura:"", montoVenta:"", montoComision:"", estadoFactura:"Pendiente", estadoComision:"Pendiente", comisionTitinPagada:"Pendiente", facturaLink:"" };
+  var opts = clientesExistentes.map(function(c){ return '<option value="'+esc(c)+'">'; }).join("");
+  function selectEstado(name, val){
+    return '<select name="'+name+'">'
+      + '<option value="Pendiente"'+(val==="Pendiente"?' selected':'')+'>Pendiente</option>'
+      + '<option value="Pagado"'+(val==="Pagado"?' selected':'')+'>Pagado</option>'
+      + '</select>';
+  }
+  return '<form class="form-card" data-action="submitPedido" id="pedido-form">'
+    + '<div class="form-grid">'
+      + '<label class="field"><span class="field-label">Cliente <span class="req">*</span></span><input list="clientes-list" name="cliente" value="'+esc(f.cliente)+'" placeholder="Ej: El Trebol" /></label>'
+      + '<datalist id="clientes-list">'+opts+'</datalist>'
+      + '<label class="field"><span class="field-label">N° de factura</span><input name="numeroFactura" value="'+esc(f.numeroFactura)+'" placeholder="Ej: 128" /></label>'
+      + '<label class="field"><span class="field-label">Fecha orden de compra <span class="req">*</span></span><input type="date" name="fechaOrdenCompra" value="'+esc(f.fechaOrdenCompra)+'" /></label>'
+      + '<label class="field"><span class="field-label">Fecha de entrega</span><input type="date" name="fechaEntrega" value="'+esc(f.fechaEntrega)+'" /></label>'
+      + '<label class="field"><span class="field-label">Fecha de pago de factura</span><input type="date" name="fechaPagoFactura" value="'+esc(f.fechaPagoFactura)+'" /></label>'
+      + '<label class="field"><span class="field-label">Monto de venta (CLP) <span class="req">*</span></span><input type="number" min="0" name="montoVenta" value="'+esc(f.montoVenta)+'" placeholder="0" /></label>'
+      + '<label class="field"><span class="field-label">Comisión asociada (CLP)</span><input type="number" min="0" name="montoComision" value="'+esc(f.montoComision)+'" placeholder="0" /></label>'
+      + '<label class="field"><span class="field-label">Pago de la factura</span>'+selectEstado("estadoFactura", f.estadoFactura)+'</label>'
+      + '<label class="field"><span class="field-label">Pago de la comisión</span>'+selectEstado("estadoComision", f.estadoComision)+'</label>'
+      + '<label class="field"><span class="field-label">Pago a Titin</span>'+selectEstado("comisionTitinPagada", f.comisionTitinPagada)+'</label>'
+      + '<label class="field"><span class="field-label">Link factura (opcional)</span><input name="facturaLink" value="'+esc(f.facturaLink)+'" placeholder="https://drive.google.com/..." /></label>'
+    + '</div>'
+    + '<div class="form-actions"><button type="button" class="btn btn-ghost" data-action="cancelForm">Cancelar</button><button type="submit" class="btn btn-primary">Guardar pedido</button></div>'
+    + '</form>';
+}
+
+function detailDrawerHtml(){
+  var pedido = STATE.pedidos.find(function(p){ return p.id===STATE.detailId; });
+  if(!pedido) return "";
+  var margen = pedido.montoVenta ? (pedido.montoComision/pedido.montoVenta)*100 : 0;
+  function statusRow(label, hint, field, value){
+    var paid = value==="Pagado";
+    return '<div class="status-row"><div><div class="status-label">'+label+'</div><div class="status-hint">'+hint+'</div></div>'
+      + '<select class="status-select" data-action="statusChange" data-field="'+field+'" style="background:'+(paid?'rgba(95,122,82,.15)':'rgba(181,83,60,.13)')+';color:'+(paid?'var(--sage)':'var(--rust)')+'">'
+        + '<option value="Pendiente"'+(value==="Pendiente"?' selected':'')+'>Pendiente</option>'
+        + '<option value="Pagado"'+(value==="Pagado"?' selected':'')+'>Pagado</option>'
+      + '</select></div>';
+  }
+  return '<div class="drawer-overlay" data-action="closeDrawer"><div class="drawer" onclick="event.stopPropagation()">'
+    + '<div class="drawer-head"><div><div class="drawer-eyebrow">Detalle de venta</div><div class="drawer-title">'+esc(pedido.cliente)+'</div></div>'
+      + '<button class="drawer-close" data-action="closeDrawer">'+ICONS.close+'</button></div>'
+    + '<div class="drawer-amounts"><div><div class="drawer-amount-label">Monto de venta</div><div class="drawer-amount-value">'+CLP(pedido.montoVenta)+'</div></div>'
+      + '<div><div class="drawer-amount-label">Comisión ('+margen.toFixed(1)+'%)</div><div class="drawer-amount-value" style="color:var(--wine)">'+CLP(pedido.montoComision)+'</div></div></div>'
+    + '<div class="drawer-section"><div class="drawer-section-title">Datos del pedido</div>'
+      + '<div class="detail-row"><span class="detail-ic">'+ICONS.file+'</span><span class="detail-label">N° de factura</span><span class="detail-value">'+esc(pedido.numeroFactura||"Sin número")+'</span></div>'
+      + '<div class="detail-row"><span class="detail-ic">'+ICONS.box+'</span><span class="detail-label">Fecha orden de compra</span><span class="detail-value">'+fmtDate(pedido.fechaOrdenCompra)+'</span></div>'
+      + '<div class="detail-row"><span class="detail-ic">'+ICONS.truck+'</span><span class="detail-label">Fecha de entrega</span><span class="detail-value">'+fmtDate(pedido.fechaEntrega)+'</span></div>'
+      + '<div class="detail-row"><span class="detail-ic">'+ICONS.file+'</span><span class="detail-label">Fecha de pago de factura</span><span class="detail-value">'+fmtDate(pedido.fechaPagoFactura)+'</span></div>'
+      + (pedido.facturaLink ? '<a href="'+esc(pedido.facturaLink)+'" target="_blank" rel="noreferrer" class="drawer-link">Ver factura adjunta ↗</a>' : "")
+    + '</div>'
+    + '<div class="drawer-section"><div class="drawer-section-title">Estados de pago</div><p class="drawer-section-hint">Actualiza cada estado a medida que se van cerrando los pagos.</p>'
+      + statusRow("Pago de la factura","¿El cliente ya pagó esta factura?","estadoFactura",pedido.estadoFactura)
+      + statusRow("Pago de la comisión","¿Ya se recibió/cobró la comisión de esta venta?","estadoComision",pedido.estadoComision)
+      + statusRow("Pago a Titin","¿Ya se le pagó a Titin su parte de esta comisión?","comisionTitinPagada",pedido.comisionTitinPagada)
+    + '</div>'
+    + '<div class="drawer-actions"><button class="btn btn-ghost" data-action="editPedido" data-id="'+pedido.id+'">Editar datos</button>'
+      + '<button class="btn btn-ghost" style="color:var(--rust);border-color:var(--rust)" data-action="deletePedido" data-id="'+pedido.id+'">Eliminar pedido</button></div>'
+    + '</div></div>';
+}
+
+/* ============================================================ */
+/* RENDER: GASTOS */
+/* ============================================================ */
+var GASTO_FIELDS = {
+  sueldos: [ {key:"periodo",label:"Período / glosa",placeholder:"Ej: Sueldo agosto 2026"}, {key:"fecha",label:"Fecha de pago",type:"date",required:true}, {key:"monto",label:"Monto (CLP)",type:"number",required:true} ],
+  mercaderistas: [ {key:"nombre",label:"Nombre / local",placeholder:"Ej: Mercaderista Ekomas"}, {key:"fecha",label:"Fecha de pago",type:"date",required:true}, {key:"monto",label:"Monto (CLP)",type:"number",required:true} ],
+  otros: [ {key:"concepto",label:"Concepto",placeholder:"Ej: Bencina, transporte, etc."}, {key:"fecha",label:"Fecha",type:"date",required:true}, {key:"monto",label:"Monto (CLP)",type:"number",required:true} ]
+};
+var GASTO_META = {
+  sueldos: { title:"Sueldo · Carmen Gloria", subtitle:"Pagos de remuneración registrados por fecha.", color:"var(--wine)", primaryKey:"periodo", primaryFallback:"Sueldo" },
+  mercaderistas: { title:"Mercaderistas", subtitle:"Pagos a personal de reposición y merchandising en punto de venta.", color:"var(--gold)", primaryKey:"nombre", primaryFallback:"Mercaderista" },
+  otros: { title:"Otros gastos", subtitle:"Cualquier otro costo operativo del negocio.", color:"var(--sage)", primaryKey:"concepto", primaryFallback:"Gasto" }
+};
+
+function renderGastos(){
+  var totalSueldos = STATE.gastos.sueldos.reduce(function(s,x){ return s+Number(x.monto||0); },0);
+  var totalMerc = STATE.gastos.mercaderistas.reduce(function(s,x){ return s+Number(x.monto||0); },0);
+  var totalOtros = STATE.gastos.otros.reduce(function(s,x){ return s+Number(x.monto||0); },0);
+  var totalGeneral = totalSueldos + totalMerc + totalOtros;
+
+  var stats = statCard("Sueldo Carmen Gloria", CLP(totalSueldos))
+    + statCard("Mercaderistas", CLP(totalMerc))
+    + statCard("Otros gastos", CLP(totalOtros))
+    + statCard("Gasto total", CLP(totalGeneral), "wine");
+
+  var header = pageHeader("Costos del negocio", "Gastos", "Sueldo de Carmen Gloria, pagos a mercaderistas y otros costos operativos.", "");
+
+  var sections = ["sueldos","mercaderistas","otros"].map(function(tipo){
+    return gastoSectionHtml(tipo) + (STATE.gastoOpenForm===tipo ? gastoFormHtml(tipo) : "");
+  }).join("");
+
+  return header + '<div class="stats">'+stats+'</div>' + sections;
+}
+
+function gastoSectionHtml(tipo){
+  var meta = GASTO_META[tipo];
+  var items = STATE.gastos[tipo];
+  var rows = items.map(function(x){
+    return '<div class="gasto-row">'
+      + '<span class="td-strong">'+esc(x[meta.primaryKey]||meta.primaryFallback)+'</span>'
+      + '<span class="td-mono">'+fmtDate(x.fecha)+'</span>'
+      + '<span class="td-mono" style="text-align:right;font-weight:600">'+CLP(x.monto)+'</span>'
+      + '<button class="icon-link danger" data-action="removeGasto" data-tipo="'+tipo+'" data-id="'+x.id+'">'+ICONS.trash+'</button>'
+      + '</div>';
+  }).join("");
+  if(items.length===0) rows = '<div class="empty-row">Sin registros todavía.</div>';
+  return '<section class="gasto-section"><div class="gasto-head">'
+    + '<div style="display:flex;align-items:center;gap:10px"><span class="dot" style="background:'+meta.color+'"></span>'
+      + '<div><div class="gasto-title">'+meta.title+'</div><div class="gasto-sub">'+meta.subtitle+'</div></div></div>'
+    + '<button class="btn-ghost-sm" data-action="openGastoForm" data-tipo="'+tipo+'">'+ICONS.plus+' Añadir</button>'
+    + '</div><div class="gasto-list">'+rows+'</div></section>';
+}
+
+function gastoFormHtml(tipo){
+  var fields = GASTO_FIELDS[tipo].map(function(fl){
+    return '<label class="field"><span class="field-label">'+fl.label+(fl.required?' <span class="req">*</span>':'')+'</span>'
+      + '<input type="'+(fl.type||"text")+'" name="'+fl.key+'" placeholder="'+(fl.placeholder||"")+'"'+(fl.type==="number"?' min="0"':'')+' /></label>';
+  }).join("");
+  return '<form class="form-card" style="margin-top:-8px" data-action="submitGasto" data-tipo="'+tipo+'">'
+    + '<div class="form-grid">'+fields+'</div>'
+    + '<div class="form-actions"><button type="button" class="btn btn-ghost" data-action="cancelGastoForm">Cancelar</button><button type="submit" class="btn btn-primary">Guardar</button></div>'
+    + '</form>';
+}
+
+/* ============================================================ */
+/* RENDER: RESULTADOS */
+/* ============================================================ */
+function renderResultados(){
+  var r = computeResultados(STATE.pedidos, STATE.gastos);
+  var stats = statCard("Venta total histórica", CLP(r.totalVenta))
+    + statCard("Comisión total ganada", CLP(r.totalComision), "wine")
+    + statCard("Comisión Titin pendiente", CLP(r.comisionPendienteTitin), "rust")
+    + statCard("Utilidad neta (comisión − gastos)", CLP(r.utilidadNeta), r.utilidadNeta>=0?"sage":"rust");
+
+  var header = pageHeader("Panel de resultados", "Resultados", "Cómo va el negocio: mejor cliente, resumen dinámico de ventas y comisiones, y su evolución mes a mes.", "");
+
+  var maxVenta = r.porCliente.length ? r.porCliente[0].venta : 1;
+  var rankRows = r.porCliente.map(function(c,i){
+    return '<div class="rank-row"><div class="rank-label-row">'
+      + '<span class="rank-index">'+String(i+1).padStart(2,"0")+'</span>'
+      + '<span class="rank-name">'+esc(c.cliente)+'</span>'
+      + '<span class="rank-meta">'+c.pedidos+' pedido'+(c.pedidos!==1?"s":"")+' · comisión '+CLP(c.comision)+'</span>'
+      + '</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(4,(c.venta/maxVenta)*100)+'%"></div></div>'
+      + '<div class="rank-value">'+CLP(c.venta)+'</div></div>';
+  }).join("");
+
+  var mejorClienteCard = '<div class="card"><div class="card-head-row"><div style="display:flex;align-items:center;gap:10px">'
+    + '<span class="trophy-badge">'+ICONS.trophy+'</span><div><div class="card-title">Mejor cliente</div><div class="card-sub">Ranking por volumen de venta acumulado</div></div>'
+    + '</div></div><div style="margin-top:16px">'+rankRows+'</div></div>';
+
+  function countPaid(field){ return STATE.pedidos.filter(function(p){ return p[field]==="Pagado"; }).length; }
+  function dynamicBlock(label, paidLabel, paid, pending, total, count){
+    return '<div class="dynamic-block"><div class="dynamic-head"><span>'+label+'</span><span class="dynamic-count">'+count+'/'+STATE.pedidos.length+'</span></div>'
+      + '<div class="progress-track"><div class="progress-fill" style="width:'+pct(paid,total)+'%"></div></div>'
+      + '<div class="dynamic-foot"><span>'+paidLabel+': <strong>'+CLP(paid)+'</strong></span><span class="pend">Pendiente: <strong>'+CLP(pending)+'</strong></span></div></div>';
+  }
+  var dynamicGrid = '<div class="dynamic-grid">'
+    + dynamicBlock("Facturas","Pagadas", r.facturaPagada, r.facturaPendiente, r.totalVenta, countPaid("estadoFactura"))
+    + dynamicBlock("Comisiones","Recibidas", r.comisionRecibida, r.comisionPorRecibir, r.totalComision, countPaid("estadoComision"))
+    + dynamicBlock("Pago a Titin","Liquidado", r.comisionPagadaTitin, r.comisionPendienteTitin, r.totalComision, countPaid("comisionTitinPagada"))
+    + '</div>';
+  var dynamicCard = '<div class="card"><div class="card-title">Resumen dinámico de pagos</div><div class="card-sub">Se recalcula al instante según el estado de cada venta</div>'+dynamicGrid+'</div>';
+
+  var areaChart = '<div class="card"><div class="card-title">Evolutivo de ventas</div><div class="card-sub">Monto de venta por mes, según fecha de orden de compra</div>'
+    + '<div class="area-chart">'+areaChartSvg(r.evolutivo)+'</div></div>';
+
+  var summaryCard = '<div class="card"><div class="card-title">Resumen de comisiones</div><div class="card-sub">Comisión total y estado de pago a Titin</div>'
+    + '<div style="margin-top:18px;display:flex;flex-direction:column;gap:12px">'
+      + '<div class="summary-line"><span class="lbl">Comisión total generada</span><span class="val">'+CLP(r.totalComision)+'</span></div>'
+      + '<div class="summary-line"><span class="lbl">Pagada a Titin</span><span class="val" style="color:var(--sage)">'+CLP(r.comisionPagadaTitin)+'</span></div>'
+      + '<div class="summary-line"><span class="lbl">Pendiente de pago</span><span class="val" style="color:var(--rust)">'+CLP(r.comisionPendienteTitin)+'</span></div>'
+      + '<div class="progress-track"><div class="progress-fill" style="width:'+pct(r.comisionPagadaTitin,r.totalComision)+'%"></div></div>'
+      + '<div class="progress-caption">'+pct(r.comisionPagadaTitin,r.totalComision)+'% de la comisión histórica ya está liquidada con Titin</div>'
+    + '</div></div>';
+
+  var barChart = '<div class="card"><div class="card-title">Evolutivo de comisiones</div><div class="card-sub">Comisión generada por mes</div>'
+    + barChartHtml(r.evolutivo) + '</div>';
+
+  return header + '<div class="stats">'+stats+'</div>' + mejorClienteCard + dynamicCard + areaChart
+    + '<div class="two-col">' + summaryCard + barChart + '</div>';
+}
+
+function areaChartSvg(data){
+  if(!data.length) return '<div class="empty-row">Sin datos suficientes todavía.</div>';
+  var w=760, h=200, padL=6, padR=6, padT=10, padB=22;
+  var maxV = Math.max.apply(null, data.map(function(d){ return d.venta; })) || 1;
+  var stepX = data.length>1 ? (w-padL-padR)/(data.length-1) : 0;
+  var pts = data.map(function(d,i){
+    var x = padL + stepX*i;
+    var y = padT + (1 - d.venta/maxV) * (h-padT-padB);
+    return {x:x,y:y,d:d};
+  });
+  var linePath = pts.map(function(p,i){ return (i===0?"M":"L")+p.x.toFixed(1)+","+p.y.toFixed(1); }).join(" ");
+  var areaPath = linePath + " L"+pts[pts.length-1].x.toFixed(1)+","+(h-padB)+" L"+pts[0].x.toFixed(1)+","+(h-padB)+" Z";
+  var gridLines = [0,0.25,0.5,0.75,1].map(function(t){
+    var y = padT + t*(h-padT-padB);
+    return '<line x1="'+padL+'" y1="'+y+'" x2="'+(w-padR)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
+  }).join("");
+  var labels = pts.map(function(p){
+    return '<text x="'+p.x+'" y="'+(h-6)+'" class="chart-axis-label" text-anchor="middle">'+esc(p.d.label)+'</text>';
+  }).join("");
+  var dots = pts.map(function(p){
+    return '<circle cx="'+p.x+'" cy="'+p.y+'" r="2.6" fill="var(--wine)"/>';
+  }).join("");
+  var lastPt = pts[pts.length-1];
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" role="img" aria-label="Evolutivo de ventas por mes">'
+    + '<defs><linearGradient id="ventaGrad" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="var(--wine)" stop-opacity="0.35"/><stop offset="100%" stop-color="var(--wine)" stop-opacity="0.02"/>'
+      + '</linearGradient></defs>'
+    + gridLines
+    + '<path d="'+areaPath+'" fill="url(#ventaGrad)" stroke="none"/>'
+    + '<path d="'+linePath+'" fill="none" stroke="var(--wine)" stroke-width="2.4" vector-effect="non-scaling-stroke"/>'
+    + dots
+    + '<circle cx="'+lastPt.x+'" cy="'+lastPt.y+'" r="4.2" fill="var(--wine)" stroke="var(--surface)" stroke-width="2"/>'
+    + labels
+    + '</svg>';
+}
+
+function barChartHtml(data){
+  if(!data.length) return '<div class="empty-row">Sin datos suficientes todavía.</div>';
+  var maxV = Math.max.apply(null, data.map(function(d){ return d.comision; })) || 1;
+  var bars = data.map(function(d){
+    var h = Math.max(2, (d.comision/maxV)*100);
+    return '<div class="mbar"><div class="mbar-val">'+(d.comision?(d.comision/1e6).toFixed(1)+"M":"")+'</div>'
+      + '<div class="mbar-track"><div class="mbar-fill" style="height:'+h+'%"></div></div>'
+      + '<div class="mbar-lbl">'+esc(d.label)+'</div></div>';
+  }).join("");
+  return '<div class="mchart">'+bars+'</div>';
+}
+
+/* ============================================================ */
+/* RENDER RAÍZ + EVENTOS */
+/* ============================================================ */
+function render(){
+  var body = STATE.tab==="pedidos" ? renderPedidos() : STATE.tab==="gastos" ? renderGastos() : renderResultados();
+  var warn = "";
+  if(saveStatus==="unavailable") warn = '<div class="warn-banner">El almacenamiento del navegador no está disponible en esta vista (por ejemplo, modo incógnito). Usa "Respaldo" en el menú para copiar tus datos antes de salir.</div>';
+  else if(saveStatus==="error") warn = '<div class="warn-banner">No se pudo guardar en este navegador. Usa "Respaldo" en el menú para copiar tus datos y no perderlos.</div>';
+
+  document.getElementById("app").innerHTML =
+    '<div class="app">' + renderSidebar()
+    + '<main class="main">' + renderTopbarMobile() + warn + body + '</main>'
+    + '</div>'
+    + (STATE.backupModal ? backupModalHtml() : "");
+
+  var form = document.getElementById("pedido-form");
+  if(form) form.querySelector('[name="cliente"]').focus();
+}
+
+function backupModalHtml(){
+  if(STATE.backupModal==="export"){
+    var json = JSON.stringify({ pedidos: STATE.pedidos, gastos: STATE.gastos, exportadoEl: new Date().toISOString() }, null, 2);
+    return '<div class="modal-overlay" data-action="closeModal"><div class="modal" onclick="event.stopPropagation()">'
+      + '<div class="card-title">Respaldo de tus datos</div><div class="card-sub">Selecciona todo el texto y cópialo a un lugar seguro (por ejemplo, Notas o un correo).</div>'
+      + '<textarea readonly onclick="this.select()">'+esc(json)+'</textarea>'
+      + '<div class="form-actions"><button class="btn btn-primary" data-action="closeModal">Listo</button></div>'
+      + '</div></div>';
+  }
+  return '<div class="modal-overlay" data-action="closeModal"><div class="modal" onclick="event.stopPropagation()">'
+    + '<div class="card-title">Cargar respaldo</div><div class="card-sub">Pega aquí el JSON de un respaldo exportado anteriormente.</div>'
+    + '<textarea id="import-text" placeholder="Pega el JSON del respaldo aquí..."></textarea>'
+    + '<div class="form-actions"><button class="btn btn-ghost" data-action="closeModal">Cancelar</button><button class="btn btn-primary" data-action="confirmImport">Cargar</button></div>'
+    + '</div></div>';
+}
+
+document.addEventListener("click", function(e){
+  var el = e.target.closest("[data-action]");
+  if(!el) return;
+  var action = el.getAttribute("data-action");
+
+  if(action==="tab"){ setState({ tab: el.getAttribute("data-tab"), showForm:false, editId:null, detailId:null, gastoOpenForm:null }); return; }
+  if(action==="newPedido"){ setState({ showForm:true, editId:null }); return; }
+  if(action==="cancelForm"){ setState({ showForm:false, editId:null }); return; }
+  if(action==="editPedido"){ setState({ editId: el.getAttribute("data-id"), showForm:true, detailId:null }); return; }
+  if(action==="openDetail"){ setState({ detailId: el.getAttribute("data-id") }); return; }
+  if(action==="closeDrawer"){ if(e.target===el) setState({ detailId:null }); return; }
+  if(action==="deletePedido"){
+    var id = el.getAttribute("data-id");
+    if(confirm("¿Eliminar este pedido? Esta acción no se puede deshacer.")){
+      var next = STATE.pedidos.filter(function(p){ return p.id!==id; });
+      STATE.detailId = STATE.detailId===id ? null : STATE.detailId;
+      savePedidos(next);
+    }
+    return;
+  }
+  if(action==="openGastoForm"){ setState({ gastoOpenForm: el.getAttribute("data-tipo") }); return; }
+  if(action==="cancelGastoForm"){ setState({ gastoOpenForm:null }); return; }
+  if(action==="removeGasto"){
+    var tipo = el.getAttribute("data-tipo"), gid = el.getAttribute("data-id");
+    var next = Object.assign({}, STATE.gastos);
+    next[tipo] = next[tipo].filter(function(x){ return x.id!==gid; });
+    saveGastos(next);
+    return;
+  }
+  if(action==="openBackupExport"){ setState({ backupModal:"export" }); return; }
+  if(action==="openBackupImport"){ setState({ backupModal:"import" }); return; }
+  if(action==="closeModal"){ if(e.target===el || el.tagName==="BUTTON") setState({ backupModal:null }); return; }
+  if(action==="confirmImport"){
+    var ta = document.getElementById("import-text");
+    try{
+      var data = JSON.parse(ta.value);
+      if(data.pedidos) STATE.pedidos = data.pedidos;
+      if(data.gastos) STATE.gastos = data.gastos;
+      persist();
+      setState({ backupModal:null });
+    }catch(err){
+      alert("Este texto no parece un respaldo válido de Wine&Co.");
+    }
+    return;
+  }
+});
+
+document.addEventListener("change", function(e){
+  if(e.target.matches('[data-action="filtroCliente"]')){ setState({ filtroCliente: e.target.value }); return; }
+  if(e.target.matches('[data-action="filtroTitin"]')){ setState({ filtroTitin: e.target.value }); return; }
+  if(e.target.matches('[data-action="statusChange"]')){
+    var field = e.target.getAttribute("data-field");
+    var patch = {}; patch[field] = e.target.value;
+    if(field==="estadoFactura" && e.target.value==="Pagado"){
+      var pedido = STATE.pedidos.find(function(p){ return p.id===STATE.detailId; });
+      if(pedido && !pedido.fechaPagoFactura) patch.fechaPagoFactura = new Date().toISOString().slice(0,10);
+    }
+    var next = STATE.pedidos.map(function(p){ return p.id===STATE.detailId ? Object.assign({}, p, patch) : p; });
+    savePedidos(next);
+    return;
+  }
+});
+
+document.addEventListener("submit", function(e){
+  if(e.target.matches('[data-action="submitPedido"]')){
+    e.preventDefault();
+    var fd = new FormData(e.target);
+    var f = Object.fromEntries(fd.entries());
+    if(!f.cliente || !f.fechaOrdenCompra || !f.montoVenta){ alert("Completa los campos obligatorios: cliente, fecha de orden de compra y monto de venta."); return; }
+    f.montoVenta = Number(f.montoVenta)||0;
+    f.montoComision = Number(f.montoComision)||0;
+    var next;
+    if(STATE.editId){
+      next = STATE.pedidos.map(function(p){ return p.id===STATE.editId ? Object.assign({}, p, f) : p; });
+    } else {
+      next = [Object.assign({ id: uid() }, f)].concat(STATE.pedidos);
+    }
+    STATE.showForm = false; STATE.editId = null;
+    savePedidos(next);
+    return;
+  }
+  if(e.target.matches('[data-action="submitGasto"]')){
+    e.preventDefault();
+    var tipo = e.target.getAttribute("data-tipo");
+    var fd2 = new FormData(e.target);
+    var item = Object.fromEntries(fd2.entries());
+    var fields = GASTO_FIELDS[tipo];
+    for(var i=0;i<fields.length;i++){ if(fields[i].required && !item[fields[i].key]){ alert("Completa los campos obligatorios."); return; } }
+    item.monto = Number(item.monto)||0;
+    var nextG = Object.assign({}, STATE.gastos);
+    nextG[tipo] = [Object.assign({ id: uid() }, item)].concat(nextG[tipo]);
+    STATE.gastoOpenForm = null;
+    saveGastos(nextG);
+    return;
+  }
+});
+
+/* primer guardado para confirmar que el almacenamiento funciona */
+persist();
+render();
+</script>
+</body>
+</html>
