@@ -1,0 +1,11 @@
+{
+  "name": "revueltos.cl",
+  "private": true,
+  "description": "Monorepo de huevos: tienda web (Next.js + Shopify) y app móvil (Expo).",
+  "scripts": {
+    "web": "npm --prefix web run dev",
+    "web:install": "npm --prefix web install",
+    "app": "npm --prefix app run start",
+    "app:install": "npm --prefix app install"
+  }
+}
