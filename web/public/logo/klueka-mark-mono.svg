@@ -1,0 +1,6 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Klueka">
+  <path d="M62 58 C 78 40, 92 34, 100 34 C 108 34, 116 42, 128 54"
+        stroke="currentColor" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M100 14 C 130 14 154 48 159 84 C 165 124 152 168 100 190 C 48 168 35 124 41 84 C 46 48 70 14 100 14 Z"
+        fill="none" stroke="currentColor" stroke-width="8"/>
+</svg>
