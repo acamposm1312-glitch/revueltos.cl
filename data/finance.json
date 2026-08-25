@@ -1,0 +1,40 @@
+{
+  "config": {
+    "currency": "CLP",
+    "hormigaThreshold": 8000,
+    "hormigaCategories": [
+      "Cafetería",
+      "Delivery/Comida rápida",
+      "Snacks/Kiosco",
+      "Suscripciones",
+      "Apps de transporte",
+      "Entretenimiento"
+    ]
+  },
+  "categories": {
+    "ingreso": ["Sueldo", "Freelance", "Bono", "Reembolso", "Otros ingresos"],
+    "gasto": [
+      "Vivienda",
+      "Cuentas básicas",
+      "Supermercado",
+      "Alimentación",
+      "Cafetería",
+      "Delivery/Comida rápida",
+      "Snacks/Kiosco",
+      "Transporte",
+      "Apps de transporte",
+      "Salud",
+      "Educación",
+      "Entretenimiento",
+      "Suscripciones",
+      "Ropa",
+      "Mascotas",
+      "Cuidado personal",
+      "Tarjetas de crédito",
+      "Ahorro/Inversión",
+      "Otros"
+    ]
+  },
+  "transactions": [],
+  "creditCards": []
+}

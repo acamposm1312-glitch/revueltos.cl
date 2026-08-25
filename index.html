@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Finanzas Personales — revueltos.cl</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>💰 Mis Finanzas</h1>
+      <span class="sub">revueltos.cl</span>
+    </div>
+    <div class="topbar-controls">
+      <select id="monthSelect" aria-label="Mes"></select>
+      <button id="addTxBtn" class="primary">+ Movimiento</button>
+      <button id="addCardBtn">+ Tarjeta</button>
+      <button id="exportBtn" class="ghost">Exportar JSON</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="demoBanner" class="demo-banner">
+      Estás viendo <strong>datos de ejemplo</strong> para mostrar cómo funciona el panel.
+      Cuéntame tus ingresos, gastos y estados de tarjeta en el chat y los iré agregando a
+      <code>data/finance.json</code> — apenas haya un movimiento real, este aviso desaparece.
+    </div>
+
+    <section class="kpi-grid">
+      <div class="kpi-card income">
+        <div class="label">Ingresos del período</div>
+        <div class="value" id="kpiIncome">$0</div>
+      </div>
+      <div class="kpi-card expense">
+        <div class="label">Gastos del período</div>
+        <div class="value" id="kpiExpense">$0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Balance</div>
+        <div class="value" id="kpiBalance">$0</div>
+      </div>
+      <div class="kpi-card hormiga">
+        <div class="label">Gasto hormiga</div>
+        <div class="value" id="kpiHormiga">$0</div>
+        <div class="hint" id="kpiHormigaHint"></div>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Ingresos vs. gastos (últimos 6 meses)</h2>
+        </div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Gastos por categoría</h2>
+          <span class="desc">del período seleccionado</span>
+        </div>
+        <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>🐜 Ranking de gastos hormiga</h2>
+        <span class="desc">agrupados por descripción/categoría — los que más se repiten y suman</span>
+      </div>
+      <div id="hormigaList" class="hormiga-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Tarjetas de crédito</h2>
+        <span class="desc">cupo utilizado, monto facturado y próximo vencimiento</span>
+      </div>
+      <div id="cardsGrid" class="cards-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Movimientos</h2>
+      </div>
+      <div class="filters-row">
+        <select id="typeFilter" aria-label="Tipo">
+          <option value="all">Todos los tipos</option>
+          <option value="ingreso">Ingresos</option>
+          <option value="gasto">Gastos</option>
+        </select>
+        <select id="categoryFilter" aria-label="Categoría"></select>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="date">Fecha</th>
+              <th>Tipo</th>
+              <th data-sort="category">Categoría</th>
+              <th>Descripción</th>
+              <th>Método de pago</th>
+              <th data-sort="amount">Monto</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="txTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <button id="resetLocalBtn" class="ghost">Borrar movimientos agregados en este navegador</button>
+    </section>
+  </main>
+
+  <footer class="note">
+    <p>
+      Los datos reales viven en <code>data/finance.json</code>. Cuéntale a Claude tus ingresos,
+      gastos y estados de cuenta y los irá registrando ahí. Los movimientos que agregues con el
+      botón "+ Movimiento" se guardan solo en este navegador (localStorage); usa "Exportar JSON"
+      para enviárselos a Claude y que los deje guardados en el repositorio.
+    </p>
+  </footer>
+
+  <dialog id="txDialog">
+    <div class="dialog-inner">
+      <h3>Nuevo movimiento</h3>
+      <form id="txForm">
+        <div class="form-grid">
+          <label>Fecha
+            <input type="date" id="txDate" required />
+          </label>
+          <label>Tipo
+            <select id="txType">
+              <option value="gasto">Gasto</option>
+              <option value="ingreso">Ingreso</option>
+            </select>
+          </label>
+          <label>Categoría
+            <select id="txCategory"></select>
+          </label>
+          <label>Monto (CLP)
+            <input type="number" id="txAmount" min="0" step="1" required />
+          </label>
+          <label>Método de pago
+            <input type="text" id="txPayment" placeholder="efectivo, débito, crédito:Visa..." />
+          </label>
+          <label class="full">Descripción / comercio
+            <input type="text" id="txDescription" placeholder="ej: Café Starbucks" />
+          </label>
+          <div class="full checkbox-row">
+            <input type="checkbox" id="txHormiga" />
+            <label for="txHormiga" style="margin:0;color:var(--text)">Marcar manualmente como gasto hormiga</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="txCancelBtn" class="ghost">Cancelar</button>
+          <button type="submit" class="primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="cardDialog">
+    <div class="dialog-inner">
+      <h3>Nueva tarjeta de crédito</h3>
+      <form id="cardForm">
+        <div class="form-grid">
+          <label>Nombre
+            <input type="text" id="cardName" placeholder="Visa Principal" required />
+          </label>
+          <label>Banco
+            <input type="text" id="cardBank" placeholder="Banco Ejemplo" />
+          </label>
+          <label>Cupo total
+            <input type="number" id="cardCupo" min="0" step="1" required />
+          </label>
+          <label>Cupo utilizado
+            <input type="number" id="cardUtilizado" min="0" step="1" required />
+          </label>
+          <label>Monto facturado
+            <input type="number" id="cardFacturado" min="0" step="1" required />
+          </label>
+          <label>Fecha de vencimiento
+            <input type="date" id="cardVencimiento" />
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cardCancelBtn" class="ghost">Cancelar</button>
+          <button type="submit" class="primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
