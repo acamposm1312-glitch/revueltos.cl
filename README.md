@@ -1,9 +1,9 @@
-# Eggi
+# Eggy
 
 Tienda online de huevos y ovoproductos, con dos frentes:
 
 - **`web/`** — tienda web (Next.js + Shopify Storefront API).
-- **`app/`** — app móvil "Eggi" para App Store y Google Play (Expo / React Native).
+- **`app/`** — app móvil "Eggy" para App Store y Google Play (Expo / React Native).
 
 Ambas leen el catálogo y precios desde la misma tienda Shopify.
 
@@ -36,6 +36,6 @@ Escanea el QR con la app Expo Go (iOS/Android) para probarla en un dispositivo r
 
 - [x] Estructura del monorepo (web + app)
 - [x] Integración con Shopify Storefront API (listado y detalle de producto)
-- [ ] Conectar a la tienda Shopify definitiva de Eggi (aún no creada)
+- [ ] Conectar a la tienda Shopify definitiva de Eggy (aún no creada)
 - [ ] Carrito y checkout
 - [ ] Publicación en App Store / Google Play

@@ -33,7 +33,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-      <Text style={styles.title}>Eggi</Text>
+      <Text style={styles.title}>Eggy</Text>
       <Text style={styles.subtitle}>
         Huevos frescos y ovoproductos, directo a tu casa.
       </Text>

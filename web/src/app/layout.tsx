@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eggi | Huevos frescos a domicilio",
+  title: "Eggy | Huevos frescos a domicilio",
   description: "Huevos frescos y ovoproductos a domicilio en Chile.",
 };
 

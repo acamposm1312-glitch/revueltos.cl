@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Eggi",
-    "slug": "eggi",
+    "name": "Eggy",
+    "slug": "eggy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "cl.eggi.app"
+      "bundleIdentifier": "cl.eggy.app"
     },
     "android": {
-      "package": "cl.eggi.app",
+      "package": "cl.eggy.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
