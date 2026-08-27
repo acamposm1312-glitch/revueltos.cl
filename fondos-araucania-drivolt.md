@@ -1,13 +1,20 @@
 # Fondos concursables para DRIVOLT (Región de La Araucanía)
 
-Investigación de instrumentos de financiamiento público aplicables a DRIVOLT, distribuidora de vinos y licores con 9 meses de antigüedad, domiciliada en la Región de La Araucanía. Fecha de la investigación: 26-08-2026.
+Investigación de instrumentos de financiamiento público aplicables a DRIVOLT, distribuidora de vinos y licores domiciliada en la Región de La Araucanía. Fecha de la investigación: 26-08-2026, actualizada 27-08-2026 con datos confirmados en el SII.
+
+## Datos confirmados en el SII (Mi SII)
+
+- **Giro vigente:** 463020 – Venta al por mayor de bebidas alcohólicas y no alcohólicas (más 463019 – abarrotes/lácteos como giro secundario). Calza exactamente con "distribuidora de vinos y licores".
+- **Fecha de inicio de actividades:** 25-11-2025 → **9 meses de antigüedad** a la fecha de esta investigación, confirmando el dato original.
+- No se requiere agregar ni corregir ningún giro ante el SII para postular.
+- Nota de privacidad: este documento vive en un repositorio público de GitHub, por lo que deliberadamente **no incluye el RUT de la empresa ni el del representante legal** (datos personales identificables). Consérvalos aparte para usarlos en las postulaciones o en la correspondencia con SERCOTEC.
 
 ## Resumen ejecutivo
 
-- **SERCOTEC es la vía más viable**, no CORFO: los instrumentos "semilla" de CORFO (Semilla Inicia/Expande) financian solo proyectos productivos o de servicios innovadores y **excluyen explícitamente el "comercio de mera reventa"**, categoría en la que cae una distribuidora. SERCOTEC sí financia comercio y ha aceptado botillerías (venta de bebidas alcohólicas) en programas como "Digitaliza tu Almacén", por lo que el giro de DRIVOLT no está categóricamente excluido — aun así, **conviene confirmar por escrito con la oficina SERCOTEC Araucanía** que el giro específico de DRIVOLT es elegible antes de invertir tiempo en una postulación, ya que no encontré una lista pública y actualizada de "giros no financiables" por instrumento.
-- **La antigüedad de 9 meses es el factor limitante.** La mayoría de los fondos SERCOTEC para empresas ya operando (Crece, Crece Sostenible) piden **más de 1 año** de antigüedad y ventas anuales de 200–25.000 UF. Los fondos para "nuevos negocios" (Capital Semilla Emprende, Capital Abeja Emprende) piden **cero inicio de actividades previo**, por lo que tampoco calzan con una empresa que ya factura hace 9 meses.
+- **SERCOTEC es la vía más viable**, no CORFO: los instrumentos "semilla" de CORFO (Semilla Inicia/Expande) financian solo proyectos productivos o de servicios innovadores y **excluyen explícitamente el "comercio de mera reventa"**, categoría en la que cae una distribuidora. SERCOTEC sí financia comercio y ha aceptado botillerías (venta de bebidas alcohólicas) en programas como "Digitaliza tu Almacén", y el giro 463020 de DRIVOLT calza directamente con esa categoría — aun así, **conviene confirmar por escrito con la oficina SERCOTEC Araucanía** antes de invertir tiempo en una postulación, ya que no encontré una lista pública y actualizada de "giros no financiables" por instrumento.
+- **La antigüedad de 9 meses es el factor limitante**, pero con una fecha límite concreta: DRIVOLT cumple 1 año el **25-11-2026**. La mayoría de los fondos SERCOTEC para empresas ya operando (Crece, Crece Sostenible) piden **más de 1 año** de antigüedad y ventas anuales de 200–25.000 UF. Los fondos para "nuevos negocios" (Capital Semilla Emprende, Capital Abeja Emprende) piden **cero inicio de actividades previo**, por lo que tampoco calzan con una empresa que ya factura hace 9 meses.
   - La excepción es el **Fondo Crece nacional 2026**, que sí tuvo una línea especial para empresas de **menos de 1 año** (mínimo 3 meses de iniciación de actividades y ventas ≥ 20 UF) — exactamente el perfil de DRIVOLT — pero su postulación 2026 ya cerró (junio 2026).
-- **Hay una ventana próxima**: SERCOTEC confirmó llamados regionales en octubre de 2026 para varias regiones, **incluida La Araucanía**. Aún no se público el instrumento/fecha exacta; hay que monitorear el sitio de SERCOTEC en septiembre.
+- **Hay una ventana próxima y con timing crítico**: SERCOTEC confirmó llamados regionales en octubre de 2026 para varias regiones, **incluida La Araucanía**. Si DRIVOLT postula **antes del 25-11-2026**, todavía califica en la línea "empresa nueva" (más fácil: solo ventas ≥20 UF). Si postula después, pasa a la línea estándar (ventas anuales 200–25.000 UF, un umbral bastante más alto). Conviene priorizar esta convocatoria de octubre. Aún no se publica el instrumento/fecha exacta; hay que monitorear el sitio de SERCOTEC en septiembre.
 
 ## Fondos evaluados
 
@@ -59,12 +66,12 @@ Investigación de instrumentos de financiamiento público aplicables a DRIVOLT, 
 
 ## Recomendaciones concretas para DRIVOLT
 
-1. **Confirmar elegibilidad del giro por escrito** con SERCOTEC Araucanía (O'Higgins 480, Temuco) o vía el portal "Mis Datos" (misdatos.sercotec.cl), indicando el código de actividad económica exacto de DRIVOLT ante el SII.
+1. **Confirmar elegibilidad del giro 463020 por escrito** con SERCOTEC Araucanía (O'Higgins 480, Temuco) o vía el portal "Mis Datos" (misdatos.sercotec.cl).
 2. **Inscribirse ahora en los cursos gratuitos de Ruta Digital** (rutadigital.cl) para quedar habilitado en la próxima convocatoria de Kit Digital Araucanía.
 3. **Aprobar 3 de los 6 cursos virtuales de capacitación SERCOTEC** — requisito transversal para formalizar cualquier subsidio adjudicado.
-4. **Monitorear el llamado regional de Araucanía de octubre de 2026** y la próxima versión del Fondo Crece (línea empresas <1 año), que es el instrumento con mejor calce para el perfil actual de DRIVOLT.
+4. **Priorizar el llamado regional de Araucanía de octubre de 2026** (Fondo Crece, línea empresas <1 año) y postular antes del **25-11-2026** para calificar con el requisito más bajo (ventas ≥20 UF en vez de 200-25.000 UF).
 5. Si la propietaria/representante legal es mujer, evaluar **Crece Mujer** en la próxima ronda regional.
-6. Cuando DRIVOLT cumpla 12 meses de antigüedad (aprox. mayo 2027), quedará habilitada para **Fondo Crece** y **Crece Sostenible** estándar (hasta $9.000.000).
+6. A partir del **25-11-2026** (año 1 de DRIVOLT), queda habilitada además para **Crece Sostenible** estándar (hasta $9.000.000), aunque con el umbral de ventas más exigente.
 7. Considerar **Pymes Globales / Mercados Virtuales** (postula hasta el 17-10-2026) si DRIVOLT quiere abrir canales de venta online o exportación.
 8. Revisar periódicamente el **Portal Único de Fondos Concursables** (fondos.gob.cl), filtrando por región "La Araucanía" y categoría "Emprendimiento e Innovación", para no depender solo de SERCOTEC.
 
