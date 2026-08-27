@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "huevos",
-    "slug": "huevos",
+    "name": "Eggi",
+    "slug": "eggi",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "cl.revueltos.huevos"
+      "bundleIdentifier": "cl.eggi.app"
     },
     "android": {
-      "package": "cl.revueltos.huevos",
+      "package": "cl.eggi.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

@@ -1,0 +1,5 @@
+<svg width="200" height="226" viewBox="0 0 200 226" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Eggi">
+  <path d="M100 92 C130 92 152 122 157 156 C162 192 150 214 100 216 C50 214 38 192 43 156 C48 122 70 92 100 92 Z" fill="none" stroke="currentColor" stroke-width="6"/>
+  <path d="M34 102 C34 50 62 12 100 12 C138 12 166 50 166 102 C166 112 158 118 150 112 C136 102 118 98 100 98 C82 98 64 102 50 112 C42 118 34 112 34 102 Z" fill="none" stroke="currentColor" stroke-width="6"/>
+  <ellipse cx="100" cy="76" rx="47" ry="18" fill="none" stroke="currentColor" stroke-width="6"/>
+</svg>

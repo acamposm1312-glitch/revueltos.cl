@@ -1,0 +1,9 @@
+<svg width="200" height="226" viewBox="0 0 200 226" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Eggi">
+  <path d="M100 92 C130 92 152 122 157 156 C162 192 150 214 100 216 C50 214 38 192 43 156 C48 122 70 92 100 92 Z" fill="#fffbf2" stroke="#ebd9b0" stroke-width="2"/>
+  <path d="M34 102 C34 50 62 12 100 12 C138 12 166 50 166 102 C166 112 158 118 150 112 C136 102 118 98 100 98 C82 98 64 102 50 112 C42 118 34 112 34 102 Z" fill="#e8562e"/>
+  <rect x="86" y="19" width="28" height="7" rx="3.5" fill="#c8431f"/>
+  <path d="M50 108 C 45 117 45 124 50 131" stroke="#c8431f" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M150 108 C 155 117 155 124 150 131" stroke="#c8431f" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <ellipse cx="100" cy="76" rx="47" ry="18" fill="#241b15"/>
+  <ellipse cx="80" cy="69" rx="13" ry="5" fill="#fffbf2" opacity="0.4"/>
+</svg>

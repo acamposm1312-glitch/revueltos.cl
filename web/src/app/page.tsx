@@ -21,9 +21,12 @@ export default async function HomePage() {
 
   return (
     <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-12">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold">huevos</h1>
-        <p className="text-neutral-500">Huevos frescos y ovoproductos, directo a tu casa.</p>
+      <header className="mb-10 flex items-center gap-3">
+        <Image src="/logo/eggi-mark.svg" alt="" width={40} height={45} />
+        <div>
+          <h1 className="text-3xl font-bold">Eggi</h1>
+          <p className="text-neutral-500">Huevos frescos y ovoproductos, directo a tu casa.</p>
+        </div>
       </header>
 
       {error && (
