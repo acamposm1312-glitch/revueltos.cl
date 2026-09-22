@@ -15,6 +15,22 @@ const ORIGENES_PERMITIDOS = new Set([
   `https://${config.shopify.dominio}`,
 ]);
 
+/**
+ * El formulario de la tienda se sirve desde appos.cl, pero el editor de temas de
+ * Shopify lo previsualiza desde el dominio .myshopify.com. Sin aceptar ese
+ * origen, la prueba desde el editor falla con un error de CORS que no dice nada.
+ */
+export function origenPermitido(origen) {
+  if (!origen) return false;
+  if (ORIGENES_PERMITIDOS.has(origen)) return true;
+  try {
+    const { protocol, hostname } = new URL(origen);
+    return protocol === 'https:' && hostname.endsWith('.myshopify.com');
+  } catch {
+    return false;
+  }
+}
+
 const leerCuerpo = (req, limite = 1_000_000) => new Promise((resolve, reject) => {
   let datos = '';
   let largo = 0;
@@ -33,7 +49,7 @@ function json(res, codigo, cuerpo, cabeceras = {}) {
 }
 
 function cabecerasCors(origen) {
-  if (!origen || !ORIGENES_PERMITIDOS.has(origen)) return {};
+  if (!origenPermitido(origen)) return {};
   return {
     'Access-Control-Allow-Origin': origen,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',

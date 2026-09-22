@@ -56,9 +56,13 @@ apuntando a `https://TU-SERVIDOR/webhooks/shopify`:
 1. **Tienda online** > **Temas** > `...` > **Editar codigo**
 2. **Snippets** > **Agregar snippet** > nombre `appos-asesoria`
 3. Pega el contenido de `shopify/appos-asesoria.liquid`
-4. Cambia `APPOS_API` por la direccion de tu servidor y `APPOS_WHATSAPP` por tu numero
-5. En `sections/main-product.liquid` (o en la pagina de contacto) agrega:
-   `{% render 'appos-asesoria' %}`
+4. El archivo ya trae la direccion del servidor y el WhatsApp de APPOS
+5. En el tema Horizon, agrega un bloque de **Liquid personalizado** desde el
+   editor visual con una sola linea: `{% render 'appos-asesoria' %}`
+
+El formulario acepta peticiones desde appos.cl y desde el dominio
+`.myshopify.com` con que el editor de temas previsualiza la tienda. Cualquier
+otro origen se rechaza.
 
 ## 4. Correo desde contacto@appos.cl
 
