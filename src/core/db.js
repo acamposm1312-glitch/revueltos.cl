@@ -104,6 +104,11 @@ function migrar(d) {
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_pub_unica ON publicaciones(fecha, canal, formato, producto_handle);
 
+    CREATE TABLE IF NOT EXISTS ajustes (
+      clave TEXT PRIMARY KEY,
+      valor TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS webhooks_vistos (
       id TEXT PRIMARY KEY,
       creado TEXT NOT NULL
@@ -112,3 +117,12 @@ function migrar(d) {
 }
 
 export const ahora = () => new Date().toISOString();
+
+export function leerAjuste(clave, porDefecto = '') {
+  return db().prepare('SELECT valor FROM ajustes WHERE clave = ?').get(clave)?.valor ?? porDefecto;
+}
+
+export function guardarAjuste(clave, valor) {
+  db().prepare('INSERT INTO ajustes (clave, valor) VALUES (?, ?) ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor')
+    .run(clave, String(valor));
+}

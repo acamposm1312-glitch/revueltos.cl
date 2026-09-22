@@ -7,6 +7,7 @@ import { moverEtapa } from './core/leads.js';
 import { firmaValida, yaProcesado, procesarWebhook } from './core/shopify.js';
 import { mensajeWhatsapp } from './core/plantillas.js';
 import { renderPanel } from './routes/panel.js';
+import { iniciarProgramador } from './core/programador.js';
 
 const ORIGENES_PERMITIDOS = new Set([
   'https://www.appos.cl',
@@ -171,5 +172,9 @@ if (ejecutadoDirectamente) {
     console.log(`APPOS escuchando en http://localhost:${config.servidor.puerto}`);
     if (!config.servidor.panelToken) console.log('Panel abierto solo desde localhost (define PANEL_TOKEN para acceso remoto).');
     if (!config.shopify.webhookSecret) console.log('Aviso: falta SHOPIFY_WEBHOOK_SECRET, los webhooks seran rechazados.');
+    if (config.servidor.rutinaAutomatica) {
+      iniciarProgramador();
+      console.log(`Rutina diaria activa: ${config.servidor.horaRutina}:00 hora de Chile.`);
+    }
   });
 }

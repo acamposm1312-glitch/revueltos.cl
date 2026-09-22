@@ -4,6 +4,7 @@ import { db } from '../src/core/db.js';
 import { listar, porId, moverEtapa, avanzar, eventosDe, resumenPorEtapa, guardarLead } from '../src/core/leads.js';
 import { generarTareas, colaDeHoy, completarTarea, tareasPendientes } from '../src/core/tareas.js';
 import { correrSecuencias } from '../src/core/secuencias.js';
+import { correrRutinaDiaria } from '../src/core/programador.js';
 import { generarCalendario, guardarCalendario, listarPublicaciones, publicacionesPendientes, exportarCSV } from '../src/core/contenido.js';
 import { publicarPendientes } from '../src/core/instagram.js';
 import { ETAPAS, clavesEtapas } from '../src/core/pipeline.js';
@@ -34,6 +35,7 @@ APPOS - automatizacion de ventas, contacto y publicaciones
   appos avanzar <id>              Pasa el lead a la etapa siguiente
   appos pipeline                  Resumen por etapa
 
+  appos rutina [--forzar]         Corre la rutina diaria completa (tareas + correos)
   appos secuencias [--simular]    Envia los correos de postventa que ya corresponden
   appos contenido [--cantidad N]  Genera y guarda el calendario de publicaciones
   appos calendario                Muestra el calendario guardado
@@ -141,6 +143,13 @@ async function principal() {
       console.log('');
       for (const e of ETAPAS) console.log(`  ${e.nombre.padEnd(20)} ${String(resumen.get(e.clave) ?? 0).padStart(4)}`);
       console.log('');
+      break;
+    }
+
+    case 'rutina': {
+      const r = await correrRutinaDiaria({ forzar: bandera('forzar') });
+      if (!r.corrio) { console.log(`La rutina no corrio: ${r.motivo}. Usa --forzar para correrla igual.`); break; }
+      console.log(`Rutina del ${r.fecha}: ${r.tareasCreadas} tareas creadas, ${r.correosEnviados} correos enviados, ${r.correosPendientes} no enviados.`);
       break;
     }
 

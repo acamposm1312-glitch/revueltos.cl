@@ -62,11 +62,17 @@ npm start
 ```
 
 El paso a paso completo, incluida la conexion con Shopify, esta en
-[`docs/INSTALACION.md`](docs/INSTALACION.md).
+[`docs/INSTALACION.md`](docs/INSTALACION.md). Para dejarlo corriendo en internet,
+[`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md): el repositorio trae `render.yaml`, asi
+que Render lo configura solo.
+
+Una vez desplegado no hay que programar nada mas: el servidor arma la cola del
+dia y envia los correos de postventa todos los dias a las 9:00 hora de Chile.
 
 ## Documentacion
 
 - [`docs/INSTALACION.md`](docs/INSTALACION.md) — conectar Shopify, correo e Instagram
+- [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) — dejarlo corriendo en internet
 - [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) — como operarlo dia a dia y por que cada plazo
 - [`shopify/appos-asesoria.liquid`](shopify/appos-asesoria.liquid) — widget de captura para el tema
 

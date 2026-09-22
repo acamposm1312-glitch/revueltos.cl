@@ -1,0 +1,45 @@
+# Blueprint de Render. Con este archivo en el repositorio, Render configura
+# todo solo: https://dashboard.render.com > New > Blueprint > elegir este repo.
+services:
+  - type: web
+    name: appos
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: starter          # el plan free no permite disco persistente
+    healthCheckPath: /salud
+    disk:
+      name: appos-datos
+      mountPath: /app/data # aqui vive appos.db, sobrevive a los despliegues
+      sizeGB: 1
+    envVars:
+      - key: DB_PATH
+        value: /app/data/appos.db
+      - key: APPOS_NOMBRE
+        value: APPOS
+      - key: APPOS_SITIO
+        value: https://www.appos.cl
+      - key: APPOS_CORREO
+        value: contacto@appos.cl
+      - key: APPOS_INSTAGRAM
+        value: apposchile
+      - key: APPOS_VENDEDOR
+        value: Alejandro
+      - key: SHOPIFY_SHOP_DOMAIN
+        value: www.appos.cl
+      - key: WHATSAPP_MODE
+        value: links
+      - key: EMAIL_PROVIDER
+        value: consola
+      - key: HORA_RUTINA
+        value: "9"
+      # Estos se completan a mano en el panel de Render (Environment).
+      # sync:false significa que Render los pide en vez de guardarlos en el repo.
+      - key: APPOS_WHATSAPP
+        sync: false
+      - key: SHOPIFY_WEBHOOK_SECRET
+        sync: false
+      - key: EMAIL_API_KEY
+        sync: false
+      - key: PANEL_TOKEN
+        generateValue: true   # Render inventa una clave segura

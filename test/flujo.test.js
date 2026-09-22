@@ -116,3 +116,38 @@ describe('sla', () => {
     assert.equal(slaVencido({ etapa: 'activo', etapa_desde: '2020-01-01T00:00:00.000Z' }), false);
   });
 });
+
+describe('rutina diaria', () => {
+  test('corre una vez al dia y no se repite', async () => {
+    const { correrRutinaDiaria } = await import('../src/core/programador.js');
+    const { lead } = guardarLead({ nombre: 'Ana', telefono: '987654321' });
+    db().prepare('UPDATE leads SET etapa_desde = ? WHERE id = ?')
+      .run(new Date(Date.now() - 5 * 36e5).toISOString(), lead.id);
+
+    const mediodia = new Date();
+    mediodia.setUTCHours(18, 0, 0, 0); // 15:00 en Chile, pasada la hora de la rutina
+
+    const primera = await correrRutinaDiaria({ referencia: mediodia });
+    assert.equal(primera.corrio, true);
+    assert.equal(primera.tareasCreadas, 1);
+
+    const segunda = await correrRutinaDiaria({ referencia: mediodia });
+    assert.equal(segunda.corrio, false, 'no debe correr dos veces el mismo dia');
+  });
+
+  test('no corre antes de la hora configurada', async () => {
+    const { correrRutinaDiaria } = await import('../src/core/programador.js');
+    const madrugada = new Date();
+    madrugada.setUTCHours(9, 0, 0, 0); // 06:00 en Chile
+    const r = await correrRutinaDiaria({ referencia: madrugada });
+    assert.equal(r.corrio, false);
+    assert.equal(r.motivo, 'aun no es la hora');
+  });
+
+  test('--forzar la corre igual', async () => {
+    const { correrRutinaDiaria } = await import('../src/core/programador.js');
+    const madrugada = new Date();
+    madrugada.setUTCHours(9, 0, 0, 0);
+    assert.equal((await correrRutinaDiaria({ referencia: madrugada, forzar: true })).corrio, true);
+  });
+});

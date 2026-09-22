@@ -64,6 +64,10 @@ export const config = {
     puerto: Number(env('PORT', '3000')),
     // Protege el panel y los endpoints de accion. Obligatorio fuera de localhost.
     panelToken: env('PANEL_TOKEN', ''),
+    // Hora local a la que se arma la cola del dia y salen los correos de postventa.
+    horaRutina: Number(env('HORA_RUTINA', '9')),
+    // Poner en '0' para desactivar la rutina automatica dentro del servidor.
+    rutinaAutomatica: env('RUTINA_AUTOMATICA', '1') !== '0',
   },
   db: {
     ruta: env('DB_PATH', resolve(ROOT, 'data', 'appos.db')),
