@@ -1,0 +1,15 @@
+asunto: Como dejar tu maquina TUU lista para vender
+---
+{{saludo}},
+
+Cuando te llegue el equipo, estos son los cuatro pasos para dejarlo operativo:
+
+1. Enciende el equipo y conectalo a wifi o usa el plan movil que viene incluido.
+2. Activa tu firma electronica simple. Sin ella el equipo no emite boleta electronica.
+3. Carga tus productos con nombre y precio, asi cobras sin teclear cada monto.
+4. Haz una venta de prueba y revisa que la boleta salga correcta.
+
+Si algo se traba en cualquiera de estos pasos, escribeme. No tienes que resolverlo solo ni esperar en una fila de soporte.
+
+{{vendedor}}
+{{negocio}} - WhatsApp +{{whatsapp}}

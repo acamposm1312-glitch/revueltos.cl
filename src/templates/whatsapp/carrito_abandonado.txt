@@ -1,0 +1,5 @@
+{{saludo}}, soy {{vendedor}} de {{negocio}}. Vi que quedaste a medio camino con tu compra en {{sitio}}.
+
+Si fue por una duda, preguntame: soy distribuidor oficial TUU y te puedo decir con franqueza si ese equipo te sirve o si te conviene otro mas barato.
+
+Si fue por el medio de pago, tambien lo podemos arreglar por aca.

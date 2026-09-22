@@ -1,0 +1,14 @@
+asunto: Tu firma electronica esta por vencer
+---
+{{saludo}},
+
+Tu firma electronica simple esta llegando a su vencimiento.
+
+Es importante: sin firma vigente tu equipo TUU deja de emitir boleta electronica. No es un aviso comercial, es un requisito del SII.
+
+{{recomendacion}}
+
+Respondeme y la dejo renovada antes de que te afecte la operacion.
+
+{{vendedor}}
+{{negocio}} - {{sitio}}

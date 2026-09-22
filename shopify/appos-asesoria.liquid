@@ -1,0 +1,106 @@
+{%- comment -%}
+  APPOS - bloque de asesoria y captura de leads.
+
+  Instalacion:
+  1. Shopify admin > Tienda online > Temas > ... > Editar codigo
+  2. Snippets > Agregar snippet nuevo > nombre: appos-asesoria
+  3. Pega este archivo completo
+  4. Donde lo quieras mostrar (por ejemplo en sections/main-product.liquid o
+     en la pagina de contacto) agrega:  {% raw %}{% render 'appos-asesoria' %}{% endraw %}
+  5. Cambia APPOS_API por la direccion publica de tu servidor.
+{%- endcomment -%}
+
+{%- assign APPOS_API = 'https://TU-SERVIDOR.cl' -%}
+{%- assign APPOS_WHATSAPP = '56900000000' -%}
+
+<div class="appos-asesoria" id="appos-asesoria">
+  <h3>No sabes cual te sirve?</h3>
+  <p>Somos distribuidor oficial TUU. Cuentanos tu rubro y te decimos con franqueza que equipo necesitas, aunque sea el mas barato.</p>
+
+  <form id="appos-form" novalidate>
+    <input type="text" name="nombre" placeholder="Tu nombre" autocomplete="name" required>
+    <input type="tel" name="telefono" placeholder="WhatsApp (9 1234 5678)" autocomplete="tel" required>
+    <input type="email" name="email" placeholder="Correo (opcional)" autocomplete="email">
+    <select name="rubro" required>
+      <option value="">Que tipo de negocio tienes?</option>
+      <option value="almacen">Almacen / minimarket</option>
+      <option value="restaurante">Restaurante / cafeteria</option>
+      <option value="comida-rapida">Comida rapida / food truck</option>
+      <option value="feria">Feria / ambulante / delivery</option>
+      <option value="retail">Tienda / retail</option>
+      <option value="servicios">Peluqueria / servicios</option>
+    </select>
+    <textarea name="mensaje" rows="2" placeholder="Que necesitas resolver? (opcional)"></textarea>
+
+    {%- comment -%} Trampa anti-spam: invisible para personas, la llenan los bots. {%- endcomment -%}
+    <input type="text" name="sitio_web" tabindex="-1" autocomplete="off" aria-hidden="true" class="appos-trampa">
+
+    {%- if product -%}
+      <input type="hidden" name="origen" value="producto:{{ product.handle }}">
+    {%- else -%}
+      <input type="hidden" name="origen" value="web">
+    {%- endif -%}
+
+    <button type="submit">Quiero que me asesoren</button>
+    <p class="appos-estado" id="appos-estado" role="status"></p>
+  </form>
+
+  <a class="appos-wa" href="https://wa.me/{{ APPOS_WHATSAPP }}?text={{ 'Hola, vengo desde appos.cl y quiero informacion sobre las maquinas TUU' | url_encode }}" target="_blank" rel="noopener">
+    O escribenos directo por WhatsApp
+  </a>
+</div>
+
+<style>
+  .appos-asesoria{border:1px solid #e3e6ea;border-radius:14px;padding:20px;margin:24px 0;max-width:520px}
+  .appos-asesoria h3{margin:0 0 6px;font-size:19px}
+  .appos-asesoria p{margin:0 0 14px;color:#5f6975;font-size:14px;line-height:1.5}
+  .appos-asesoria input,.appos-asesoria select,.appos-asesoria textarea{width:100%;padding:11px 12px;margin-bottom:9px;border:1px solid #d7dbe0;border-radius:8px;font-size:15px;font-family:inherit}
+  .appos-asesoria button{width:100%;padding:13px;border:0;border-radius:8px;background:#075e54;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .appos-asesoria button[disabled]{opacity:.6;cursor:progress}
+  .appos-trampa{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important}
+  .appos-wa{display:block;text-align:center;margin-top:12px;color:#075e54;font-weight:600;text-decoration:none;font-size:14px}
+  .appos-estado{margin:10px 0 0;font-size:14px;min-height:20px}
+  .appos-estado.ok{color:#0a7c3f}
+  .appos-estado.error{color:#b42318}
+</style>
+
+<script>
+(function () {
+  var form = document.getElementById('appos-form');
+  var estado = document.getElementById('appos-estado');
+  if (!form) return;
+
+  form.addEventListener('submit', function (evento) {
+    evento.preventDefault();
+    var boton = form.querySelector('button[type=submit]');
+    var datos = Object.fromEntries(new FormData(form).entries());
+
+    if (!datos.telefono && !datos.email) {
+      estado.className = 'appos-estado error';
+      estado.textContent = 'Dejanos un WhatsApp o un correo para poder responderte.';
+      return;
+    }
+
+    boton.disabled = true;
+    estado.className = 'appos-estado';
+    estado.textContent = 'Enviando...';
+
+    fetch({{ APPOS_API | json }} + '/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+      .then(function (r) { if (!r.ok) throw new Error('respuesta ' + r.status); return r.json(); })
+      .then(function () {
+        form.reset();
+        estado.className = 'appos-estado ok';
+        estado.textContent = 'Listo. Te escribimos por WhatsApp dentro de las proximas horas.';
+      })
+      .catch(function () {
+        estado.className = 'appos-estado error';
+        estado.textContent = 'No pudimos enviarlo. Escribenos por WhatsApp y lo vemos al tiro.';
+      })
+      .finally(function () { boton.disabled = false; });
+  });
+})();
+</script>

@@ -1,0 +1,7 @@
+{{saludo}}, segun la fecha de tu compra ya deberias andar corto de papel termico.
+
+Quedarse sin rollos es quedarse sin poder entregar boleta, asi que mejor adelantarse.
+
+{{recomendacion}}
+
+Te lo despacho igual que el equipo. Me dices cuantos y lo dejo encargado.

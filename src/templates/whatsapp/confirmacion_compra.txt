@@ -1,0 +1,11 @@
+{{saludo}}, recibi tu compra. Muchas gracias por confiar en {{negocio}}.
+
+Ahora yo te ingreso directamente en la plataforma de TUU y hago la compra a tu nombre. Desde ahi TUU despacha el equipo a tu domicilio y te acompana en la activacion.
+
+Para ingresarte necesito confirmar estos datos:
+- RUT del titular o de la empresa
+- Nombre o razon social
+- Direccion de despacho completa (calle, numero, depto, comuna)
+- Correo para la boleta y el acceso al sistema
+
+Me los mandas por aca y lo dejo andando hoy mismo.
