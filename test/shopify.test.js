@@ -108,3 +108,23 @@ describe('origenes permitidos para el formulario', () => {
     assert.equal(origenPermitido(undefined), false);
   });
 });
+
+describe('token de ruta (webhooks creados por API)', () => {
+  test('acepta el token correcto y rechaza variaciones', async () => {
+    const { tokenDeRutaValido } = await import('../src/core/shopify.js');
+    const token = 'a'.repeat(48);
+    assert.equal(tokenDeRutaValido(token, token), true);
+    assert.equal(tokenDeRutaValido('b'.repeat(48), token), false);
+    assert.equal(tokenDeRutaValido(token.slice(0, 47), token), false);
+    assert.equal(tokenDeRutaValido(token + 'x', token), false);
+  });
+
+  test('queda cerrado si el token no esta configurado o es corto', async () => {
+    const { tokenDeRutaValido } = await import('../src/core/shopify.js');
+    assert.equal(tokenDeRutaValido('cualquiera', ''), false, 'sin token configurado no se acepta nada');
+    assert.equal(tokenDeRutaValido('corto', 'corto'), false, 'menos de 32 caracteres no basta');
+    assert.equal(tokenDeRutaValido('', ''), false);
+    assert.equal(tokenDeRutaValido(null, 'a'.repeat(48)), false);
+    assert.equal(tokenDeRutaValido(undefined, 'a'.repeat(48)), false);
+  });
+});
