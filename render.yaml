@@ -33,6 +33,12 @@ services:
         value: consola
       - key: HORA_RUTINA
         value: "9"
+      - key: RESUMEN_DIARIO
+        value: "1"
+      # Completa esto con la direccion que te asigne Render, para que el
+      # correo resumen traiga el enlace directo al panel.
+      - key: PANEL_URL
+        sync: false
       # Estos se completan a mano en el panel de Render (Environment).
       # sync:false significa que Render los pide en vez de guardarlos en el repo.
       - key: APPOS_WHATSAPP

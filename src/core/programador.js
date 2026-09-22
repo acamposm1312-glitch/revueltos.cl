@@ -34,6 +34,11 @@ export async function correrRutinaDiaria({ referencia = new Date(), forzar = fal
 
   const tareas = generarTareas(referencia);
   const correos = await correrSecuencias({ referencia });
+
+  // Se importa aqui y no arriba porque resumen.js depende de este modulo.
+  const { enviarResumenDiario } = await import('./resumen.js');
+  const resumen = await enviarResumenDiario({ referencia, forzar });
+
   guardarAjuste('ultima_rutina', hoy);
 
   return {
@@ -42,6 +47,7 @@ export async function correrRutinaDiaria({ referencia = new Date(), forzar = fal
     tareasCreadas: tareas.creadas,
     correosEnviados: correos.filter((c) => c.enviado).length,
     correosPendientes: correos.filter((c) => !c.enviado && !c.simulado).length,
+    resumen: { enviado: resumen.enviado, motivo: resumen.motivo, pendientes: resumen.total ?? 0 },
   };
 }
 

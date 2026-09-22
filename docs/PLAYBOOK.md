@@ -3,6 +3,20 @@
 Guia de como operar el sistema. Los mensajes viven en `src/templates/` y los
 puedes editar cuando quieras: son archivos de texto, no codigo.
 
+## El correo de cada manana
+
+A las 9:00 te llega a contacto@appos.cl un resumen de lo que hay que hacer,
+ordenado por urgencia. Arriba siempre va lo mismo: **quienes ya pagaron y estan
+esperando que los ingreses en TUU**. Esa plata ya entro y el cliente esta
+esperando, asi que no compite con nada.
+
+El asunto te dice el total y cuantos son urgentes, para que decidas sin abrir:
+`4 pendientes para hoy (2 urgentes)`.
+
+Si no hay nada pendiente, **no te llega nada**. Es a proposito: un correo diario
+que dice "no hay novedades" se empieza a ignorar, y con el se ignoran los dias
+que si importan.
+
 ## Tu rutina diaria (10 minutos)
 
 ```bash
@@ -55,6 +69,8 @@ mensaje que no suena a robot de cobranza.
 | dia 7 | Check-in: las dudas tipicas de la primera semana |
 | dia 30 | Recompra de papel termico |
 | dia 330 | Renovacion de firma electronica antes de que venza |
+
+Y a ti te llega el resumen de pendientes cada manana.
 
 Los dos ultimos son los que te generan ingreso recurrente sin vender nada nuevo.
 El papel se acaba y la firma vence: son ventas que ya estan, solo hay que

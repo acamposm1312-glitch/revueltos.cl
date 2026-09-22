@@ -5,6 +5,7 @@ import { listar, porId, moverEtapa, avanzar, eventosDe, resumenPorEtapa, guardar
 import { generarTareas, colaDeHoy, completarTarea, tareasPendientes } from '../src/core/tareas.js';
 import { correrSecuencias } from '../src/core/secuencias.js';
 import { correrRutinaDiaria } from '../src/core/programador.js';
+import { enviarResumenDiario, construirResumen } from '../src/core/resumen.js';
 import { generarCalendario, guardarCalendario, listarPublicaciones, publicacionesPendientes, exportarCSV } from '../src/core/contenido.js';
 import { publicarPendientes } from '../src/core/instagram.js';
 import { ETAPAS, clavesEtapas } from '../src/core/pipeline.js';
@@ -35,7 +36,8 @@ APPOS - automatizacion de ventas, contacto y publicaciones
   appos avanzar <id>              Pasa el lead a la etapa siguiente
   appos pipeline                  Resumen por etapa
 
-  appos rutina [--forzar]         Corre la rutina diaria completa (tareas + correos)
+  appos rutina [--forzar]         Corre la rutina diaria completa (tareas + correos + resumen)
+  appos resumen [--simular]       Envia el correo resumen del dia a tu casilla
   appos secuencias [--simular]    Envia los correos de postventa que ya corresponden
   appos contenido [--cantidad N]  Genera y guarda el calendario de publicaciones
   appos calendario                Muestra el calendario guardado
@@ -150,6 +152,24 @@ async function principal() {
       const r = await correrRutinaDiaria({ forzar: bandera('forzar') });
       if (!r.corrio) { console.log(`La rutina no corrio: ${r.motivo}. Usa --forzar para correrla igual.`); break; }
       console.log(`Rutina del ${r.fecha}: ${r.tareasCreadas} tareas creadas, ${r.correosEnviados} correos enviados, ${r.correosPendientes} no enviados.`);
+      console.log(`Resumen diario: ${r.resumen.enviado ? `enviado a ${config.negocio.correo}` : `no enviado (${r.resumen.motivo})`}`);
+      break;
+    }
+
+    case 'resumen': {
+      const simular = bandera('simular') || config.email.proveedor === 'consola';
+      const r = await enviarResumenDiario({ forzar: true, simular });
+      if (r.motivo === 'sin pendientes') { console.log('No hay pendientes hoy: no se envia resumen.'); break; }
+      if (simular) {
+        console.log(`Para: ${config.negocio.correo}`);
+        console.log(`Asunto: ${r.asunto}\n`);
+        console.log(r.cuerpo);
+        if (config.email.proveedor === 'consola') console.log('\n(EMAIL_PROVIDER=consola: no se envio de verdad)');
+        break;
+      }
+      console.log(r.enviado
+        ? `Resumen enviado a ${config.negocio.correo}: ${r.total} pendientes, ${r.urgentes} urgentes.`
+        : `No se pudo enviar: ${r.error ?? r.motivo}`);
       break;
     }
 
@@ -214,6 +234,8 @@ async function principal() {
       revisar('Secreto de webhooks Shopify', !!config.shopify.webhookSecret, 'define SHOPIFY_WEBHOOK_SECRET');
       revisar('Proveedor de correo', config.email.proveedor !== 'consola', 'define EMAIL_PROVIDER y EMAIL_API_KEY');
       revisar('Token del panel', !!config.servidor.panelToken, 'define PANEL_TOKEN para abrirlo fuera de localhost');
+      revisar('Resumen diario por correo', config.servidor.resumenDiario && config.email.proveedor !== 'consola', 'necesita EMAIL_PROVIDER real para llegarte');
+      revisar('URL del panel en el resumen', !!config.servidor.panelUrl, 'define PANEL_URL para que el correo traiga el enlace');
       revisar('Instagram (opcional)', !!(config.instagram.igUserId && config.instagram.token), 'define IG_USER_ID e IG_TOKEN');
       revisar('WhatsApp Cloud API (opcional)', config.whatsapp.modo === 'cloud', 'sigue con enlaces wa.me, funciona igual');
       console.log(`\nDatos:\n`);

@@ -27,6 +27,7 @@ El repositorio ya trae `render.yaml`, asi que Render se configura solo.
    | `APPOS_WHATSAPP` | tu numero, formato `569XXXXXXXX` |
    | `SHOPIFY_WEBHOOK_SECRET` | la clave de firma de Shopify (ver `INSTALACION.md`) |
    | `EMAIL_API_KEY` | la clave de Resend o Brevo, o dejala vacia por ahora |
+   | `PANEL_URL` | dejala vacia en el primer deploy y completala despues (abajo) |
 
    `PANEL_TOKEN` lo genera Render solo. Lo encuentras despues en
    **Environment** > `PANEL_TOKEN`: ese es tu acceso al panel.
@@ -39,6 +40,10 @@ Con eso:
 - Panel: `https://appos.onrender.com/?token=EL_TOKEN_GENERADO`
 - Webhooks de Shopify: `https://appos.onrender.com/webhooks/shopify`
 - Widget de la tienda: cambia `APPOS_API` en el snippet Liquid por esa direccion
+
+Vuelve a **Environment** y completa `PANEL_URL` con esa misma direccion
+(`https://appos.onrender.com`). Con eso el correo resumen de cada manana te
+llega con el enlace directo al panel, ya autenticado.
 
 ### Sobre el costo
 
@@ -116,8 +121,9 @@ node bin/appos.js hoy
 
 ## Las tareas diarias
 
-No necesitas configurar cron. El servidor arma la cola y manda los correos de
-postventa solo, todos los dias a las 9:00 hora de Chile.
+No necesitas configurar cron. Todos los dias a las 9:00 hora de Chile el
+servidor arma la cola, manda los correos de postventa y te envia a ti el
+resumen de pendientes.
 
 Se hizo dentro del mismo proceso a proposito: un cron job en Render corre en
 otro contenedor, que no puede montar el mismo disco, y no veria la base de
@@ -129,6 +135,16 @@ corres a mano cuando quieras:
 ```bash
 node bin/appos.js rutina --forzar
 ```
+
+El resumen de cada manana se apaga aparte con `RESUMEN_DIARIO=0`. Para verlo
+sin enviarlo:
+
+```bash
+node bin/appos.js resumen --simular
+```
+
+Ojo: con `EMAIL_PROVIDER=consola` el resumen **no se envia**, solo se muestra.
+Para que te llegue de verdad necesitas Resend o Brevo configurado.
 
 ## Respaldo
 

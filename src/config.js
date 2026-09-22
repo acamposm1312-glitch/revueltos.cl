@@ -68,6 +68,10 @@ export const config = {
     horaRutina: Number(env('HORA_RUTINA', '9')),
     // Poner en '0' para desactivar la rutina automatica dentro del servidor.
     rutinaAutomatica: env('RUTINA_AUTOMATICA', '1') !== '0',
+    // Direccion publica del panel, para enlazarla en el correo resumen.
+    panelUrl: env('PANEL_URL', ''),
+    // Poner en '0' para no recibir el correo resumen de cada manana.
+    resumenDiario: env('RESUMEN_DIARIO', '1') !== '0',
   },
   db: {
     ruta: env('DB_PATH', resolve(ROOT, 'data', 'appos.db')),

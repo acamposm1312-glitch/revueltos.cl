@@ -20,6 +20,7 @@ El sistema acompana ese flujo completo:
 | Hay que acordarse de hacer seguimiento | Aparece en la cola del dia con el mensaje escrito |
 | Una compra en Shopify obliga a abrir el admin para sacar los datos | Llega la tarea con nombre, direccion y productos listos para la plataforma TUU |
 | La postventa depende de la memoria | Correos automaticos en los dias 1, 7, 30 y 330 |
+| Hay que acordarse de revisar si hay algo pendiente | Llega un correo cada manana con lo del dia, ordenado por urgencia |
 | Publicar en Instagram cuesta empezar de cero cada vez | Calendario con los copys ya redactados |
 
 ## Como se usa
@@ -67,7 +68,8 @@ El paso a paso completo, incluida la conexion con Shopify, esta en
 que Render lo configura solo.
 
 Una vez desplegado no hay que programar nada mas: el servidor arma la cola del
-dia y envia los correos de postventa todos los dias a las 9:00 hora de Chile.
+dia, envia los correos de postventa y te manda el resumen de pendientes todos
+los dias a las 9:00 hora de Chile.
 
 ## Documentacion
 
@@ -87,6 +89,8 @@ src/core/
   leads.js                CRM: alta, deduplicacion y avance de etapas
   tareas.js               Cola de trabajo diaria
   secuencias.js           Correos de postventa
+  resumen.js              Correo resumen diario de pendientes
+  programador.js          Rutina diaria dentro del servidor
   contenido.js            Calendario editorial y generacion de copys
   shopify.js              Webhooks firmados: ordenes, clientes y carritos
   whatsapp.js             Enlaces wa.me y soporte para Cloud API
