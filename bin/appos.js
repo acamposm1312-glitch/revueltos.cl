@@ -231,7 +231,8 @@ async function principal() {
       const revisar = (etiqueta, ok, pista) => console.log(`  ${ok ? 'OK  ' : 'FALTA'} ${etiqueta.padEnd(34)}${ok ? '' : pista}`);
       console.log('\nConfiguracion:\n');
       revisar('WhatsApp de APPOS', config.negocio.whatsapp !== '56900000000', 'define APPOS_WHATSAPP en .env');
-      revisar('Secreto de webhooks Shopify', !!config.shopify.webhookSecret, 'define SHOPIFY_WEBHOOK_SECRET');
+      revisar('Firma HMAC de webhooks', !!config.shopify.webhookSecret, config.shopify.webhookUrlToken ? 'usando token de ruta; migra a SHOPIFY_WEBHOOK_SECRET' : 'define SHOPIFY_WEBHOOK_SECRET');
+      revisar('Webhooks recibibles', !!(config.shopify.webhookSecret || config.shopify.webhookUrlToken), 'sin secreto ni token, se rechaza todo');
       revisar('Proveedor de correo', config.email.proveedor !== 'consola', 'define EMAIL_PROVIDER y EMAIL_API_KEY');
       revisar('Token del panel', !!config.servidor.panelToken, 'define PANEL_TOKEN para abrirlo fuera de localhost');
       revisar('Resumen diario por correo', config.servidor.resumenDiario && config.email.proveedor !== 'consola', 'necesita EMAIL_PROVIDER real para llegarte');

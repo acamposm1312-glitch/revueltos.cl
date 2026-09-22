@@ -4,7 +4,7 @@ import { db } from './core/db.js';
 import { guardarLead } from './core/leads.js';
 import { crearTarea, completarTarea, colaDeHoy } from './core/tareas.js';
 import { moverEtapa } from './core/leads.js';
-import { firmaValida, yaProcesado, procesarWebhook } from './core/shopify.js';
+import { firmaValida, tokenDeRutaValido, yaProcesado, procesarWebhook } from './core/shopify.js';
 import { mensajeWhatsapp } from './core/plantillas.js';
 import { renderPanel } from './routes/panel.js';
 import { iniciarProgramador } from './core/programador.js';
@@ -112,10 +112,22 @@ async function manejar(req, res) {
   }
 
   // --- Webhooks de Shopify ---
-  if (ruta === '/webhooks/shopify' && req.method === 'POST') {
+  // Dos rutas: la firmada con HMAC (preferida) y la de token secreto, para los
+  // webhooks creados por API que vienen firmados con el secreto de otra app.
+  const rutaConToken = ruta.match(/^\/webhooks\/shopify\/([A-Za-z0-9_-]{32,128})$/);
+  if ((ruta === '/webhooks/shopify' || rutaConToken) && req.method === 'POST') {
     const crudo = await leerCuerpo(req);
-    const firma = req.headers['x-shopify-hmac-sha256'];
-    if (!firmaValida(crudo, firma)) return json(res, 401, { error: 'firma invalida' });
+
+    let autorizado = false;
+    let via = '';
+    if (rutaConToken) {
+      autorizado = tokenDeRutaValido(rutaConToken[1]);
+      via = 'token';
+    } else {
+      autorizado = firmaValida(crudo, req.headers['x-shopify-hmac-sha256']);
+      via = 'hmac';
+    }
+    if (!autorizado) return json(res, 401, { error: via === 'token' ? 'token invalido' : 'firma invalida' });
 
     const webhookId = req.headers['x-shopify-webhook-id'];
     if (yaProcesado(webhookId)) return json(res, 200, { ok: true, repetido: true });
@@ -126,7 +138,8 @@ async function manejar(req, res) {
 
     try {
       const r = procesarWebhook(topic, payload);
-      return json(res, 200, { ok: true, ...r });
+      if (via === 'token') console.log(`[webhook ${topic}] aceptado por token de ruta (sin firma HMAC)`);
+      return json(res, 200, { ok: true, via, ...r });
     } catch (e) {
       console.error('[webhook]', topic, e);
       return json(res, 200, { ok: false, error: e.message });
@@ -187,7 +200,11 @@ if (ejecutadoDirectamente) {
   servidor.listen(config.servidor.puerto, () => {
     console.log(`APPOS escuchando en http://localhost:${config.servidor.puerto}`);
     if (!config.servidor.panelToken) console.log('Panel abierto solo desde localhost (define PANEL_TOKEN para acceso remoto).');
-    if (!config.shopify.webhookSecret) console.log('Aviso: falta SHOPIFY_WEBHOOK_SECRET, los webhooks seran rechazados.');
+    if (!config.shopify.webhookSecret && !config.shopify.webhookUrlToken) {
+      console.log('Aviso: sin SHOPIFY_WEBHOOK_SECRET ni SHOPIFY_WEBHOOK_URL_TOKEN, los webhooks seran rechazados.');
+    } else if (!config.shopify.webhookSecret) {
+      console.log('Aviso: webhooks aceptados por token de ruta. Migra a SHOPIFY_WEBHOOK_SECRET cuando puedas.');
+    }
     if (config.servidor.rutinaAutomatica) {
       iniciarProgramador();
       console.log(`Rutina diaria activa: ${config.servidor.horaRutina}:00 hora de Chile.`);

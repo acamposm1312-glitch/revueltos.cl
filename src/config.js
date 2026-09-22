@@ -38,8 +38,14 @@ export const config = {
   },
   shopify: {
     dominio: env('SHOPIFY_SHOP_DOMAIN', 'www.appos.cl'),
-    // Secreto de firma de los webhooks (Shopify admin > Notificaciones > Webhooks)
+    // Secreto de firma de los webhooks (Shopify admin > Notificaciones > Webhooks).
+    // Es la forma preferida: prueba que el contenido no fue alterado.
     webhookSecret: env('SHOPIFY_WEBHOOK_SECRET', ''),
+    // Alternativa mas debil para cuando los webhooks se crean por API y quedan
+    // firmados con el secreto de otra aplicacion, que no podemos conocer: se
+    // acepta la entrega por una ruta secreta larga. No prueba integridad del
+    // contenido, solo que quien llama conoce la ruta. Migrar a webhookSecret.
+    webhookUrlToken: env('SHOPIFY_WEBHOOK_URL_TOKEN', ''),
   },
   email: {
     // 'resend' | 'brevo' | 'consola'  ('consola' solo imprime, no envia)

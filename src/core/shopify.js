@@ -19,6 +19,23 @@ export function firmaValida(cuerpoCrudo, firmaRecibida, secreto = config.shopify
   return timingSafeEqual(a, b);
 }
 
+/**
+ * Verificacion por ruta secreta, para los webhooks creados via API.
+ *
+ * Es deliberadamente mas estricta de lo necesario: exige un token de al menos
+ * 32 caracteres y compara en tiempo constante. Si el token no esta configurado
+ * la ruta queda cerrada, para que un despliegue sin la variable no deje el
+ * endpoint abierto.
+ */
+export function tokenDeRutaValido(recibido, esperado = config.shopify.webhookUrlToken) {
+  if (!esperado || esperado.length < 32) return false;
+  if (!recibido || typeof recibido !== 'string') return false;
+  const a = Buffer.from(esperado);
+  const b = Buffer.from(recibido);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
 /** Evita procesar dos veces el mismo webhook si Shopify lo reintenta. */
 export function yaProcesado(webhookId) {
   if (!webhookId) return false;

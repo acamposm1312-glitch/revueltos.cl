@@ -35,6 +35,17 @@ Abre `http://localhost:3000` y veras el panel.
 Sin esta clave el sistema **rechaza** todos los webhooks, a proposito: es lo que
 impide que cualquiera invente ordenes falsas contra tu servidor.
 
+### Alternativa: ruta secreta
+
+Los webhooks creados por la API de Shopify quedan firmados con el secreto de la
+aplicacion que los creo, no con la clave de tu tienda. Para ese caso existe una
+segunda via: define `SHOPIFY_WEBHOOK_URL_TOKEN` con un texto largo y apunta los
+webhooks a `https://tu-servidor/webhooks/shopify/<token>`.
+
+Es mas debil que la firma: prueba que quien llama conoce la ruta, pero no que el
+contenido venga intacto. Sirve para partir rapido. Cuando configures
+`SHOPIFY_WEBHOOK_SECRET`, rehaz los webhooks desde el admin y borra el token.
+
 ### 3.2 Crear los webhooks
 
 En la misma pantalla, **Crear webhook**. Crea estos cuatro, todos en formato JSON
