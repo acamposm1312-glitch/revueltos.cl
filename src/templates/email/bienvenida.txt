@@ -1,0 +1,16 @@
+asunto: Tu compra TUU esta en proceso, {{nombre_corto}}
+---
+{{saludo}},
+
+Gracias por comprar con {{negocio}}, distribuidor oficial de TUU.
+
+Como sigue esto:
+
+1. Yo te ingreso en la plataforma de TUU y realizo la compra a tu nombre.
+2. TUU despacha el equipo a la direccion que registraste.
+3. TUU te acompana en la activacion, y yo quedo disponible para lo que necesites.
+
+Si tienes cualquier duda sobre el equipo, la boleta electronica o la firma del SII, respondeme este correo o escribeme por WhatsApp al +{{whatsapp}}.
+
+{{vendedor}}
+{{negocio}} - {{sitio}}

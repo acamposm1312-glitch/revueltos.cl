@@ -1,0 +1,8 @@
+{{saludo}}, ya llevas unos dias con la maquina. Como te ha ido?
+
+Te dejo las tres cosas que mas preguntan al principio:
+1) Que la firma electronica quede vigente, si no, no emite boleta
+2) Cargar los productos con precio para cobrar mas rapido
+3) Revisar el cierre de caja al final del dia
+
+Si algo no te esta resultando, me escribes y lo vemos juntos.
