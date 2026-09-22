@@ -93,3 +93,18 @@ describe('carrito abandonado', () => {
     assert.equal(procesarWebhook('checkouts/create', { completed_at: '2026-09-01T10:00:00Z' }).accion, 'checkout_completado');
   });
 });
+
+describe('origenes permitidos para el formulario', () => {
+  test('acepta la tienda y el editor de temas, rechaza el resto', async () => {
+    const { origenPermitido } = await import('../src/server.js');
+    assert.equal(origenPermitido('https://www.appos.cl'), true);
+    assert.equal(origenPermitido('https://appos.cl'), true);
+    assert.equal(origenPermitido('https://zsd1j4-ss.myshopify.com'), true);
+    assert.equal(origenPermitido('https://otra-tienda.myshopify.com'), true);
+    assert.equal(origenPermitido('https://appos.cl.malicioso.com'), false);
+    assert.equal(origenPermitido('http://www.appos.cl'), false, 'http sin TLS no');
+    assert.equal(origenPermitido('https://myshopify.com.malo.cl'), false);
+    assert.equal(origenPermitido(''), false);
+    assert.equal(origenPermitido(undefined), false);
+  });
+});
