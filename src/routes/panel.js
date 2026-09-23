@@ -1,6 +1,7 @@
 import config from '../config.js';
 import { ETAPAS } from '../core/pipeline.js';
 import { resumenPorEtapa, listar } from '../core/leads.js';
+import { ETAPAS as TODAS_LAS_ETAPAS } from '../core/pipeline.js';
 import { colaDeHoy, tareasPendientes } from '../core/tareas.js';
 import { listarPublicaciones } from '../core/contenido.js';
 import { formatearTelefono } from '../core/telefono.js';
@@ -30,6 +31,10 @@ pre{white-space:pre-wrap;word-break:break-word;background:var(--fondo);border:1p
 a.boton,button{border:0;border-radius:9px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
 a.wa{background:var(--acento2);color:#04140d}
 button.hecha{background:var(--borde);color:var(--texto)}
+button.borrar{background:transparent;color:var(--alerta);border:1px solid var(--borde)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:8px 6px;border-bottom:1px solid var(--borde);text-align:left;vertical-align:top}
+th{color:var(--suave);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
 .rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 .kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:10px;padding:10px 12px}
 .kpi b{display:block;font-size:22px}
@@ -54,6 +59,10 @@ function tarjetaTarea(t, token) {
       <form method="post" action="/api/tareas/${t.id}/hecha${token ? `?token=${encodeURIComponent(token)}` : ''}">
         <button class="hecha" type="submit">Marcar hecha</button>
       </form>
+      <form method="post" action="/api/leads/${t.leadId}/borrar${token ? `?token=${encodeURIComponent(token)}` : ''}"
+            onsubmit="return confirm('Borrar este lead y todo su historial? No se puede deshacer.')">
+        <button class="borrar" type="submit">Borrar lead</button>
+      </form>
     </div>
   </article>`;
 }
@@ -67,6 +76,24 @@ function tarjetaPublicacion(p) {
     </div>
     <pre>${esc(p.copy)}\n\n${esc(p.hashtags)}</pre>
   </article>`;
+}
+
+function listaDeLeads(token) {
+  const filas = listar({ limite: 60 });
+  if (!filas.length) return '<p class="vacio">Todavia no hay leads.</p>';
+  const sufijo = token ? `?token=${encodeURIComponent(token)}` : '';
+  const nombreEtapa = new Map(TODAS_LAS_ETAPAS.map((e) => [e.clave, e.nombre]));
+  return `<div class="tarjeta"><table>
+    <tr><th>Nombre</th><th>Contacto</th><th>Etapa</th><th></th></tr>
+    ${filas.map((l) => `<tr>
+      <td>${esc(l.nombre || 'sin nombre')}${l.rubro ? `<br><span class="meta">${esc(l.rubro)}</span>` : ''}</td>
+      <td>${esc(formatearTelefono(l.telefono) || l.email || '-')}</td>
+      <td>${esc(nombreEtapa.get(l.etapa) ?? l.etapa)}</td>
+      <td><form method="post" action="/api/leads/${l.id}/borrar${sufijo}"
+                onsubmit="return confirm('Borrar a ${esc((l.nombre || l.telefono || 'este lead').replace(/'/g, ''))} y todo su historial? No se puede deshacer.')">
+        <button class="borrar" type="submit">Borrar</button></form></td>
+    </tr>`).join('')}
+  </table></div>`;
 }
 
 export function renderPanel(token = '') {
@@ -95,6 +122,9 @@ export function renderPanel(token = '') {
 
   <h2>Pipeline</h2>
   <div class="rejilla">${kpis}</div>
+
+  <h2>Todos los leads</h2>
+  ${listaDeLeads(token)}
 
   <h2>Estado del sistema</h2>
   <p><a class="boton wa" href="/diagnostico${token ? `?token=${encodeURIComponent(token)}` : ''}">Ver diagnostico de configuracion</a></p>

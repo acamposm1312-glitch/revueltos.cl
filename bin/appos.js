@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import config from '../src/config.js';
 import { db } from '../src/core/db.js';
-import { listar, porId, moverEtapa, avanzar, eventosDe, resumenPorEtapa, guardarLead } from '../src/core/leads.js';
+import { listar, porId, moverEtapa, avanzar, eventosDe, resumenPorEtapa, guardarLead, borrarLead } from '../src/core/leads.js';
 import { generarTareas, colaDeHoy, completarTarea, tareasPendientes } from '../src/core/tareas.js';
 import { correrSecuencias } from '../src/core/secuencias.js';
 import { correrRutinaDiaria } from '../src/core/programador.js';
@@ -33,6 +33,7 @@ APPOS - automatizacion de ventas, contacto y publicaciones
   appos leads [--etapa <etapa>]   Lista los leads
   appos lead <id>                 Ficha del lead con su historial
   appos nuevo                     Carga un lead a mano (--nombre --telefono --email --rubro)
+  appos borrar <id>               Borra un lead y todo su historial
   appos mover <id> <etapa>        Cambia la etapa del lead
   appos avanzar <id>              Pasa el lead a la etapa siguiente
   appos pipeline                  Resumen por etapa
@@ -126,6 +127,14 @@ async function principal() {
         interes: valor('interes', ''),
       });
       console.log(`${creado ? 'Lead creado' : 'Lead ya existia, se actualizo'}: #${lead.id} ${lead.nombre || lead.telefono}`);
+      break;
+    }
+
+    case 'borrar': {
+      const l = porId(Number(args[0]));
+      if (!l) { console.log(`No existe el lead ${args[0]}.`); break; }
+      borrarLead(l.id);
+      console.log(`Lead #${l.id} (${l.nombre || l.telefono || 'sin nombre'}) borrado con todo su historial.`);
       break;
     }
 

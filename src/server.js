@@ -3,7 +3,7 @@ import config from './config.js';
 import { db } from './core/db.js';
 import { guardarLead } from './core/leads.js';
 import { crearTarea, completarTarea, colaDeHoy } from './core/tareas.js';
-import { moverEtapa } from './core/leads.js';
+import { moverEtapa, borrarLead } from './core/leads.js';
 import { firmaValida, tokenDeRutaValido, yaProcesado, procesarWebhook } from './core/shopify.js';
 import { mensajeWhatsapp } from './core/plantillas.js';
 import { renderPanel } from './routes/panel.js';
@@ -186,6 +186,16 @@ async function manejar(req, res) {
     completarTarea(Number(hecha[1]));
     const destino = `/${url.searchParams.get('token') ? `?token=${encodeURIComponent(url.searchParams.get('token'))}` : ''}`;
     res.writeHead(303, { Location: destino });
+    return res.end();
+  }
+
+  const borrado = ruta.match(/^\/api\/leads\/(\d+)\/borrar$/);
+  if (borrado && req.method === 'POST') {
+    if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
+    const borrado_ok = borrarLead(Number(borrado[1]));
+    console.log(`[panel] lead #${borrado[1]} ${borrado_ok ? 'borrado' : 'no existia'}`);
+    const t = url.searchParams.get('token');
+    res.writeHead(303, { Location: `/${t ? `?token=${encodeURIComponent(t)}` : ''}` });
     return res.end();
   }
 
