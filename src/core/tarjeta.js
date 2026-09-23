@@ -19,7 +19,7 @@ const esc = (v) => String(v ?? '')
  * No es el manual de marca de TUU. Si TUU entrega uno a sus distribuidores,
  * este bloque es lo unico que hay que cambiar.
  */
-const MARCA = {
+export const MARCA = {
   azul: '#0052cc',
   azulOscuro: '#003d99',
   azulClaro: '#e8f0ff',
@@ -51,8 +51,8 @@ function cargarInter() {
   }
 }
 
-const INTER = cargarInter();
-const FAMILIA = INTER ? 'Inter, sans-serif' : '"Helvetica Neue",Helvetica,Arial,sans-serif';
+export const INTER = cargarInter();
+export const FAMILIA = INTER ? 'Inter, sans-serif' : '"Helvetica Neue",Helvetica,Arial,sans-serif';
 
 const ETIQUETAS = { post: 'Producto', carrusel: 'Lo que hay que saber', reel: '¿Cuál te sirve?' };
 
