@@ -29,10 +29,11 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave
 .kpi b{display:block;font-size:20px}
 .kpi span{color:var(--suave);font-size:12px}
 .aviso-caja{background:var(--tarjeta);border:1px solid var(--borde);border-radius:10px;padding:14px;color:var(--suave);font-size:14px}
+.aviso{background:var(--tarjeta);border:1px solid var(--acento);border-left-width:4px;border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:14px}
 a.volver{display:inline-block;margin-top:22px;color:var(--acento);font-weight:600;text-decoration:none}
 `;
 
-export function renderDiagnostico(token = '') {
+export function renderDiagnostico(token = '', aviso = '') {
   const e = estadoDelSistema();
   const sufijo = token ? `?token=${encodeURIComponent(token)}` : '';
 
@@ -67,8 +68,17 @@ export function renderDiagnostico(token = '') {
   <p>${esc(titular)}</p>
 </header>
 <main>
+  ${aviso ? `<p class="aviso">${esc(aviso)}</p>` : ''}
+
   <h2>Configuracion</h2>
   ${items}
+
+  <h2>Probar el correo</h2>
+  <form class="aviso-caja" method="post" action="/api/probar-correo${sufijo}">
+    <p style="margin:0 0 12px">Envía un correo real a ${esc(config.negocio.correo)} y te dice si salió o cuál fue el error.
+    Saber que una clave "está definida" no dice si funciona: una clave mal copiada se ve igual que una correcta.</p>
+    <button type="submit" style="width:100%;padding:12px;border:0;border-radius:9px;background:var(--acento);color:#fff;font-size:15px;font-weight:600;cursor:pointer">Enviar correo de prueba</button>
+  </form>
 
   <h2>Datos</h2>
   <div class="rejilla">${kpis}</div>
