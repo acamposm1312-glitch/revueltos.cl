@@ -100,6 +100,18 @@ export function eventosDe(id, limite = 50) {
   return db().prepare('SELECT * FROM eventos WHERE lead_id = ? ORDER BY id DESC LIMIT ?').all(id, limite);
 }
 
+/**
+ * Borra el lead y todo lo suyo. Las tablas de eventos, tareas y envios tienen
+ * ON DELETE CASCADE, de modo que no quedan huerfanos.
+ * @returns {boolean} true si existia y se borro.
+ */
+export function borrarLead(id) {
+  const lead = porId(id);
+  if (!lead) return false;
+  db().prepare('DELETE FROM leads WHERE id = ?').run(id);
+  return true;
+}
+
 export function resumenPorEtapa() {
   return db().prepare('SELECT etapa, COUNT(*) AS total FROM leads GROUP BY etapa').all();
 }
