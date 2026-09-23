@@ -1,14 +1,14 @@
-asunto: Te queda papel termico, {{nombre_corto}}?
+asunto: ¿Te queda papel térmico, {{nombre_corto}}?
 ---
 {{saludo}},
 
-Al mes de uso la mayoria ya va por la mitad de los rollos.
+Al mes de uso, la mayoría ya va por la mitad de los rollos.
 
-Quedarse sin papel termico significa no poder entregar boleta, y eso te frena la venta en el peor momento. Conviene tener el pack de repuesto antes de que pase.
+Quedarse sin papel térmico significa no poder entregar boleta, y eso te frena la venta en el peor momento. Conviene tener el pack de repuesto antes de que pase.
 
 {{recomendacion}}
 
-Te lo despacho a tu direccion. Respondeme este correo o escribeme por WhatsApp al +{{whatsapp}} y lo dejo encargado.
+Te lo despacho a tu dirección. Respóndeme este correo o escríbeme por WhatsApp al +{{whatsapp}} y lo dejo encargado.
 
 {{vendedor}}
-{{negocio}} - {{sitio}}
+{{negocio}} · {{sitio}}

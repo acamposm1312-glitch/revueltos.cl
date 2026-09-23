@@ -1,8 +1,8 @@
 {{saludo}}, soy {{vendedor}} de {{negocio}}, distribuidor oficial de TUU en Chile.
 
-Vi que estabas viendo las maquinas TUU. Para recomendarte la correcta y no hacerte gastar de mas, cuentame dos cosas:
+Vi que estabas viendo las máquinas TUU. Para recomendarte la correcta y no hacerte gastar de más, cuéntame dos cosas:
 
-1) Que vendes o que rubro tienes
-2) Si necesitas escanear productos con codigo de barras
+1) Qué vendes o qué rubro tienes
+2) Si necesitas escanear productos con código de barras
 
-Con eso te digo cual te sirve y cuanto sale, sin compromiso.
+Con eso te digo cuál te sirve y cuánto sale, sin compromiso.

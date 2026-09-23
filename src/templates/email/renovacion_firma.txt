@@ -1,14 +1,14 @@
-asunto: Tu firma electronica esta por vencer
+asunto: Tu firma electrónica está por vencer
 ---
 {{saludo}},
 
-Tu firma electronica simple esta llegando a su vencimiento.
+Tu firma electrónica simple está llegando a su vencimiento.
 
-Es importante: sin firma vigente tu equipo TUU deja de emitir boleta electronica. No es un aviso comercial, es un requisito del SII.
+Es importante: sin firma vigente, tu equipo TUU deja de emitir boleta electrónica. No es un aviso comercial, es un requisito del SII.
 
 {{recomendacion}}
 
-Respondeme y la dejo renovada antes de que te afecte la operacion.
+Respóndeme y la dejo renovada antes de que te afecte la operación.
 
 {{vendedor}}
-{{negocio}} - {{sitio}}
+{{negocio}} · {{sitio}}

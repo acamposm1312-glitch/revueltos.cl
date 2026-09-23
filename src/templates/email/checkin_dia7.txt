@@ -1,17 +1,17 @@
-asunto: Como te ha ido con la TUU esta semana?
+asunto: ¿Cómo te ha ido con la TUU esta semana?
 ---
 {{saludo}},
 
-Ya llevas una semana con tu equipo TUU. Te escribo para saber como va.
+Ya llevas una semana con tu equipo TUU. Te escribo para saber cómo va.
 
-Lo que mas me preguntan a esta altura:
+Lo que más me preguntan a esta altura:
 
-- Como hacer el cierre de caja diario
-- Como anular o reimprimir una boleta
-- Como revisar cuanto vendiste en el mes
-- Como agregar un segundo usuario para el que atiende
+- Cómo hacer el cierre de caja diario
+- Cómo anular o reimprimir una boleta
+- Cómo revisar cuánto vendiste en el mes
+- Cómo agregar un segundo usuario para quien atiende
 
-Respondeme este correo con lo que necesites y te lo explico, o te mando un video corto si es mas facil.
+Respóndeme este correo con lo que necesites y te lo explico, o te mando un video corto si es más fácil.
 
 {{vendedor}}
-{{negocio}} - WhatsApp +{{whatsapp}}
+{{negocio}} · WhatsApp +{{whatsapp}}

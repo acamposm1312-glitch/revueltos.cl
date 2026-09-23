@@ -1,5 +1,5 @@
-{{saludo}}, te escribo para saber si alcanzaste a ver la cotizacion que te mande.
+{{saludo}}, te escribo para saber si alcanzaste a ver la cotización que te mandé.
 
-Si quedo alguna duda con el equipo, el precio o como funciona la boleta electronica, me dices y lo resolvemos al tiro.
+Si quedó alguna duda con el equipo, el precio o cómo funciona la boleta electrónica, me dices y lo resolvemos al tiro.
 
-Si por ahora no es el momento, tambien esta bien, avisame y te dejo tranquilo.
+Si por ahora no es el momento, también está bien. Avísame y te dejo tranquilo.

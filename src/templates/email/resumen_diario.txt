@@ -1,10 +1,10 @@
 asunto: {{total}} pendientes para hoy{{sufijo_urgente}}
 ---
-Buenos dias {{vendedor}},
+Buenos días {{vendedor}},
 
 {{resumen}}
 {{enlace_panel}}
 Para verlo desde el terminal:  node bin/appos.js hoy
 
 --
-{{negocio}} · resumen automatico de las {{hora_rutina}}:00
+{{negocio}} · resumen automático de las {{hora_rutina}}:00

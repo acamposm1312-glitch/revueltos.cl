@@ -1,7 +1,7 @@
-{{saludo}}, segun la fecha de tu compra ya deberias andar corto de papel termico.
+{{saludo}}, según la fecha de tu compra ya deberías andar corto de papel térmico.
 
-Quedarse sin rollos es quedarse sin poder entregar boleta, asi que mejor adelantarse.
+Quedarse sin rollos es quedarse sin poder entregar boleta, así que mejor adelantarse.
 
 {{recomendacion}}
 
-Te lo despacho igual que el equipo. Me dices cuantos y lo dejo encargado.
+Te lo despacho igual que el equipo. Me dices cuántos y lo dejo encargado.
