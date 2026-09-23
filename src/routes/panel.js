@@ -6,6 +6,7 @@ import { colaDeHoy, tareasPendientes } from '../core/tareas.js';
 import { listarPublicaciones } from '../core/contenido.js';
 import { formatearTelefono } from '../core/telefono.js';
 import { clp } from '../core/catalogo.js';
+import { cabeceraHtml } from './comunes.js';
 
 const esc = (v) => String(v ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -16,9 +17,13 @@ const ESTILOS = `
 @media(prefers-color-scheme:dark){:root{--fondo:#0f1115;--tarjeta:#181b21;--texto:#e8eaed;--suave:#9aa4b2;--borde:#272b33;--acento:#25d366;--acento2:#25d366;--alerta:#ff6b6b}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:0 0 48px}
-header{background:var(--acento);color:#fff;padding:18px 16px}
-header h1{margin:0;font-size:20px;letter-spacing:.3px}
-header p{margin:4px 0 0;opacity:.85;font-size:13px}
+header{background:var(--acento);color:#fff;padding:20px 16px calc(18px + env(safe-area-inset-bottom,0px));padding-top:calc(20px + env(safe-area-inset-top,0px))}
+header h1{margin:0;font-size:19px;letter-spacing:.3px}
+header p{margin:3px 0 0;opacity:.85;font-size:13px}
+.titulares{display:flex;gap:10px;margin-top:16px}
+.titular{flex:1;background:rgba(255,255,255,.14);border-radius:10px;padding:10px 12px}
+.titular b{display:block;font-size:24px;line-height:1.1}
+.titular span{font-size:11px;opacity:.9;text-transform:uppercase;letter-spacing:.5px}
 main{max-width:860px;margin:0 auto;padding:16px}
 h2{font-size:15px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave);margin:28px 0 12px}
 .tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:12px;padding:14px;margin-bottom:12px}
@@ -80,6 +85,18 @@ function tarjetaPublicacion(p) {
   </article>`;
 }
 
+/** Saludo segun la hora de Chile, para que el panel se sienta del dia. */
+function saludoDelDia() {
+  const hora = Number(new Intl.DateTimeFormat('en-GB', {
+    timeZone: config.negocio.zonaHoraria, hour: '2-digit', hour12: false,
+  }).format(new Date()));
+  const momento = hora < 12 ? 'Buenos días' : (hora < 20 ? 'Buenas tardes' : 'Buenas noches');
+  const fecha = new Intl.DateTimeFormat('es-CL', {
+    timeZone: config.negocio.zonaHoraria, weekday: 'long', day: 'numeric', month: 'long',
+  }).format(new Date());
+  return `${momento}, ${config.negocio.vendedor} · ${fecha}`;
+}
+
 function listaDeLeads(token) {
   const filas = listar({ limite: 60 });
   if (!filas.length) return '<p class="vacio">Todavia no hay leads.</p>';
@@ -111,12 +128,15 @@ export function renderPanel(token = '', aviso = '') {
     .map((e) => `<div class="kpi"><b>${resumen.get(e.clave) ?? 0}</b><span>${esc(e.nombre)}</span></div>`)
     .join('');
 
-  return `<!doctype html><html lang="es"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Panel ${esc(config.negocio.nombre)}</title><style>${ESTILOS}</style></head><body>
+  return `${cabeceraHtml(`Panel ${config.negocio.nombre}`, token, ESTILOS)}
 <header>
-  <h1>${esc(config.negocio.nombre)} · panel de operacion</h1>
-  <p>${tareasPendientes()} tareas pendientes · ${enJuego.length} negocios abiertos · ${esc(clp(valorEnJuego))} en juego</p>
+  <h1>${esc(config.negocio.nombre)}</h1>
+  <p>${esc(saludoDelDia())}</p>
+  <div class="titulares">
+    <div class="titular"><b>${cola.length}</b><span>Por hacer hoy</span></div>
+    <div class="titular"><b>${enJuego.length}</b><span>Negocios abiertos</span></div>
+    <div class="titular"><b>${esc(clp(valorEnJuego))}</b><span>En juego</span></div>
+  </div>
 </header>
 <main>
   ${aviso ? `<p class="aviso">${esc(aviso)}</p>` : ''}
