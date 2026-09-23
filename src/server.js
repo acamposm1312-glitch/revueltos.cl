@@ -259,9 +259,11 @@ async function manejar(req, res) {
     let aviso;
     try {
       const r = await correrRutinaDiaria({ forzar: true });
+      const { plural } = await import('./core/resumen.js');
+      const tareas = `${r.tareasCreadas} ${plural(r.tareasCreadas, 'tarea nueva', 'tareas nuevas')}`;
       aviso = r.resumen.enviado
-        ? `Rutina lista: ${r.tareasCreadas} tareas nuevas y resumen enviado a ${config.negocio.correo}.`
-        : `Rutina lista: ${r.tareasCreadas} tareas nuevas. Resumen no enviado (${r.resumen.motivo ?? 'sin motivo'}).`;
+        ? `Rutina lista: ${tareas} y resumen enviado a ${config.negocio.correo}.`
+        : `Rutina lista: ${tareas}. Resumen no enviado (${r.resumen.motivo ?? 'sin motivo'}).`;
       console.log(`[panel] rutina forzada · ${aviso}`);
     } catch (e) {
       aviso = `La rutina fallo: ${e.message}`;

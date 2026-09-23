@@ -1,4 +1,4 @@
-asunto: {{total}} pendientes para hoy{{sufijo_urgente}}
+asunto: {{total}} {{palabra_pendientes}} para hoy{{sufijo_urgente}}
 ---
 Buenos días {{vendedor}},
 
