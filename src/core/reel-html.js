@@ -35,6 +35,8 @@ export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, pre
   // El acercamiento es lento y constante: es lo que da sensacion de video sin
   // que el equipo se deforme ni gire, que es lo que delata una animacion falsa.
   const zoom = 1 + 0.09 * suave(t);
+  // Un gancho largo a 84 px ocupaba cuatro lineas y aplastaba el resto.
+  const tamano = titulo.length > 70 ? 66 : (titulo.length > 45 ? 74 : 84);
   const sitio = config.negocio.sitio.replace(/^https?:\/\//, '');
 
   const aparecer = (desde, hasta, px = 40) => {
@@ -48,16 +50,21 @@ export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, pre
   html,body{width:${ANCHO}px;height:${ALTO}px;overflow:hidden}
   body{position:relative;font-family:${FAMILIA};background:${MARCA.azul};
     color:${MARCA.blanco};-webkit-font-smoothing:antialiased}
-  .equipo{position:absolute;left:0;right:0;top:620px;height:820px;
-    display:flex;align-items:center;justify-content:center}
-  .equipo img{max-width:74%;max-height:100%;object-fit:contain;
+  /* El equipo va sobre un panel blanco, no sobre el azul: las maquinas TUU son
+     azules y contra el fondo de marca perdian el contorno entero. El panel usa
+     la misma forma que la pastilla y el bloque de precio. */
+  .panel{position:absolute;left:84px;right:84px;top:660px;height:760px;
+    background:${MARCA.blanco};border-radius:34px;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 26px 52px rgba(0,0,0,.22)}
+  .panel img{max-width:88%;max-height:84%;object-fit:contain;
     transform:scale(${zoom.toFixed(4)});
-    filter:drop-shadow(0 38px 46px rgba(0,0,0,.34))}
+    filter:drop-shadow(0 22px 26px rgba(0,26,77,.22))}
   .arriba{position:absolute;left:0;right:0;top:0;padding:150px 84px 0}
   .etiqueta{display:inline-block;background:${MARCA.blanco};color:${MARCA.azul};
     font-size:30px;letter-spacing:2px;text-transform:uppercase;font-weight:700;
     padding:17px 36px;border-radius:${MARCA.radioPildora}px;${aparecer(0.02, 0.22, 26)}}
-  .titulo{margin-top:46px;font-size:84px;line-height:1.08;font-weight:800;
+  .titulo{margin-top:46px;font-size:${tamano}px;line-height:1.08;font-weight:800;
     letter-spacing:-2.5px;max-width:900px;${aparecer(0.10, 0.38)}}
   .abajo{position:absolute;left:0;right:0;bottom:200px;padding:0 84px}
   .precio{display:inline-block;background:${MARCA.blanco};color:${MARCA.azul};
@@ -71,7 +78,7 @@ export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, pre
   .marca .nombre{font-size:40px;font-weight:800;letter-spacing:.5px}
   .oficial{font-size:26px;text-align:right;line-height:1.35;font-weight:600;color:${MARCA.azulOscuro}}
   </style></head><body>
-  <div class="equipo"><img src="${fotoBase64}" alt=""></div>
+  <div class="panel"><img src="${fotoBase64}" alt=""></div>
   <div class="arriba">
     ${etiqueta ? `<div class="etiqueta">${esc(etiqueta)}</div>` : ''}
     <div class="titulo">${esc(titulo)}</div>
