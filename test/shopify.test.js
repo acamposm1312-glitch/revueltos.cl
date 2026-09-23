@@ -129,15 +129,39 @@ describe('token de ruta (webhooks creados por API)', () => {
   });
 });
 
-describe('observabilidad del endpoint', () => {
-  test('/salud informa cuantos webhooks y leads hay', async () => {
+describe('observabilidad y acceso', () => {
+  test('sin token configurado solo se autoriza desde la propia maquina', async () => {
+    const { panelAutorizado } = await import('../src/server.js');
+    const url = new URL('http://x/salud');
+    assert.equal(panelAutorizado({ socket: { remoteAddress: '127.0.0.1' }, headers: {} }, url, ''), true);
+    assert.equal(panelAutorizado({ socket: { remoteAddress: '190.1.2.3' }, headers: {} }, url, ''), false);
+  });
+
+  test('con token configurado, se exige el token correcto', async () => {
+    const { panelAutorizado } = await import('../src/server.js');
+    const remoto = { socket: { remoteAddress: '190.1.2.3' }, headers: {} };
+    assert.equal(panelAutorizado(remoto, new URL('http://x/salud'), 'secreto'), false);
+    assert.equal(panelAutorizado(remoto, new URL('http://x/salud?token=otro'), 'secreto'), false);
+    assert.equal(panelAutorizado(remoto, new URL('http://x/salud?token=secreto'), 'secreto'), true);
+    assert.equal(
+      panelAutorizado({ socket: { remoteAddress: '190.1.2.3' }, headers: { 'x-panel-token': 'secreto' } }, new URL('http://x/salud'), 'secreto'),
+      true,
+      'tambien se acepta por cabecera',
+    );
+    assert.equal(panelAutorizado({ socket: { remoteAddress: '127.0.0.1' }, headers: {} }, new URL('http://x/salud'), 'secreto'), false,
+      'con token configurado, localhost tampoco entra sin el');
+  });
+
+  test('/salud responde ok para el health check de Render', async () => {
     const { servidor } = await import('../src/server.js');
     await new Promise((r) => servidor.listen(0, r));
-    const { port } = servidor.address();
-    const cuerpo = await (await fetch(`http://127.0.0.1:${port}/salud`)).json();
-    assert.equal(cuerpo.ok, true);
-    assert.equal(typeof cuerpo.webhooksRecibidos, 'number');
-    assert.equal(typeof cuerpo.leads, 'number');
-    await new Promise((r) => servidor.close(r));
+    try {
+      const { port } = servidor.address();
+      const cuerpo = await (await fetch(`http://127.0.0.1:${port}/salud`)).json();
+      assert.equal(cuerpo.ok, true);
+      assert.equal(typeof cuerpo.hora, 'string');
+    } finally {
+      await new Promise((r) => servidor.close(r));
+    }
   });
 });
