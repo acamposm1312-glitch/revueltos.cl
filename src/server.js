@@ -7,6 +7,7 @@ import { moverEtapa } from './core/leads.js';
 import { firmaValida, tokenDeRutaValido, yaProcesado, procesarWebhook } from './core/shopify.js';
 import { mensajeWhatsapp } from './core/plantillas.js';
 import { renderPanel } from './routes/panel.js';
+import { renderDiagnostico } from './routes/diagnostico.js';
 import { iniciarProgramador } from './core/programador.js';
 
 const ORIGENES_PERMITIDOS = new Set([
@@ -171,6 +172,15 @@ async function manejar(req, res) {
   if (ruta === '/api/cola' && req.method === 'GET') {
     if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
     return json(res, 200, { cola: colaDeHoy() });
+  }
+
+  if (ruta === '/diagnostico' && req.method === 'GET') {
+    if (!panelAutorizado(req, url)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('No autorizado. Agrega ?token=... a la direccion (PANEL_TOKEN en el .env).');
+    }
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return res.end(renderDiagnostico(url.searchParams.get('token') ?? ''));
   }
 
   // --- Panel ---

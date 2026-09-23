@@ -96,6 +96,9 @@ export function renderPanel(token = '') {
   <h2>Pipeline</h2>
   <div class="rejilla">${kpis}</div>
 
+  <h2>Estado del sistema</h2>
+  <p><a class="boton wa" href="/diagnostico${token ? `?token=${encodeURIComponent(token)}` : ''}">Ver diagnostico de configuracion</a></p>
+
   <h2>Proximas publicaciones</h2>
   ${publicaciones.length ? publicaciones.map(tarjetaPublicacion).join('') : '<p class="vacio">No hay calendario generado. Corre: npm run cli contenido generar</p>'}
 </main></body></html>`;

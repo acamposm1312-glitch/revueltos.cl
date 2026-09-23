@@ -12,6 +12,7 @@ import { ETAPAS, clavesEtapas } from '../src/core/pipeline.js';
 import { formatearTelefono } from '../src/core/telefono.js';
 import { clp } from '../src/core/catalogo.js';
 import { listarPlantillas } from '../src/core/plantillas.js';
+import { estadoDelSistema } from '../src/core/estado.js';
 
 const [, , comando, ...args] = process.argv;
 const bandera = (nombre) => args.includes(`--${nombre}`);
@@ -228,23 +229,17 @@ async function principal() {
       break;
 
     case 'diagnostico': {
-      const revisar = (etiqueta, ok, pista) => console.log(`  ${ok ? 'OK  ' : 'FALTA'} ${etiqueta.padEnd(34)}${ok ? '' : pista}`);
+      const e = estadoDelSistema();
       console.log('\nConfiguracion:\n');
-      revisar('WhatsApp de APPOS', config.negocio.whatsapp !== '56900000000', 'define APPOS_WHATSAPP en .env');
-      revisar('Firma HMAC de webhooks', !!config.shopify.webhookSecret, config.shopify.webhookUrlToken ? 'usando token de ruta; migra a SHOPIFY_WEBHOOK_SECRET' : 'define SHOPIFY_WEBHOOK_SECRET');
-      revisar('Webhooks recibibles', !!(config.shopify.webhookSecret || config.shopify.webhookUrlToken), 'sin secreto ni token, se rechaza todo');
-      revisar('Proveedor de correo', config.email.proveedor !== 'consola', 'define EMAIL_PROVIDER y EMAIL_API_KEY');
-      revisar('Token del panel', !!config.servidor.panelToken, 'define PANEL_TOKEN para abrirlo fuera de localhost');
-      revisar('Resumen diario por correo', config.servidor.resumenDiario && config.email.proveedor !== 'consola', 'necesita EMAIL_PROVIDER real para llegarte');
-      revisar('URL del panel en el resumen', !!config.servidor.panelUrl, 'define PANEL_URL para que el correo traiga el enlace');
-      revisar('Instagram (opcional)', !!(config.instagram.igUserId && config.instagram.token), 'define IG_USER_ID e IG_TOKEN');
-      revisar('WhatsApp Cloud API (opcional)', config.whatsapp.modo === 'cloud', 'sigue con enlaces wa.me, funciona igual');
-      console.log(`\nDatos:\n`);
-      console.log(`  Base de datos      ${config.db.ruta}`);
-      console.log(`  Leads              ${listar({ limite: 100000 }).length}`);
-      console.log(`  Tareas pendientes  ${tareasPendientes()}`);
-      console.log(`  Plantillas WA      ${listarPlantillas('whatsapp').join(', ')}`);
-      console.log(`  Plantillas correo  ${listarPlantillas('email').join(', ')}`);
+      for (const r of e.revisiones) {
+        console.log(`  ${(r.ok ? 'LISTO' : (r.critico ? 'FALTA' : 'PEND.')).padEnd(6)} ${r.etiqueta.padEnd(30)} ${r.valor}`);
+        if (!r.ok) console.log(`         ${r.pista}`);
+      }
+      console.log('\nDatos:\n');
+      for (const [k, v] of Object.entries(e.datos)) console.log(`  ${k.padEnd(20)} ${v}`);
+      console.log(`\n  Base de datos        ${config.db.ruta}`);
+      console.log(`  Plantillas WhatsApp  ${listarPlantillas('whatsapp').length}`);
+      console.log(`  Plantillas correo    ${listarPlantillas('email').length}`);
       console.log('');
       break;
     }
