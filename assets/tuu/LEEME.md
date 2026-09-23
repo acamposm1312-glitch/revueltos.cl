@@ -49,7 +49,8 @@ En Shopify vive en los dos esquemas de color creados para esto,
 | Azul sobre blanco | `#1731ef`, con `#101f9e` al pasar el mouse |
 | Tinte claro sobre azul | `#dfe3ff` |
 
-El cambio está hecho en el tema **Horizon - azul TUU oficial**, que es una copia
-del tema en vivo con esos ocho valores cambiados y nada más. Queda sin publicar:
-poner un tema en producción se hace a mano desde el admin de Shopify, y es la
-única parte de esto que no se automatiza.
+El cambio está publicado en el tema **Horizon - azul TUU oficial**, una copia
+del anterior con esos ocho valores cambiados y nada más.
+
+Para volver atrás se publica **Horizon - WhatsApp flotante**, que quedó sin
+publicar y con su contenido original intacto.
