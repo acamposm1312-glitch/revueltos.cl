@@ -112,6 +112,13 @@ describe('telefonos', () => {
 });
 
 describe('sla', () => {
+  test('un lead nuevo entra a la cola a la media hora, no a las dos horas', () => {
+    const haceUnaHora = { etapa: 'nuevo', etapa_desde: new Date(Date.now() - 36e5).toISOString() };
+    const hace10min = { etapa: 'nuevo', etapa_desde: new Date(Date.now() - 10 * 6e4).toISOString() };
+    assert.equal(slaVencido(haceUnaHora), true);
+    assert.equal(slaVencido(hace10min), false);
+  });
+
   test('una etapa sin plazo nunca vence', () => {
     assert.equal(slaVencido({ etapa: 'activo', etapa_desde: '2020-01-01T00:00:00.000Z' }), false);
   });

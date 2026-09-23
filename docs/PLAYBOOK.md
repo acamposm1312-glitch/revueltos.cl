@@ -37,7 +37,7 @@ Desde el celular es mas comodo el panel: `https://TU-SERVIDOR/?token=TU_TOKEN`.
 
 | Etapa | Que significa | Plazo antes de que el sistema te avise |
 |---|---|---|
-| `nuevo` | Dejo sus datos, nadie le ha escrito | 2 horas |
+| `nuevo` | Dejo sus datos, nadie le ha escrito | 30 minutos |
 | `contactado` | Ya le escribiste, falta la recomendacion | 24 horas |
 | `cotizado` | Tiene precio y equipo sugerido | 48 horas |
 | `pagado` | Pago en appos.cl | 4 horas |
@@ -47,8 +47,11 @@ Desde el celular es mas comodo el panel: `https://TU-SERVIDOR/?token=TU_TOKEN`.
 | `activo` | Operando. Aqui empieza la postventa | sin plazo |
 | `perdido` | No avanzo | sin plazo |
 
-Las 2 horas en `nuevo` no son un capricho: en venta de equipos el que responde
-primero se queda con la venta, y tu competencia es la pagina de TUU directo.
+Los 30 minutos en `nuevo` no son un capricho: en venta de equipos el que
+responde primero se queda con la venta, y tu competencia es la pagina de TUU
+abierta en otra pestana. La tarea ademas se crea apenas entra el lead, venga del
+formulario de la tienda o de Shopify, asi que no hay que esperar nada para verla
+en la cola.
 
 ## Lo que pasa solo
 
