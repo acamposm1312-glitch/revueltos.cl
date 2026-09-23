@@ -10,7 +10,7 @@ import { renderPanel } from './routes/panel.js';
 import { renderDiagnostico } from './routes/diagnostico.js';
 import { renderWidgetJs } from './routes/widget.js';
 import { renderComision } from './routes/comision.js';
-import { manifiesto } from './routes/comunes.js';
+import { manifiesto, paginaNoAutorizado } from './routes/comunes.js';
 import { generarIcono } from './core/icono.js';
 import { iniciarProgramador, correrRutinaDiaria } from './core/programador.js';
 
@@ -54,6 +54,12 @@ const leerCuerpo = (req, limite = 1_000_000) => new Promise((resolve, reject) =>
   req.on('end', () => resolve(datos));
   req.on('error', reject);
 });
+
+/** Respuesta cuando falta la llave: distingue "no la trae" de "no coincide". */
+function sinLlave(res, url) {
+  res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' });
+  return res.end(paginaNoAutorizado(url.searchParams.has('token')));
+}
 
 function json(res, codigo, cuerpo, cabeceras = {}) {
   res.writeHead(codigo, { 'Content-Type': 'application/json; charset=utf-8', ...cabeceras });
@@ -282,10 +288,7 @@ async function manejar(req, res) {
   }
 
   if (ruta === '/comision' && req.method === 'GET') {
-    if (!panelAutorizado(req, url)) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-      return res.end('No autorizado. Agrega ?token=... a la direccion.');
-    }
+    if (!panelAutorizado(req, url)) return sinLlave(res, url);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(renderComision(url.searchParams.get('token') ?? '', {
       ticket: url.searchParams.get('ticket'),
@@ -295,20 +298,14 @@ async function manejar(req, res) {
   }
 
   if (ruta === '/diagnostico' && req.method === 'GET') {
-    if (!panelAutorizado(req, url)) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-      return res.end('No autorizado. Agrega ?token=... a la direccion (PANEL_TOKEN en el .env).');
-    }
+    if (!panelAutorizado(req, url)) return sinLlave(res, url);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(renderDiagnostico(url.searchParams.get('token') ?? ''));
   }
 
   // --- Panel ---
   if (ruta === '/' && req.method === 'GET') {
-    if (!panelAutorizado(req, url)) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-      return res.end('No autorizado. Agrega ?token=... a la direccion (PANEL_TOKEN en el .env).');
-    }
+    if (!panelAutorizado(req, url)) return sinLlave(res, url);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(renderPanel(url.searchParams.get('token') ?? '', url.searchParams.get('aviso') ?? ''));
   }

@@ -54,3 +54,32 @@ export function manifiesto(token = '') {
     ],
   };
 }
+
+/**
+ * Pagina que se muestra cuando falta la llave o no coincide.
+ *
+ * Reemplaza un mensaje anterior que hablaba de "PANEL_TOKEN en el .env": quien
+ * usa esto desde el telefono no tiene un archivo .env ni sabe que es, y el
+ * mensaje no decia que hacer.
+ */
+export function paginaNoAutorizado(sobra = false) {
+  const ESTILOS = `
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+      background:${COLOR_MARCA};color:#fff;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px}
+    .caja{max-width:420px;text-align:center}
+    h1{font-size:22px;margin:0 0 12px}
+    p{margin:0 0 14px;opacity:.92;font-size:15px}
+    code{display:block;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 12px;
+      font:13px/1.5 ui-monospace,Menlo,monospace;word-break:break-all;margin:14px 0}
+    .pie{font-size:13px;opacity:.75;margin-top:22px}
+  `;
+  return `${cabeceraHtml('Falta la llave de acceso', '', ESTILOS)}
+  <div class="caja">
+    <h1>Falta la llave de acceso</h1>
+    <p>${sobra ? 'La llave no coincide. Revisa que la hayas copiado completa, sin espacios al principio ni al final.' : 'Esta página es privada: muestra tus clientes, así que necesita una llave para abrirse.'}</p>
+    <p>Agrégala al final de la dirección, así:</p>
+    <code>${esc(config.negocio.sitio.replace(/^https?:\/\/[^/]+/, '') || '')}/?token=TU_LLAVE</code>
+    <p class="pie">Si no la tienes a mano, está guardada en la configuración del servidor, en la variable <strong>PANEL_TOKEN</strong>.</p>
+  </div>
+</body></html>`;
+}

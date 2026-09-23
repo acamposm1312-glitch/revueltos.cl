@@ -88,3 +88,24 @@ describe('cabecera del panel', () => {
     assert.match(renderPanel('t'), /Buen(os|as) (días|tardes|noches), Alejandro · /);
   });
 });
+
+describe('cuando falta la llave', () => {
+  test('explica que hacer, sin hablar de archivos que el usuario no tiene', async () => {
+    const { paginaNoAutorizado } = await import('../src/routes/comunes.js');
+    const html = paginaNoAutorizado(false);
+    assert.match(html, /Falta la llave de acceso/);
+    assert.match(html, /\?token=TU_LLAVE/);
+    assert.doesNotMatch(html, /\.env/, 'quien entra desde el telefono no tiene un archivo .env');
+  });
+
+  test('distingue entre no traer llave y traer una equivocada', async () => {
+    const { paginaNoAutorizado } = await import('../src/routes/comunes.js');
+    assert.match(paginaNoAutorizado(true), /no coincide/);
+    assert.match(paginaNoAutorizado(false), /Esta página es privada/);
+  });
+
+  test('la pagina de error tambien se ve bien en el telefono', async () => {
+    const { paginaNoAutorizado } = await import('../src/routes/comunes.js');
+    assert.match(paginaNoAutorizado(false), /name="viewport"/);
+  });
+});
