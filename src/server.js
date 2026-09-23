@@ -59,14 +59,20 @@ function cabecerasCors(origen) {
   };
 }
 
-/** El panel exige token salvo que se acceda desde la propia maquina. */
-function panelAutorizado(req, url) {
-  if (!config.servidor.panelToken) {
-    const ip = req.socket.remoteAddress ?? '';
+/**
+ * El panel exige token. Sin token configurado solo se permite el acceso desde la
+ * propia maquina, para que un despliegue sin PANEL_TOKEN no quede abierto.
+ *
+ * `tokenEsperado` se puede inyectar en las pruebas: config se lee al importar el
+ * modulo, asi que cambiar process.env despues no tendria efecto.
+ */
+export function panelAutorizado(req, url, tokenEsperado = config.servidor.panelToken) {
+  if (!tokenEsperado) {
+    const ip = req.socket?.remoteAddress ?? '';
     return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
   }
   const token = url.searchParams.get('token') || req.headers['x-panel-token'];
-  return token === config.servidor.panelToken;
+  return token === tokenEsperado;
 }
 
 async function manejar(req, res) {
@@ -79,16 +85,22 @@ async function manejar(req, res) {
     return res.end();
   }
 
+  // /salud es publico porque Render lo usa como health check, asi que responde
+  // lo minimo. Los contadores solo se entregan a quien trae el token del panel:
+  // cuantos clientes tiene el negocio no es informacion para cualquiera.
   if (ruta === '/salud') {
-    // Incluye contadores para poder verificar el estado desde fuera sin abrir
-    // el panel: util cuando la integracion se revisa desde otra herramienta.
-    let webhooks = 0;
-    let leads = 0;
+    const base = { ok: true, hora: new Date().toISOString() };
+    if (!panelAutorizado(req, url)) return json(res, 200, base);
     try {
-      webhooks = db().prepare('SELECT COUNT(*) AS n FROM webhooks_vistos').get().n;
-      leads = db().prepare('SELECT COUNT(*) AS n FROM leads').get().n;
-    } catch { /* base recien creada */ }
-    return json(res, 200, { ok: true, hora: new Date().toISOString(), webhooksRecibidos: webhooks, leads });
+      return json(res, 200, {
+        ...base,
+        webhooksRecibidos: db().prepare('SELECT COUNT(*) AS n FROM webhooks_vistos').get().n,
+        leads: db().prepare('SELECT COUNT(*) AS n FROM leads').get().n,
+        tareasPendientes: db().prepare("SELECT COUNT(*) AS n FROM tareas WHERE estado = 'pendiente'").get().n,
+      });
+    } catch {
+      return json(res, 200, base);
+    }
   }
 
   // --- Captura de leads desde el formulario de la tienda ---
