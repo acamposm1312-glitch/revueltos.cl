@@ -60,7 +60,10 @@ export function iniciarProgramador(intervaloMs = 15 * 60 * 1000) {
     try {
       const r = await correrRutinaDiaria();
       if (r.corrio) {
-        console.log(`[rutina ${r.fecha}] ${r.tareasCreadas} tareas creadas, ${r.correosEnviados} correos enviados`);
+        const res = r.resumen.enviado
+          ? 'resumen enviado'
+          : `resumen NO enviado (${r.resumen.motivo ?? 'sin motivo'})`;
+        console.log(`[rutina ${r.fecha}] ${r.tareasCreadas} tareas creadas, ${r.correosEnviados} correos enviados, ${res}`);
       }
     } catch (e) {
       console.error('[rutina] error:', e.message);

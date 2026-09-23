@@ -48,6 +48,7 @@ export function descartarTarea(id) {
 export function generarTareas(referencia = new Date()) {
   const detalle = [];
   let creadas = 0;
+  const momento = referencia.toISOString();
 
   const abiertos = db().prepare(
     `SELECT * FROM leads WHERE etapa IN (${ETAPAS_ABIERTAS.map(() => '?').join(',')})`,
@@ -65,6 +66,11 @@ export function generarTareas(referencia = new Date()) {
       canal: lead.telefono ? 'whatsapp' : 'email',
       titulo: `${e.accion} (${horas} h en "${e.nombre}")`,
       mensaje,
+      // Vence en el instante que se esta evaluando, no en "ahora". Si se usara
+      // ahora(), la tarea quedaria unos milisegundos en el futuro respecto de
+      // `referencia` y no aparecceria en la cola de esta misma corrida: el
+      // resumen diario se enviaria vacio el dia que se crea la tarea.
+      vence: momento,
     })) { creadas++; detalle.push(`#${lead.id} ${lead.nombre || lead.telefono}: ${e.accion}`); }
   }
 
@@ -87,7 +93,7 @@ export function generarTareas(referencia = new Date()) {
       const mensaje = lead.telefono
         ? mensajeWhatsapp('recompra_papel', lead, { recomendacion: bloqueRecomendacion(papel.slice(0, 2)) })
         : '';
-      if (crearTarea({ leadId: lead.id, tipo: 'recompra_papel', titulo: 'Ofrecer recompra de papel termico', mensaje })) {
+      if (crearTarea({ leadId: lead.id, tipo: 'recompra_papel', titulo: 'Ofrecer recompra de papel térmico', mensaje, vence: momento })) {
         creadas++; detalle.push(`#${lead.id} ${lead.nombre}: recompra de papel`);
       }
     }
@@ -95,7 +101,7 @@ export function generarTareas(referencia = new Date()) {
       const mensaje = lead.telefono
         ? mensajeWhatsapp('renovacion_firma', lead, { recomendacion: bloqueRecomendacion(firmas) })
         : '';
-      if (crearTarea({ leadId: lead.id, tipo: 'renovacion_firma', titulo: 'Renovar firma electronica antes del vencimiento', mensaje })) {
+      if (crearTarea({ leadId: lead.id, tipo: 'renovacion_firma', titulo: 'Renovar firma electrónica antes del vencimiento', mensaje, vence: momento })) {
         creadas++; detalle.push(`#${lead.id} ${lead.nombre}: renovacion de firma`);
       }
     }
