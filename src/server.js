@@ -239,6 +239,17 @@ async function manejar(req, res) {
     return res.end();
   }
 
+  if (ruta === '/api/probar-correo' && req.method === 'POST') {
+    if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
+    const { probarCorreo } = await import('./core/email.js');
+    const r = await probarCorreo(config);
+    console.log(`[panel] prueba de correo · ${r.mensaje}`);
+    const t = url.searchParams.get('token');
+    const partes = [t ? `token=${encodeURIComponent(t)}` : '', `aviso=${encodeURIComponent(r.mensaje)}`].filter(Boolean);
+    res.writeHead(303, { Location: `/diagnostico?${partes.join('&')}` });
+    return res.end();
+  }
+
   // Permite correr la rutina a demanda, sin esperar a las 9:00. Sirve para
   // verificar la configuracion del correo y para el dia en que el servidor
   // estuvo caido a la hora que correspondia.
@@ -322,7 +333,7 @@ async function manejar(req, res) {
   if (ruta === '/diagnostico' && req.method === 'GET') {
     if (!panelAutorizado(req, url)) return sinLlave(res, url);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    return res.end(renderDiagnostico(url.searchParams.get('token') ?? ''));
+    return res.end(renderDiagnostico(url.searchParams.get('token') ?? '', url.searchParams.get('aviso') ?? ''));
   }
 
   // --- Panel ---

@@ -62,3 +62,26 @@ describe('pagina de diagnostico', () => {
     assert.doesNotMatch(html, /<script>alert\(1\)<\/script>/);
   });
 });
+
+describe('probar el correo', () => {
+  test('en modo consola explica que el proveedor no envia', async () => {
+    const { probarCorreo } = await import('../src/core/email.js');
+    const config = (await import('../src/config.js')).default;
+    const r = await probarCorreo(config);
+    assert.equal(r.ok, false);
+    assert.match(r.mensaje, /No se pudo enviar/);
+    assert.match(r.mensaje, /consola/);
+  });
+
+  test('la pagina ofrece el boton y muestra el aviso', async () => {
+    const { renderDiagnostico } = await import('../src/routes/diagnostico.js');
+    const html = renderDiagnostico('t', 'Correo de prueba enviado.');
+    assert.match(html, /\/api\/probar-correo\?token=t/);
+    assert.match(html, /Correo de prueba enviado\./);
+  });
+
+  test('el aviso se escapa', async () => {
+    const { renderDiagnostico } = await import('../src/routes/diagnostico.js');
+    assert.doesNotMatch(renderDiagnostico('t', '<script>alert(1)</script>'), /<script>alert\(1\)<\/script>/);
+  });
+});

@@ -57,3 +57,30 @@ export async function enviarEmail({ para, asunto, cuerpo }) {
     return { enviado: false, proveedor, error: e.message };
   }
 }
+
+/**
+ * Envia un correo de prueba a la casilla del negocio y devuelve el resultado.
+ *
+ * Existe porque saber que una variable "esta definida" no dice nada: una clave
+ * mal copiada se ve igual que una correcta en la pantalla de configuracion, y
+ * el problema solo aparece cuando un correo de verdad no llega. Esto lo
+ * responde en diez segundos y con el error textual del proveedor.
+ */
+export async function probarCorreo(config) {
+  const r = await enviarEmail({
+    para: config.negocio.correo,
+    asunto: `Prueba de envío · ${config.negocio.nombre}`,
+    cuerpo: [
+      'Este es un correo de prueba enviado desde tu propio sistema.',
+      '',
+      'Si te llegó, el envío está bien configurado: los correos de postventa y',
+      'tu resumen de cada mañana van a salir sin problema.',
+      '',
+      `Proveedor: ${config.email.proveedor}`,
+      `Remitente: ${config.email.remitente}`,
+    ].join('\n'),
+  });
+
+  if (r.enviado) return { ok: true, mensaje: `Correo de prueba enviado a ${config.negocio.correo}. Revisa tu bandeja.` };
+  return { ok: false, mensaje: `No se pudo enviar: ${r.error || r.motivo || 'el proveedor rechazó el envío'}` };
+}
