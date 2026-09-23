@@ -6,3 +6,8 @@ data/*.db-shm
 .env
 .env.local
 out/
+
+# Material de marca de TUU. Licenciado a APPOS como distribuidor autorizado,
+# no redistribuible: este repositorio es publico.
+assets/tuu/*
+!assets/tuu/LEEME.md
