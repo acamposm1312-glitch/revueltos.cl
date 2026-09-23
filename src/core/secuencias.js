@@ -19,17 +19,43 @@ export const SECUENCIA_POSTVENTA = [
   { plantilla: 'renovacion_firma', dias: 330 },
 ];
 
-function yaEnviado(leadId, plantilla) {
-  return !!db().prepare('SELECT 1 FROM envios WHERE lead_id = ? AND plantilla = ?').get(leadId, plantilla);
+/** Despues de estos intentos fallidos se deja de insistir con esa direccion. */
+export const MAX_INTENTOS = 5;
+
+/**
+ * Un correo se considera resuelto si se envio, o si fallo tantas veces que ya no
+ * vale la pena insistir.
+ *
+ * Antes bastaba con que existiera la fila para darlo por enviado, de modo que un
+ * fallo -por ejemplo, el proveedor de correo mal configurado- quedaba registrado
+ * y el correo no se reintentaba nunca. El cliente se quedaba sin su correo de
+ * bienvenida y sin ninguna senal de que algo habia fallado.
+ */
+function yaResuelto(leadId, plantilla) {
+  const fila = db().prepare('SELECT estado, intentos FROM envios WHERE lead_id = ? AND plantilla = ?')
+    .get(leadId, plantilla);
+  if (!fila) return false;
+  return fila.estado === 'enviado' || fila.intentos >= MAX_INTENTOS;
 }
 
-function anotarEnvio(leadId, plantilla, destino, estado, error = '') {
-  try {
-    db().prepare('INSERT INTO envios (lead_id, canal, plantilla, destino, estado, error, creado) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .run(leadId, 'email', plantilla, destino, estado, error, ahora());
-  } catch (e) {
-    if (!String(e.message).includes('UNIQUE')) throw e;
-  }
+function anotarEnvio(leadId, plantilla, destino, enviado, error = '') {
+  db().prepare(`
+    INSERT INTO envios (lead_id, canal, plantilla, destino, estado, error, creado, intentos)
+    VALUES (?, 'email', ?, ?, ?, ?, ?, 1)
+    ON CONFLICT(lead_id, plantilla) DO UPDATE SET
+      estado = excluded.estado,
+      error = excluded.error,
+      creado = excluded.creado,
+      intentos = envios.intentos + 1
+  `).run(leadId, plantilla, destino, enviado ? 'enviado' : 'pendiente', error, ahora());
+}
+
+/** Correos que fallaron y siguen pendientes de reintento. */
+export function enviosPendientes() {
+  return db().prepare(
+    `SELECT e.*, l.nombre FROM envios e JOIN leads l ON l.id = e.lead_id
+     WHERE e.estado <> 'enviado' AND e.intentos < ? ORDER BY e.creado`,
+  ).all(MAX_INTENTOS);
 }
 
 /** Fecha de compra del lead: el primer evento 'compra', o su fecha de creacion. */
@@ -58,7 +84,7 @@ export async function correrSecuencias({ referencia = new Date(), simular = fals
 
     for (const paso of SECUENCIA_POSTVENTA) {
       if (dias < paso.dias) continue;
-      if (yaEnviado(lead.id, paso.plantilla)) continue;
+      if (yaResuelto(lead.id, paso.plantilla)) continue;
 
       let extra = {};
       if (paso.plantilla === 'recompra_dia30') extra = { recomendacion: bloqueRecomendacion(papel) };
@@ -72,7 +98,8 @@ export async function correrSecuencias({ referencia = new Date(), simular = fals
       }
 
       const r = await enviarEmail({ para: lead.email, asunto, cuerpo });
-      anotarEnvio(lead.id, paso.plantilla, lead.email, r.enviado ? 'enviado' : 'pendiente', r.error ?? '');
+      anotarEnvio(lead.id, paso.plantilla, lead.email, r.enviado, r.error ?? '');
+      if (!r.enviado) console.log(`[correo] ${paso.plantilla} a ${lead.email} NO salio: ${r.error ?? 'proveedor en modo consola'}`);
       resultados.push({ leadId: lead.id, plantilla: paso.plantilla, para: lead.email, asunto, enviado: r.enviado, error: r.error });
     }
   }

@@ -114,6 +114,18 @@ function migrar(d) {
       creado TEXT NOT NULL
     );
   `);
+
+  agregarColumna(d, 'envios', 'intentos INTEGER NOT NULL DEFAULT 0');
+}
+
+// Migraciones sobre tablas que ya existen en produccion. ALTER TABLE no admite
+// IF NOT EXISTS, asi que se ignora el error de columna duplicada.
+function agregarColumna(d, tabla, definicion) {
+  try {
+    d.exec(`ALTER TABLE ${tabla} ADD COLUMN ${definicion}`);
+  } catch (e) {
+    if (!/duplicate column/i.test(e.message)) throw e;
+  }
 }
 
 export const ahora = () => new Date().toISOString();
