@@ -12,7 +12,14 @@ export async function enviarEmail({ para, asunto, cuerpo }) {
   if (!esEmailValido(para)) return { enviado: false, proveedor, error: 'correo invalido' };
 
   if (proveedor === 'consola') {
-    return { enviado: false, proveedor, vistaPrevia: { para, asunto, cuerpo } };
+    // Se devuelve un motivo explicito: sin el, quien lee el log no distingue
+    // "no hay proveedor configurado" de "el envio fallo".
+    return {
+      enviado: false,
+      proveedor,
+      motivo: 'EMAIL_PROVIDER es "consola": el correo se genera pero no se envia',
+      vistaPrevia: { para, asunto, cuerpo },
+    };
   }
   if (!config.email.apiKey) {
     return { enviado: false, proveedor, error: 'falta EMAIL_API_KEY' };

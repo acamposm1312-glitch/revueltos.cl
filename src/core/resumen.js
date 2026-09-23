@@ -112,5 +112,15 @@ export async function enviarResumenDiario({ referencia = new Date(), forzar = fa
   const r = await enviarEmail({ para: config.negocio.correo, asunto, cuerpo });
   if (r.enviado) guardarAjuste('ultimo_resumen', hoy);
 
-  return { enviado: r.enviado, error: r.error, asunto, total: resumen.total, urgentes: resumen.urgentes };
+  return {
+    enviado: r.enviado,
+    // `motivo` siempre viene con algo cuando no se envio. Antes, el fallo del
+    // envio dejaba `motivo` vacio y el log decia "sin motivo", que es
+    // exactamente lo que no se necesita saber cuando algo no llega.
+    motivo: r.enviado ? '' : (r.error || r.motivo || 'el proveedor rechazo el envio'),
+    error: r.error,
+    asunto,
+    total: resumen.total,
+    urgentes: resumen.urgentes,
+  };
 }

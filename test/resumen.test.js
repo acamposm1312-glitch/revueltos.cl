@@ -135,3 +135,24 @@ describe('correr la rutina a demanda', () => {
     assert.doesNotMatch(renderPanel('t'), /class="aviso"/);
   });
 });
+
+describe('por que no se envio el resumen', () => {
+  test('en modo consola dice que el proveedor no envia, no queda en blanco', async () => {
+    const { enviarResumenDiario } = await import('../src/core/resumen.js');
+    const { guardarLead } = await import('../src/core/leads.js');
+    const { crearTarea } = await import('../src/core/tareas.js');
+    const { lead } = guardarLead({ nombre: 'Ana', telefono: '987654321' });
+    crearTarea({ leadId: lead.id, tipo: 'sla_nuevo', titulo: 'escribir' });
+
+    const r = await enviarResumenDiario({ forzar: true });
+    assert.equal(r.enviado, false);
+    assert.ok(r.motivo, 'siempre debe haber un motivo cuando no se envia');
+    assert.match(r.motivo, /consola/, 'debe decir que el proveedor esta en modo consola');
+  });
+
+  test('sin pendientes tambien trae motivo', async () => {
+    const { enviarResumenDiario } = await import('../src/core/resumen.js');
+    const r = await enviarResumenDiario({ forzar: true });
+    assert.equal(r.motivo, 'sin pendientes');
+  });
+});
