@@ -29,6 +29,7 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.8px;color:var(--suave
 pre{white-space:pre-wrap;word-break:break-word;background:var(--fondo);border:1px solid var(--borde);border-radius:8px;padding:10px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;margin:10px 0;max-height:190px;overflow:auto}
 .acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 a.boton,button{border:0;border-radius:9px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+a.boton.hecha{background:var(--borde);color:var(--texto)}
 a.wa{background:var(--acento2);color:#04140d}
 button.hecha{background:var(--borde);color:var(--texto)}
 button.borrar{background:transparent;color:var(--alerta);border:1px solid var(--borde)}
@@ -126,8 +127,11 @@ export function renderPanel(token = '') {
   <h2>Todos los leads</h2>
   ${listaDeLeads(token)}
 
-  <h2>Estado del sistema</h2>
-  <p><a class="boton wa" href="/diagnostico${token ? `?token=${encodeURIComponent(token)}` : ''}">Ver diagnostico de configuracion</a></p>
+  <h2>Herramientas</h2>
+  <p class="acciones">
+    <a class="boton wa" href="/comision${token ? `?token=${encodeURIComponent(token)}` : ''}">Calcular comisión del cliente</a>
+    <a class="boton hecha" href="/diagnostico${token ? `?token=${encodeURIComponent(token)}` : ''}">Diagnóstico del sistema</a>
+  </p>
 
   <h2>Proximas publicaciones</h2>
   ${publicaciones.length ? publicaciones.map(tarjetaPublicacion).join('') : '<p class="vacio">No hay calendario generado. Corre: npm run cli contenido generar</p>'}

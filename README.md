@@ -29,6 +29,8 @@ El sistema acompana ese flujo completo:
 node bin/appos.js hoy          # que tengo que hacer hoy, con los mensajes listos
 node bin/appos.js pipeline     # como viene el embudo
 node bin/appos.js contenido    # genera el calendario de publicaciones
+node bin/appos.js comision --ticket 15000 --ventas 8000000   # que comision le conviene
+node bin/appos.js respuestas   # respuestas listas para WhatsApp e Instagram
 node bin/appos.js diagnostico  # revisa que este todo configurado
 ```
 
@@ -95,6 +97,7 @@ src/core/
   resumen.js              Correo resumen diario de pendientes
   programador.js          Rutina diaria dentro del servidor
   contenido.js            Calendario editorial y generacion de copys
+  comisiones.js           Comparador de esquemas de comision TUU
   shopify.js              Webhooks firmados: ordenes, clientes y carritos
   whatsapp.js             Enlaces wa.me y soporte para Cloud API
   instagram.js            Publicacion via Graph API (opcional)

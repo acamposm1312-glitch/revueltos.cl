@@ -1,0 +1,12 @@
+¿La máquina emite boleta?
+
+Sí, boleta electrónica válida ante el SII, impresa en el mismo equipo.
+
+Ojo con algo que confunde a mucha gente: el voucher y la boleta son cosas distintas.
+
+- El voucher es el comprobante de que la tarjeta se cobró.
+- La boleta es el documento tributario que exige el SII.
+
+Te pueden cursar una multa por no entregar la segunda. Las máquinas TUU emiten las dos en la misma impresión.
+
+Para que emita boleta necesitas firma electrónica simple, que se compra aparte.

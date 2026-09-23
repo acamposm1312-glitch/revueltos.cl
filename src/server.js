@@ -9,6 +9,7 @@ import { mensajeWhatsapp } from './core/plantillas.js';
 import { renderPanel } from './routes/panel.js';
 import { renderDiagnostico } from './routes/diagnostico.js';
 import { renderWidgetJs } from './routes/widget.js';
+import { renderComision } from './routes/comision.js';
 import { iniciarProgramador } from './core/programador.js';
 
 const ORIGENES_PERMITIDOS = new Set([
@@ -227,6 +228,19 @@ async function manejar(req, res) {
   if (ruta === '/api/cola' && req.method === 'GET') {
     if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
     return json(res, 200, { cola: colaDeHoy() });
+  }
+
+  if (ruta === '/comision' && req.method === 'GET') {
+    if (!panelAutorizado(req, url)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('No autorizado. Agrega ?token=... a la direccion.');
+    }
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return res.end(renderComision(url.searchParams.get('token') ?? '', {
+      ticket: url.searchParams.get('ticket'),
+      ventas: url.searchParams.get('ventas'),
+      primerMes: url.searchParams.get('primerMes'),
+    }));
   }
 
   if (ruta === '/diagnostico' && req.method === 'GET') {

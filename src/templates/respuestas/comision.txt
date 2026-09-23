@@ -1,0 +1,21 @@
+¿Cuánto cobra TUU por transacción?
+
+Hay dos esquemas y puedes elegir el que te convenga:
+
+COMISIÓN FIJA (un solo porcentaje)
+- Hasta $5.000.000 al mes: 1,99% + IVA
+- De $5.000.000 a $10.000.000: 1,69% + IVA
+- Sobre $10.000.000: 1,49% + IVA
+
+COMISIÓN MIXTA (menos porcentaje, más un cargo fijo por venta)
+- Hasta $5.000.000: 0,99% + $65 + IVA
+- De $5.000.000 a $10.000.000: 0,89% + $65 + IVA
+- Sobre $10.000.000: 0,79% + $65 + IVA
+
+El primer mes pagas la tarifa más baja: 1,49% o 0,79% + $65, sea cual sea tu volumen.
+
+Cuál te conviene depende de tu ticket promedio, no de cuánto vendas:
+- Ticket bajo $6.500 aproximadamente: conviene la FIJA
+- Ticket sobre eso: conviene la MIXTA
+
+Dime cuánto te compra en promedio una persona y cuánto vendes al mes, y te calculo exactamente cuál te sale más barato y cuánto ahorras.
