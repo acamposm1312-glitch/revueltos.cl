@@ -131,7 +131,7 @@ function copyRubro(claveRubro, rng) {
       angulo,
       '',
       equipo ? `Recomendado: ${equipo.titulo} - ${clp(equipo.precio)}` : '',
-      complemento ? `Complemento util: ${complemento.titulo} - ${clp(complemento.precio)}` : '',
+      complemento ? `Complemento útil: ${complemento.titulo} - ${clp(complemento.precio)}` : '',
       '',
       'Cuéntame tu caso por WhatsApp y te digo con franqueza cuál necesitas, aunque sea la opción más barata.',
     ].filter(Boolean).join('\n'),
