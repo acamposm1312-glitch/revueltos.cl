@@ -38,4 +38,18 @@ de producto y sin lockup, como antes. Pierden calidad, no se rompen.
 ## Azul oficial
 
 `#1731ef`, muestreado del lockup. Es el color de marca de TUU, no una
-aproximación. La tienda en Shopify todavía usa `#0052cc`: conviene alinearla.
+aproximación.
+
+En Shopify vive en los dos esquemas de color creados para esto,
+`scheme-tuu-vibrant-blue` y `scheme-product-price-blue`:
+
+| Ajuste | Valor |
+| --- | --- |
+| Fondo azul | `#1731ef` |
+| Azul sobre blanco | `#1731ef`, con `#101f9e` al pasar el mouse |
+| Tinte claro sobre azul | `#dfe3ff` |
+
+El cambio está hecho en el tema **Horizon - azul TUU oficial**, que es una copia
+del tema en vivo con esos ocho valores cambiados y nada más. Queda sin publicar:
+poner un tema en producción se hace a mano desde el admin de Shopify, y es la
+única parte de esto que no se automatiza.
