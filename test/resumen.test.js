@@ -83,3 +83,35 @@ describe('resumen diario', () => {
     assert.match(r.texto, /Ana Soto/);
   });
 });
+
+describe('la rutina y el resumen del mismo dia', () => {
+  test('las tareas creadas en la corrida entran en el resumen de esa misma corrida', async () => {
+    const { correrRutinaDiaria } = await import('../src/core/programador.js');
+    const { guardarLead } = await import('../src/core/leads.js');
+
+    const { lead } = guardarLead({ nombre: 'Ana Soto', telefono: '987654321', rubro: 'almacen' });
+    db().prepare('UPDATE leads SET etapa_desde = ? WHERE id = ?')
+      .run(new Date(Date.now() - 5 * 36e5).toISOString(), lead.id);
+
+    const r = await correrRutinaDiaria({ forzar: true });
+    assert.equal(r.corrio, true);
+    assert.equal(r.tareasCreadas, 1, 'la tarea se crea');
+    assert.ok(
+      r.resumen.pendientes > 0,
+      'el resumen debe ver la tarea recien creada, no esperar al dia siguiente',
+    );
+  });
+
+  test('la tarea queda visible en la cola con la hora de la corrida', async () => {
+    const { generarTareas, colaDeHoy } = await import('../src/core/tareas.js');
+    const { guardarLead } = await import('../src/core/leads.js');
+
+    const { lead } = guardarLead({ nombre: 'Luis', telefono: '911111111' });
+    db().prepare('UPDATE leads SET etapa_desde = ? WHERE id = ?')
+      .run(new Date(Date.now() - 5 * 36e5).toISOString(), lead.id);
+
+    const referencia = new Date();
+    generarTareas(referencia);
+    assert.equal(colaDeHoy({ referencia }).length, 1, 'la cola con la misma referencia debe verla');
+  });
+});
