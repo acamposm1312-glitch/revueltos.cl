@@ -10,7 +10,7 @@ import { renderPanel } from './routes/panel.js';
 import { renderDiagnostico } from './routes/diagnostico.js';
 import { renderWidgetJs } from './routes/widget.js';
 import { renderComision } from './routes/comision.js';
-import { iniciarProgramador } from './core/programador.js';
+import { iniciarProgramador, correrRutinaDiaria } from './core/programador.js';
 
 const ORIGENES_PERMITIDOS = new Set([
   'https://www.appos.cl',
@@ -203,6 +203,28 @@ async function manejar(req, res) {
     return res.end();
   }
 
+  // Permite correr la rutina a demanda, sin esperar a las 9:00. Sirve para
+  // verificar la configuracion del correo y para el dia en que el servidor
+  // estuvo caido a la hora que correspondia.
+  if (ruta === '/api/rutina' && req.method === 'POST') {
+    if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
+    const t = url.searchParams.get('token');
+    let aviso;
+    try {
+      const r = await correrRutinaDiaria({ forzar: true });
+      aviso = r.resumen.enviado
+        ? `Rutina lista: ${r.tareasCreadas} tareas nuevas y resumen enviado a ${config.negocio.correo}.`
+        : `Rutina lista: ${r.tareasCreadas} tareas nuevas. Resumen no enviado (${r.resumen.motivo ?? 'sin motivo'}).`;
+      console.log(`[panel] rutina forzada · ${aviso}`);
+    } catch (e) {
+      aviso = `La rutina fallo: ${e.message}`;
+      console.error('[panel] rutina forzada fallo:', e);
+    }
+    const partes = [t ? `token=${encodeURIComponent(t)}` : '', `aviso=${encodeURIComponent(aviso)}`].filter(Boolean);
+    res.writeHead(303, { Location: `/?${partes.join('&')}` });
+    return res.end();
+  }
+
   const borrado = ruta.match(/^\/api\/leads\/(\d+)\/borrar$/);
   if (borrado && req.method === 'POST') {
     if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
@@ -259,7 +281,7 @@ async function manejar(req, res) {
       return res.end('No autorizado. Agrega ?token=... a la direccion (PANEL_TOKEN en el .env).');
     }
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    return res.end(renderPanel(url.searchParams.get('token') ?? ''));
+    return res.end(renderPanel(url.searchParams.get('token') ?? '', url.searchParams.get('aviso') ?? ''));
   }
 
   return json(res, 404, { error: 'no encontrado' });

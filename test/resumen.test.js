@@ -115,3 +115,23 @@ describe('la rutina y el resumen del mismo dia', () => {
     assert.equal(colaDeHoy({ referencia }).length, 1, 'la cola con la misma referencia debe verla');
   });
 });
+
+describe('correr la rutina a demanda', () => {
+  test('el panel muestra el aviso de lo que paso', async () => {
+    const { renderPanel } = await import('../src/routes/panel.js');
+    const html = renderPanel('t', 'Rutina lista: 3 tareas nuevas y resumen enviado.');
+    assert.match(html, /Rutina lista: 3 tareas nuevas/);
+    assert.match(html, /\/api\/rutina\?token=t/);
+    assert.match(html, /confirm\(/, 'debe pedir confirmacion antes de correrla');
+  });
+
+  test('el aviso se escapa antes de mostrarlo', async () => {
+    const { renderPanel } = await import('../src/routes/panel.js');
+    assert.doesNotMatch(renderPanel('t', '<script>alert(1)</script>'), /<script>alert\(1\)<\/script>/);
+  });
+
+  test('sin aviso no aparece el recuadro', async () => {
+    const { renderPanel } = await import('../src/routes/panel.js');
+    assert.doesNotMatch(renderPanel('t'), /class="aviso"/);
+  });
+});

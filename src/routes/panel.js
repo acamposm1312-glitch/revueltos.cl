@@ -41,6 +41,7 @@ th{color:var(--suave);font-weight:600;font-size:12px;text-transform:uppercase;le
 .kpi b{display:block;font-size:22px}
 .kpi span{color:var(--suave);font-size:12px}
 .vacio{color:var(--suave);padding:20px;text-align:center;border:1px dashed var(--borde);border-radius:12px}
+.aviso{background:var(--tarjeta);border:1px solid var(--acento);border-left-width:4px;border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:14px}
 form{display:inline}
 `;
 
@@ -97,7 +98,7 @@ function listaDeLeads(token) {
   </table></div>`;
 }
 
-export function renderPanel(token = '') {
+export function renderPanel(token = '', aviso = '') {
   const cola = colaDeHoy({ limite: 40 });
   const resumen = new Map(resumenPorEtapa().map((r) => [r.etapa, r.total]));
   const publicaciones = listarPublicaciones(120)
@@ -118,6 +119,8 @@ export function renderPanel(token = '') {
   <p>${tareasPendientes()} tareas pendientes · ${enJuego.length} negocios abiertos · ${esc(clp(valorEnJuego))} en juego</p>
 </header>
 <main>
+  ${aviso ? `<p class="aviso">${esc(aviso)}</p>` : ''}
+
   <h2>Cola de hoy</h2>
   ${cola.length ? cola.map((t) => tarjetaTarea(t, token)).join('') : '<p class="vacio">Nada pendiente. Todo al dia.</p>'}
 
@@ -132,6 +135,11 @@ export function renderPanel(token = '') {
     <a class="boton wa" href="/comision${token ? `?token=${encodeURIComponent(token)}` : ''}">Calcular comisión del cliente</a>
     <a class="boton hecha" href="/diagnostico${token ? `?token=${encodeURIComponent(token)}` : ''}">Diagnóstico del sistema</a>
   </p>
+  <form method="post" action="/api/rutina${token ? `?token=${encodeURIComponent(token)}` : ''}"
+        onsubmit="return confirm('Correr la rutina ahora? Arma la cola del día y envía el resumen a tu correo.')">
+    <button class="hecha" type="submit">Correr la rutina ahora</button>
+  </form>
+  <p class="meta">Normalmente corre sola a las 9:00. Úsalo para probar el correo o si el servidor estuvo caído a esa hora.</p>
 
   <h2>Proximas publicaciones</h2>
   ${publicaciones.length ? publicaciones.map(tarjetaPublicacion).join('') : '<p class="vacio">No hay calendario generado. Corre: npm run cli contenido generar</p>'}
