@@ -2,9 +2,7 @@ import config from '../config.js';
 import { compararEsquemas, explicarParaCliente, TRAMOS, PRIMER_MES, ticketDeEquilibrio } from '../core/comisiones.js';
 import { clp } from '../core/catalogo.js';
 
-const esc = (v) => String(v ?? '')
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+import { cabeceraHtml, esc } from './comunes.js';
 
 const ESTILOS = `
 :root{--fondo:#f6f7f9;--tarjeta:#fff;--texto:#16191d;--suave:#5f6975;--borde:#e3e6ea;--acento:#075e54;--ok:#0a7c3f}
@@ -63,9 +61,7 @@ export function renderComision(token = '', params = {}) {
     <td class="num">${esc(clp(ticketDeEquilibrio(t)))}</td>
   </tr>`).join('');
 
-  return `<!doctype html><html lang="es"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Comisiones TUU · ${esc(config.negocio.nombre)}</title><style>${ESTILOS}</style></head><body>
+  return `${cabeceraHtml(`Comisiones TUU · ${config.negocio.nombre}`, token, ESTILOS)}
 <header>
   <h1>¿Qué comisión le conviene?</h1>
   <p>Depende del ticket promedio, no del volumen</p>

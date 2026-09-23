@@ -1,9 +1,7 @@
 import config from '../config.js';
 import { estadoDelSistema } from '../core/estado.js';
 
-const esc = (v) => String(v ?? '')
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+import { cabeceraHtml, esc } from './comunes.js';
 
 const ESTILOS = `
 :root{--fondo:#f6f7f9;--tarjeta:#fff;--texto:#16191d;--suave:#5f6975;--borde:#e3e6ea;--acento:#075e54;--ok:#0a7c3f;--falta:#b42318;--aviso:#9a6700}
@@ -63,9 +61,7 @@ export function renderDiagnostico(token = '') {
     ? `${e.faltantesCriticas} cosa${e.faltantesCriticas > 1 ? 's' : ''} sin configurar que el sistema necesita`
     : 'Todo lo esencial esta configurado';
 
-  return `<!doctype html><html lang="es"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Diagnostico ${esc(config.negocio.nombre)}</title><style>${ESTILOS}</style></head><body>
+  return `${cabeceraHtml(`Diagnostico ${config.negocio.nombre}`, token, ESTILOS)}
 <header>
   <h1>Diagnostico del sistema</h1>
   <p>${esc(titular)}</p>

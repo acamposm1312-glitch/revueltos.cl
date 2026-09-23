@@ -10,6 +10,8 @@ import { renderPanel } from './routes/panel.js';
 import { renderDiagnostico } from './routes/diagnostico.js';
 import { renderWidgetJs } from './routes/widget.js';
 import { renderComision } from './routes/comision.js';
+import { manifiesto } from './routes/comunes.js';
+import { generarIcono } from './core/icono.js';
 import { iniciarProgramador, correrRutinaDiaria } from './core/programador.js';
 
 const ORIGENES_PERMITIDOS = new Set([
@@ -32,6 +34,13 @@ export function origenPermitido(origen) {
   } catch {
     return false;
   }
+}
+
+// Dibujar el icono cuesta unos milisegundos; se guarda tras la primera vez.
+const iconos = new Map();
+function iconoCacheado(lado) {
+  if (!iconos.has(lado)) iconos.set(lado, generarIcono(lado));
+  return iconos.get(lado);
 }
 
 const leerCuerpo = (req, limite = 1_000_000) => new Promise((resolve, reject) => {
@@ -103,6 +112,26 @@ async function manejar(req, res) {
     } catch {
       return json(res, 200, base);
     }
+  }
+
+  // --- Recursos de la aplicacion instalable ---
+  const icono = ruta.match(/^\/icono-(192|512)\.png$/);
+  if (icono && req.method === 'GET') {
+    const png = iconoCacheado(Number(icono[1]));
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': png.length,
+      'Cache-Control': 'public, max-age=604800',
+    });
+    return res.end(png);
+  }
+
+  if (ruta === '/manifest.webmanifest' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'application/manifest+json; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
+    });
+    return res.end(JSON.stringify(manifiesto(url.searchParams.get('token') ?? '')));
   }
 
   // El widget se sirve como JavaScript para que instalarlo en el tema sea una
