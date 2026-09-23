@@ -30,6 +30,17 @@ const entrada = valor('foto', '');
 const salida = valor('salida', 'out');
 const tolerancia = Number(valor('tolerancia', '18'));
 const margen = Number(valor('margen', '12'));
+// Por defecto el fondo es el blanco de estudio de las fotos de producto. Con
+// --fondo se recorta sobre otro color plano, como el azul del logo de TUU.
+const fondo = valor('fondo', '#ffffff');
+
+const aRgb = (hex) => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) { console.error(`Color invalido: ${hex}. Usa formato #rrggbb.`); process.exit(1); }
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+const fondoRgb = aRgb(fondo);
 
 if (!entrada || !existsSync(entrada)) {
   console.error('Falta --foto con la ruta a la imagen.');
@@ -50,7 +61,7 @@ const navegador = await chromium.launch({
 });
 const pagina = await navegador.newPage();
 
-const resultado = await pagina.evaluate(async ({ src, tolerancia, margen }) => {
+const resultado = await pagina.evaluate(async ({ src, tolerancia, margen, fondoRgb }) => {
   const img = new Image();
   img.src = src;
   await img.decode();
@@ -65,13 +76,11 @@ const resultado = await pagina.evaluate(async ({ src, tolerancia, margen }) => {
   const px = datos.data;
   const { width: an, height: al } = lienzo;
 
-  const esFondo = (i) => {
-    const r = px[i], g = px[i + 1], b = px[i + 2];
-    const min = Math.min(r, g, b);
-    // Blanco de estudio: muy claro y sin dominante de color. El JPEG deja ruido
-    // en los bordes, de ahi la tolerancia.
-    return min >= 255 - tolerancia && Math.max(r, g, b) - min <= tolerancia;
-  };
+  // Distancia al color de fondo. El JPEG y los degradados suaves del render
+  // dejan ruido, de ahi la tolerancia.
+  const esFondo = (i) => Math.abs(px[i] - fondoRgb[0]) <= tolerancia
+    && Math.abs(px[i + 1] - fondoRgb[1]) <= tolerancia
+    && Math.abs(px[i + 2] - fondoRgb[2]) <= tolerancia;
 
   // Relleno desde los bordes. Una pila explicita en vez de recursion: con 2576
   // por 1929 pixeles, la recursion revienta el stack.
@@ -102,8 +111,13 @@ const resultado = await pagina.evaluate(async ({ src, tolerancia, margen }) => {
       || (y > 0 && marca[p - an]) || (y < al - 1 && marca[p + an]);
     if (!linda) { alfa[p] = 255; continue; }
     const i = p * 4;
-    const blancura = Math.min(px[i], px[i + 1], px[i + 2]) / 255;
-    alfa[p] = blancura <= 0.8 ? 255 : 255 * (1 - (blancura - 0.8) / 0.2);
+    const dist = Math.max(
+      Math.abs(px[i] - fondoRgb[0]),
+      Math.abs(px[i + 1] - fondoRgb[1]),
+      Math.abs(px[i + 2] - fondoRgb[2]),
+    ) / 255;
+    // Cerca del color de fondo el pixel es mezcla; dejarlo opaco deja una orla.
+    alfa[p] = dist >= 0.2 ? 255 : 255 * (dist / 0.2);
   }
   for (let p = 0; p < an * al; p++) px[p * 4 + 3] = alfa[p];
 
@@ -119,7 +133,7 @@ const resultado = await pagina.evaluate(async ({ src, tolerancia, margen }) => {
       }
     }
   }
-  if (x1 < 0) return { error: 'La foto quedo entera transparente: el fondo no era blanco.' };
+  if (x1 < 0) return { error: 'La imagen quedo entera transparente: el fondo no era del color indicado.' };
 
   x0 = Math.max(0, x0 - margen); y0 = Math.max(0, y0 - margen);
   x1 = Math.min(an - 1, x1 + margen); y1 = Math.min(al - 1, y1 + margen);
@@ -138,7 +152,7 @@ const resultado = await pagina.evaluate(async ({ src, tolerancia, margen }) => {
     alto: recorte.height,
     pctQuitado: (100 * fondoQuitado / (an * al)).toFixed(1),
   };
-}, { src: fuente, tolerancia, margen });
+}, { src: fuente, tolerancia, margen, fondoRgb });
 
 await navegador.close();
 

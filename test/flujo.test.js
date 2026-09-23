@@ -128,11 +128,16 @@ describe('rutina diaria', () => {
   test('corre una vez al dia y no se repite', async () => {
     const { correrRutinaDiaria } = await import('../src/core/programador.js');
     const { lead } = guardarLead({ nombre: 'Ana', telefono: '987654321' });
-    db().prepare('UPDATE leads SET etapa_desde = ? WHERE id = ?')
-      .run(new Date(Date.now() - 5 * 36e5).toISOString(), lead.id);
 
     const mediodia = new Date();
     mediodia.setUTCHours(18, 0, 0, 0); // 15:00 en Chile, pasada la hora de la rutina
+
+    // La antiguedad se cuenta desde la referencia, no desde el reloj real. Con
+    // Date.now() el test fallaba despues de las 18:30 UTC -es decir, en la tarde
+    // chilena-: el lead quedaba creado mas tarde que la referencia y su plazo
+    // todavia no vencia.
+    db().prepare('UPDATE leads SET etapa_desde = ? WHERE id = ?')
+      .run(new Date(mediodia.getTime() - 5 * 36e5).toISOString(), lead.id);
 
     const primera = await correrRutinaDiaria({ referencia: mediodia });
     assert.equal(primera.corrio, true);

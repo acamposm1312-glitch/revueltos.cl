@@ -26,18 +26,24 @@ const tramo = (t, desde, hasta) => suave((t - desde) / (hasta - desde));
  * @param {object} opciones
  * @param {number} opciones.t Avance de la animacion, de 0 a 1.
  * @param {string} opciones.fotoBase64 Foto del equipo, ya en data URI.
- * @param {string} opciones.etiqueta Texto de la pastilla superior.
+ * @param {string} [opciones.logoBase64] Lockup oficial de TUU, ya en data URI.
+ * @param {string} opciones.etiqueta Texto de la pastilla superior, si no hay lockup.
  * @param {string} opciones.titulo Titular grande.
  * @param {string} opciones.producto Nombre del equipo.
  * @param {string} opciones.precio Precio ya formateado.
  */
-export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, precio }) {
+export function htmlDeFotograma({ t, fotoBase64, logoBase64 = '', etiqueta, titulo, producto, precio }) {
   // El acercamiento es lento y constante: es lo que da sensacion de video sin
   // que el equipo se deforme ni gire, que es lo que delata una animacion falsa.
   const zoom = 1 + 0.09 * suave(t);
   // Un gancho largo a 84 px ocupaba cuatro lineas y aplastaba el resto.
   const tamano = titulo.length > 70 ? 66 : (titulo.length > 45 ? 74 : 84);
   const sitio = config.negocio.sitio.replace(/^https?:\/\//, '');
+
+  const aparecerLockup = (() => {
+    const p = tramo(t, 0.02, 0.22);
+    return `opacity:${p.toFixed(4)};transform:translateY(${((1 - p) * 26).toFixed(2)}px)`;
+  })();
 
   const aparecer = (desde, hasta, px = 40) => {
     const p = tramo(t, desde, hasta);
@@ -57,10 +63,14 @@ export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, pre
     background:${MARCA.blanco};border-radius:34px;overflow:hidden;
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 26px 52px rgba(0,0,0,.22)}
-  .panel img{max-width:88%;max-height:84%;object-fit:contain;
+  .panel img{max-width:90%;max-height:94%;object-fit:contain;
     transform:scale(${zoom.toFixed(4)});
     filter:drop-shadow(0 22px 26px rgba(0,26,77,.22))}
   .arriba{position:absolute;left:0;right:0;top:0;padding:150px 84px 0}
+  /* El lockup oficial es arte blanco pensado para ir sobre el azul de TUU, asi
+     que va tal cual sobre el fondo y no dentro de una pastilla. Es la marca que
+     acredita al distribuidor: encabeza la pieza. */
+  .lockup{height:96px;display:block;${aparecerLockup}}
   .etiqueta{display:inline-block;background:${MARCA.blanco};color:${MARCA.azul};
     font-size:30px;letter-spacing:2px;text-transform:uppercase;font-weight:700;
     padding:17px 36px;border-radius:${MARCA.radioPildora}px;${aparecer(0.02, 0.22, 26)}}
@@ -80,7 +90,9 @@ export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, pre
   </style></head><body>
   <div class="panel"><img src="${fotoBase64}" alt=""></div>
   <div class="arriba">
-    ${etiqueta ? `<div class="etiqueta">${esc(etiqueta)}</div>` : ''}
+    ${logoBase64
+      ? `<img class="lockup" src="${logoBase64}" alt="TUU Chile, distribuidor autorizado">`
+      : (etiqueta ? `<div class="etiqueta">${esc(etiqueta)}</div>` : '')}
     <div class="titulo">${esc(titulo)}</div>
   </div>
   <div class="abajo">
@@ -94,7 +106,7 @@ export function htmlDeFotograma({ t, fotoBase64, etiqueta, titulo, producto, pre
       </svg>
       <span class="nombre">${esc(config.negocio.nombre)}</span>
     </div>
-    <div class="oficial">Distribuidor oficial TUU<br>${esc(sitio)}</div>
+    <div class="oficial">${esc(sitio)}<br>Temuco, La Araucanía</div>
   </div>
   </body></html>`;
 }

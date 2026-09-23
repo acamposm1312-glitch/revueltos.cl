@@ -20,9 +20,12 @@ const esc = (v) => String(v ?? '')
  * este bloque es lo unico que hay que cambiar.
  */
 export const MARCA = {
-  azul: '#0052cc',
-  azulOscuro: '#003d99',
-  azulClaro: '#e8f0ff',
+  // Azul oficial de TUU, muestreado del lockup "TUU Chile - Distribuidor
+  // Autorizado" que TUU entrega a sus distribuidores. Reemplaza al #0052cc que
+  // se venia usando, que salia del tema de la tienda y era una aproximacion.
+  azul: '#1731ef',
+  azulOscuro: '#101f9e',
+  azulClaro: '#dfe3ff',
   blanco: '#ffffff',
   radioPildora: 100,
   radioBloque: 14,

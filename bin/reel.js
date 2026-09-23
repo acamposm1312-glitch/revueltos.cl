@@ -33,6 +33,8 @@ const salida = valor('salida', 'out');
 const segundos = Number(valor('segundos', '5'));
 const fps = Number(valor('fps', '30'));
 const titulo = valor('titulo', '');
+// Lockup oficial de TUU. Opcional: sin el, la pieza usa la pastilla de texto.
+const logo = valor('logo', '');
 
 if (!foto || !existsSync(foto)) {
   console.error('Falta --foto con la ruta a la foto del equipo.');
@@ -63,6 +65,8 @@ mkdirSync(resolve(salida), { recursive: true });
 // prefiere al titulo generico cuando no viene uno por parametro.
 const encabezado = titulo || producto.angulos?.[0] || producto.resumen || producto.titulo;
 const fotoBase64 = fotoComoDataUri(foto);
+const logoBase64 = logo && existsSync(logo) ? fotoComoDataUri(logo) : '';
+if (logo && !logoBase64) console.warn(`Aviso: no encontre el logo en ${logo}, sigo sin el.`);
 
 console.log(`Reel de ${producto.titulo} · ${ANCHO}x${ALTO} · ${segundos}s a ${fps} fps (${total} cuadros)`);
 
@@ -77,6 +81,7 @@ for (let i = 0; i < total; i++) {
   await pagina.setContent(htmlDeFotograma({
     t,
     fotoBase64,
+    logoBase64,
     etiqueta: 'Distribuidor oficial',
     titulo: encabezado,
     producto: producto.titulo,

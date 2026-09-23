@@ -54,4 +54,23 @@ describe('fotogramas del reel', () => {
     assert.doesNotMatch(html, /<script>alert/);
     assert.match(html, /&lt;script&gt;/);
   });
+
+  test('el lockup oficial reemplaza a la pastilla de texto', () => {
+    // Cuando TUU entrega su marca de distribuidor autorizado, esa es la que
+    // acredita la pieza; repetir ademas una pastilla que dice lo mismo sobra.
+    const conLogo = htmlDeFotograma({ t: 1, ...base, logoBase64: 'data:image/png;base64,BBBB' });
+    assert.match(conLogo, /class="lockup"/);
+    assert.doesNotMatch(conLogo, /class="etiqueta"/);
+
+    const sinLogo = htmlDeFotograma({ t: 1, ...base });
+    assert.match(sinLogo, /class="etiqueta"/);
+    assert.doesNotMatch(sinLogo, /class="lockup"/);
+  });
+
+  test('el lockup tambien aparece de a poco y termina visible', () => {
+    const inicio = htmlDeFotograma({ t: 0, ...base, logoBase64: 'data:image/png;base64,BBBB' });
+    const fin = htmlDeFotograma({ t: 1, ...base, logoBase64: 'data:image/png;base64,BBBB' });
+    assert.match(inicio, /\.lockup\{[^}]*opacity:0\.0000/);
+    assert.match(fin, /\.lockup\{[^}]*opacity:1\.0000/);
+  });
 });
