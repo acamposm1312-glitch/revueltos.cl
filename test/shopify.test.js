@@ -128,3 +128,16 @@ describe('token de ruta (webhooks creados por API)', () => {
     assert.equal(tokenDeRutaValido(undefined, 'a'.repeat(48)), false);
   });
 });
+
+describe('observabilidad del endpoint', () => {
+  test('/salud informa cuantos webhooks y leads hay', async () => {
+    const { servidor } = await import('../src/server.js');
+    await new Promise((r) => servidor.listen(0, r));
+    const { port } = servidor.address();
+    const cuerpo = await (await fetch(`http://127.0.0.1:${port}/salud`)).json();
+    assert.equal(cuerpo.ok, true);
+    assert.equal(typeof cuerpo.webhooksRecibidos, 'number');
+    assert.equal(typeof cuerpo.leads, 'number');
+    await new Promise((r) => servidor.close(r));
+  });
+});

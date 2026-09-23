@@ -79,7 +79,17 @@ async function manejar(req, res) {
     return res.end();
   }
 
-  if (ruta === '/salud') return json(res, 200, { ok: true, hora: new Date().toISOString() });
+  if (ruta === '/salud') {
+    // Incluye contadores para poder verificar el estado desde fuera sin abrir
+    // el panel: util cuando la integracion se revisa desde otra herramienta.
+    let webhooks = 0;
+    let leads = 0;
+    try {
+      webhooks = db().prepare('SELECT COUNT(*) AS n FROM webhooks_vistos').get().n;
+      leads = db().prepare('SELECT COUNT(*) AS n FROM leads').get().n;
+    } catch { /* base recien creada */ }
+    return json(res, 200, { ok: true, hora: new Date().toISOString(), webhooksRecibidos: webhooks, leads });
+  }
 
   // --- Captura de leads desde el formulario de la tienda ---
   if (ruta === '/api/lead' && req.method === 'POST') {
@@ -128,10 +138,20 @@ async function manejar(req, res) {
       autorizado = firmaValida(crudo, req.headers['x-shopify-hmac-sha256']);
       via = 'hmac';
     }
-    if (!autorizado) return json(res, 401, { error: via === 'token' ? 'token invalido' : 'firma invalida' });
+    const topicCrudo = String(req.headers['x-shopify-topic'] ?? 'sin-topic');
+    if (!autorizado) {
+      // Se registra el rechazo a proposito: sin esto es imposible distinguir
+      // "el webhook nunca llego" de "llego y lo rechazamos", que es justo lo
+      // que hay que saber cuando la integracion no funciona.
+      console.log(`[webhook ${topicCrudo}] RECHAZADO por ${via === 'token' ? 'token invalido' : 'firma invalida'}`);
+      return json(res, 401, { error: via === 'token' ? 'token invalido' : 'firma invalida' });
+    }
 
     const webhookId = req.headers['x-shopify-webhook-id'];
-    if (yaProcesado(webhookId)) return json(res, 200, { ok: true, repetido: true });
+    if (yaProcesado(webhookId)) {
+      console.log(`[webhook ${topicCrudo}] repetido, ya estaba procesado`);
+      return json(res, 200, { ok: true, repetido: true });
+    }
 
     const topic = String(req.headers['x-shopify-topic'] ?? '');
     let payload;
@@ -139,7 +159,7 @@ async function manejar(req, res) {
 
     try {
       const r = procesarWebhook(topic, payload);
-      if (via === 'token') console.log(`[webhook ${topic}] aceptado por token de ruta (sin firma HMAC)`);
+      console.log(`[webhook ${topic}] ${r.accion}${r.leadId ? ` · lead #${r.leadId}` : ''} · via ${via}`);
       return json(res, 200, { ok: true, via, ...r });
     } catch (e) {
       console.error('[webhook]', topic, e);
