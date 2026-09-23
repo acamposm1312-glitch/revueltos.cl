@@ -1,10 +1,11 @@
-{{saludo}}, te dejo la recomendación para {{rubro}}:
+{{saludo}}, esto es lo que te recomiendo para {{rubro}}:
 
 {{recomendacion}}
 
-Todo incluye boleta electrónica del SII, garantía TUU y despacho a tu domicilio.
+Todo trae boleta electrónica del SII, garantía TUU y despacho a tu domicilio.
 
-Importante: para emitir boleta electrónica necesitas firma electrónica simple. Si no la tienes, te la agrego a la compra.
+Un detalle que a mucha gente le pilla de sorpresa: para emitir boleta necesitas firma electrónica simple. Si no la tienes, te la sumo a la compra y queda listo.
 
-Lo puedes comprar aquí: {{sitio}}
-Cualquier duda me escribes por acá y lo vemos.
+Lo ves acá: {{sitio}}
+
+Cualquier duda me escribes.

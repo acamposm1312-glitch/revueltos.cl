@@ -18,7 +18,11 @@ const SIN_TILDE = [
   'cotizacion', 'numero', 'numeros', 'codigo', 'dias', 'aqui', 'proximas',
   'proximos', 'razon', 'acrilico', 'almacen', 'cafeteria', 'peluqueria',
   'rapida', 'atencion', 'impresion', 'configuracion', 'operacion', 'automatico',
-  'ano ', 'anos', 'manana', 'confianza', 'util', 'utiles',
+  'ano ', 'anos', 'manana', 'util', 'utiles',
+  // "confianza" es llana terminada en vocal y va sin tilde; estuvo en esta
+  // lista por error y marcaba como falta una palabra bien escrita. Las que si
+  // la llevan son las formas del verbo.
+  'confia', 'confian', 'confio',
 ];
 
 /**
