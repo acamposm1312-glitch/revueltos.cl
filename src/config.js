@@ -79,6 +79,14 @@ export const config = {
     // Poner en '0' para no recibir el correo resumen de cada manana.
     resumenDiario: env('RESUMEN_DIARIO', '1') !== '0',
   },
+  // Generacion de video para los reels. Es opcional: si no hay llave, la pagina
+  // /reels lo dice y no se llama a nadie. Se cobra por llamada, asi que el tope
+  // existe para que un error en bucle no termine en una cuenta sorpresa.
+  runapi: {
+    llave: env('RUNAPI_API_KEY', ''),
+    base: env('RUNAPI_BASE', 'https://runapi.ai/api/v1'),
+    topeDiario: Number(env('RUNAPI_TOPE_DIARIO', '5')),
+  },
   db: {
     ruta: env('DB_PATH', resolve(ROOT, 'data', 'appos.db')),
   },

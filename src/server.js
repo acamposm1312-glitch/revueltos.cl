@@ -12,6 +12,7 @@ import { renderWidgetJs } from './routes/widget.js';
 import { renderComision } from './routes/comision.js';
 import { renderLead } from './routes/lead.js';
 import { renderRespuestas } from './routes/respuestas.js';
+import { renderReels } from './routes/reels.js';
 import { manifiesto, paginaNoAutorizado } from './routes/comunes.js';
 import { generarIcono } from './core/icono.js';
 import { iniciarProgramador, correrRutinaDiaria } from './core/programador.js';
@@ -321,6 +322,33 @@ async function manejar(req, res) {
     if (!panelAutorizado(req, url)) return sinLlave(res, url);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(renderLead(Number(fichaLead[1]), url.searchParams.get('token') ?? ''));
+  }
+
+  // La pagina de reels se sirve sin resultado; la consulta a RunAPI la dispara
+  // el POST de abajo, que vuelve a renderizarla con lo que llego.
+  if (ruta === '/reels' && req.method === 'GET') {
+    if (!panelAutorizado(req, url)) return sinLlave(res, url);
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return res.end(renderReels(url.searchParams.get('token') ?? ''));
+  }
+
+  if (ruta === '/api/reels/modelos' && req.method === 'POST') {
+    if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
+    const t = url.searchParams.get('token') ?? '';
+    const { listarModelos } = await import('./core/reels.js');
+    let resultado = null;
+    let fallo = '';
+    try {
+      resultado = await listarModelos();
+      console.log(`[reels] catalogo consultado · ${resultado.modelos.length} modelos Wan`);
+    } catch (e) {
+      // El cuerpo del error trae el detalle del proveedor y es lo unico que
+      // permite corregir la llamada, asi que se muestra en la pagina.
+      fallo = e.cuerpo ? `${e.message}: ${e.cuerpo}` : e.message;
+      console.error('[reels] catalogo fallo:', e.message);
+    }
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return res.end(renderReels(t, resultado, fallo));
   }
 
   if (ruta === '/respuestas' && req.method === 'GET') {

@@ -155,6 +155,7 @@ export function renderPanel(token = '', aviso = '') {
   <p class="acciones">
     <a class="boton wa" href="/comision${token ? `?token=${encodeURIComponent(token)}` : ''}">Calcular comisión del cliente</a>
     <a class="boton hecha" href="/respuestas${token ? `?token=${encodeURIComponent(token)}` : ''}">Respuestas listas para copiar</a>
+    <a class="boton hecha" href="/reels${token ? `?token=${encodeURIComponent(token)}` : ''}">Reels con video</a>
     <a class="boton hecha" href="/diagnostico${token ? `?token=${encodeURIComponent(token)}` : ''}">Diagnóstico del sistema</a>
   </p>
   <form method="post" action="/api/rutina${token ? `?token=${encodeURIComponent(token)}` : ''}"
