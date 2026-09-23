@@ -64,6 +64,22 @@ apuntando a `https://TU-SERVIDOR/webhooks/shopify`:
 
 ### 3.3 Widget de asesoria en la tienda
 
+El widget se sirve desde el propio servidor, asi que instalarlo es una sola
+linea. En el editor del tema, agrega un bloque de **Liquid personalizado** con:
+
+```html
+<script src="https://TU-SERVIDOR/widget.js" defer></script>
+```
+
+Eso es todo. El formulario aparece donde pongas el bloque, detecta solo si esta
+en una pagina de producto para registrar de donde vino el lead, y cualquier
+cambio posterior al formulario se aplica sin volver a tocar Shopify.
+
+Si prefieres tener el codigo dentro del tema, el archivo
+`shopify/appos-asesoria.liquid` hace lo mismo pegado a mano.
+
+### 3.3.1 Version en Liquid (alternativa)
+
 1. **Tienda online** > **Temas** > `...` > **Editar codigo**
 2. **Snippets** > **Agregar snippet** > nombre `appos-asesoria`
 3. Pega el contenido de `shopify/appos-asesoria.liquid`

@@ -76,7 +76,10 @@ los dias a las 9:00 hora de Chile.
 - [`docs/INSTALACION.md`](docs/INSTALACION.md) — conectar Shopify, correo e Instagram
 - [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) — dejarlo corriendo en internet
 - [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) — como operarlo dia a dia y por que cada plazo
-- [`shopify/appos-asesoria.liquid`](shopify/appos-asesoria.liquid) — widget de captura para el tema
+- [`shopify/appos-asesoria.liquid`](shopify/appos-asesoria.liquid) — version en Liquid del widget, para pegarla dentro del tema
+
+El widget de captura se instala con una sola linea en el editor del tema:
+`<script src="https://TU-SERVIDOR/widget.js" defer></script>`
 
 ## Estructura
 

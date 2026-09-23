@@ -8,6 +8,7 @@ import { firmaValida, tokenDeRutaValido, yaProcesado, procesarWebhook } from './
 import { mensajeWhatsapp } from './core/plantillas.js';
 import { renderPanel } from './routes/panel.js';
 import { renderDiagnostico } from './routes/diagnostico.js';
+import { renderWidgetJs } from './routes/widget.js';
 import { iniciarProgramador } from './core/programador.js';
 
 const ORIGENES_PERMITIDOS = new Set([
@@ -101,6 +102,18 @@ async function manejar(req, res) {
     } catch {
       return json(res, 200, base);
     }
+  }
+
+  // El widget se sirve como JavaScript para que instalarlo en el tema sea una
+  // sola linea y los cambios posteriores no obliguen a editar Shopify de nuevo.
+  if (ruta === '/widget.js' && req.method === 'GET') {
+    const base = config.servidor.panelUrl || `https://${req.headers.host}`;
+    res.writeHead(200, {
+      'Content-Type': 'application/javascript; charset=utf-8',
+      'Cache-Control': 'public, max-age=300',
+      'Access-Control-Allow-Origin': '*',
+    });
+    return res.end(renderWidgetJs(base.replace(/\/$/, '')));
   }
 
   // --- Captura de leads desde el formulario de la tienda ---
