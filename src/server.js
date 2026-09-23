@@ -10,6 +10,7 @@ import { renderPanel } from './routes/panel.js';
 import { renderDiagnostico } from './routes/diagnostico.js';
 import { renderWidgetJs } from './routes/widget.js';
 import { renderComision } from './routes/comision.js';
+import { renderLead } from './routes/lead.js';
 import { manifiesto, paginaNoAutorizado } from './routes/comunes.js';
 import { generarIcono } from './core/icono.js';
 import { iniciarProgramador, correrRutinaDiaria } from './core/programador.js';
@@ -273,10 +274,24 @@ async function manejar(req, res) {
   const cambio = ruta.match(/^\/api\/leads\/(\d+)\/etapa$/);
   if (cambio && req.method === 'POST') {
     if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
+    const crudo = await leerCuerpo(req);
+    const tipo = String(req.headers['content-type'] ?? '');
+
+    // El panel manda un formulario y las integraciones mandan JSON. Se aceptan
+    // los dos para que la ficha pueda usar un <form> normal, sin JavaScript.
     let datos;
-    try { datos = JSON.parse(await leerCuerpo(req)); } catch { return json(res, 400, { error: 'json invalido' }); }
+    if (tipo.includes('application/json')) {
+      try { datos = JSON.parse(crudo); } catch { return json(res, 400, { error: 'json invalido' }); }
+    } else {
+      datos = Object.fromEntries(new URLSearchParams(crudo));
+    }
+
     try {
-      return json(res, 200, { ok: true, lead: moverEtapa(Number(cambio[1]), datos.etapa, datos.detalle ?? '') });
+      const lead = moverEtapa(Number(cambio[1]), datos.etapa, datos.detalle ?? 'cambio desde el panel');
+      if (tipo.includes('application/json')) return json(res, 200, { ok: true, lead });
+      const t = url.searchParams.get('token');
+      res.writeHead(303, { Location: `/lead/${cambio[1]}${t ? `?token=${encodeURIComponent(t)}` : ''}` });
+      return res.end();
     } catch (e) {
       return json(res, 400, { error: e.message });
     }
@@ -285,6 +300,13 @@ async function manejar(req, res) {
   if (ruta === '/api/cola' && req.method === 'GET') {
     if (!panelAutorizado(req, url)) return json(res, 403, { error: 'no autorizado' });
     return json(res, 200, { cola: colaDeHoy() });
+  }
+
+  const fichaLead = ruta.match(/^\/lead\/(\d+)$/);
+  if (fichaLead && req.method === 'GET') {
+    if (!panelAutorizado(req, url)) return sinLlave(res, url);
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return res.end(renderLead(Number(fichaLead[1]), url.searchParams.get('token') ?? ''));
   }
 
   if (ruta === '/comision' && req.method === 'GET') {

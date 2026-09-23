@@ -55,7 +55,8 @@ function tarjetaTarea(t, token) {
   return `
   <article class="tarjeta">
     <div class="fila">
-      <span class="nombre">${esc(t.lead.nombre || tel || t.lead.email || 'Sin nombre')}</span>
+      <a class="nombre" href="/lead/${t.leadId}${token ? `?token=${encodeURIComponent(token)}` : ''}"
+         style="color:var(--acento);text-decoration:none">${esc(t.lead.nombre || tel || t.lead.email || 'Sin nombre')}</a>
       <span class="etiqueta">${esc(t.lead.etapa)}</span>
     </div>
     <div class="meta">${esc(t.titulo)}</div>
@@ -105,7 +106,7 @@ function listaDeLeads(token) {
   return `<div class="tarjeta"><table>
     <tr><th>Nombre</th><th>Contacto</th><th>Etapa</th><th></th></tr>
     ${filas.map((l) => `<tr>
-      <td>${esc(l.nombre || 'sin nombre')}${l.rubro ? `<br><span class="meta">${esc(l.rubro)}</span>` : ''}</td>
+      <td><a href="/lead/${l.id}${sufijo}" style="color:var(--acento);font-weight:600;text-decoration:none">${esc(l.nombre || 'sin nombre')}</a>${l.rubro ? `<br><span class="meta">${esc(l.rubro)}</span>` : ''}</td>
       <td>${esc(formatearTelefono(l.telefono) || l.email || '-')}</td>
       <td>${esc(nombreEtapa.get(l.etapa) ?? l.etapa)}</td>
       <td><form method="post" action="/api/leads/${l.id}/borrar${sufijo}"

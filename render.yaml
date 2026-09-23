@@ -29,8 +29,15 @@ services:
         value: www.appos.cl
       - key: WHATSAPP_MODE
         value: links
+      # Valor de produccion. Si aqui dijera "consola", Render lo volveria a
+      # aplicar en cada despliegue y apagaria el envio de correo cada vez que
+      # se sube un cambio, en silencio.
       - key: EMAIL_PROVIDER
-        value: consola
+        value: resend
+      - key: EMAIL_FROM
+        value: contacto@appos.cl
+      - key: EMAIL_FROM_NAME
+        value: APPOS
       - key: HORA_RUTINA
         value: "9"
       - key: RESUMEN_DIARIO
