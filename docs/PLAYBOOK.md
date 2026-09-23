@@ -76,6 +76,49 @@ Los dos ultimos son los que te generan ingreso recurrente sin vender nada nuevo.
 El papel se acaba y la firma vence: son ventas que ya estan, solo hay que
 acordarse. El sistema se acuerda por ti.
 
+## El argumento que nadie mas le da
+
+Las comisiones de TUU tienen dos esquemas, y cual conviene **depende del ticket
+promedio del cliente, no de cuanto venda**:
+
+| Rango de ventas | Fija | Mixta | Ticket de equilibrio |
+|---|---|---|---|
+| Hasta $5.000.000 | 1,99% | 0,99% + $65 | $6.500 |
+| $5.000.000 a $10.000.000 | 1,69% | 0,89% + $65 | $8.125 |
+| Sobre $10.000.000 | 1,49% | 0,79% + $65 | $9.286 |
+| Primer mes | 1,49% | 0,79% + $65 | $9.286 |
+
+Bajo el ticket de equilibrio conviene la fija; sobre el, la mixta. Todas + IVA.
+
+Un almacen con ticket de $3.500 que elige mal pierde unos $300.000 al ano. Un
+restaurante con ticket de $15.000 que elige mal pierde unos $350.000.
+
+Pregunta siempre **"cuanto te compra en promedio una persona"** y calcula:
+
+```bash
+node bin/appos.js comision --ticket 15000 --ventas 8000000
+```
+
+O desde el celular, con el cliente al telefono: el boton **Calcular comision del
+cliente** en el panel. Te entrega el veredicto y el texto listo para mandarle.
+
+Comprando directo en TUU nadie le explica esto. Es la razon mas concreta para
+comprarte a ti.
+
+## Respuestas listas
+
+Las diez preguntas que mas se repiten estan escritas en
+`src/templates/respuestas/`. Se ven con:
+
+```bash
+node bin/appos.js respuestas            # lista
+node bin/appos.js respuestas comision   # una en particular
+```
+
+Cargalas como **respuestas rapidas** en WhatsApp Business y como **respuestas
+guardadas** o **preguntas frecuentes** en Instagram. Es el mismo texto para los
+dos canales.
+
 ## Tu ventaja frente a comprar directo en TUU
 
 El precio es el mismo. Lo unico que te diferencia es que quedas tu como persona

@@ -11,8 +11,9 @@ import { publicarPendientes } from '../src/core/instagram.js';
 import { ETAPAS, clavesEtapas } from '../src/core/pipeline.js';
 import { formatearTelefono } from '../src/core/telefono.js';
 import { clp } from '../src/core/catalogo.js';
-import { listarPlantillas } from '../src/core/plantillas.js';
+import { listarPlantillas, cargarPlantilla } from '../src/core/plantillas.js';
 import { estadoDelSistema } from '../src/core/estado.js';
+import { compararEsquemas, explicarParaCliente, TRAMOS, PRIMER_MES, ticketDeEquilibrio } from '../src/core/comisiones.js';
 
 const [, , comando, ...args] = process.argv;
 const bandera = (nombre) => args.includes(`--${nombre}`);
@@ -45,6 +46,9 @@ APPOS - automatizacion de ventas, contacto y publicaciones
   appos calendario                Muestra el calendario guardado
   appos exportar                  Imprime el calendario en CSV
   appos publicar                  Publica en Instagram las piezas cuya fecha ya llego
+
+  appos comision --ticket N --ventas N   Que esquema de comision le conviene al cliente
+  appos respuestas [nombre]       Respuestas listas para WhatsApp e Instagram
 
   appos diagnostico               Revisa que este todo configurado
   appos etapas                    Lista las etapas del pipeline
@@ -228,6 +232,41 @@ async function principal() {
       if (!pendientes.length) { console.log('No hay publicaciones con fecha cumplida.'); break; }
       const r = await publicarPendientes(pendientes);
       for (const x of r) console.log(`  ${x.publicado ? 'PUBLICADO' : 'NO PUBLICADO'}  ${x.fecha}  ${x.titulo}${x.error ? `  (${x.error})` : ''}`);
+      break;
+    }
+
+    case 'comision': {
+      const ticket = Number(valor('ticket', 0));
+      const ventas = Number(valor('ventas', 0));
+      if (!ticket || !ventas) {
+        console.log('\nComisiones TUU, punto de equilibrio entre los dos esquemas:\n');
+        for (const t of [...TRAMOS, PRIMER_MES]) {
+          console.log(`  ${t.nombre.padEnd(30)} fija ${String(t.fija).padStart(4)}%   mixta ${t.mixta.porcentaje}% + $${t.mixta.fijo}   equilibrio: ${clp(Math.round(ticketDeEquilibrio(t)))}`);
+        }
+        console.log('\nBajo el ticket de equilibrio conviene la fija, sobre el conviene la mixta.');
+        console.log('\nPara un cliente concreto:  appos comision --ticket 15000 --ventas 8000000\n');
+        break;
+      }
+      const r = compararEsquemas({ ticketPromedio: ticket, ventasMensuales: ventas, primerMes: bandera('primer-mes') });
+      console.log('\n' + explicarParaCliente({ ticketPromedio: ticket, ventasMensuales: ventas, primerMes: bandera('primer-mes') }));
+      console.log(`\n(Con IVA: ${clp(r[r.conviene].mensualConIva)} al mes con la ${r.conviene})\n`);
+      break;
+    }
+
+    case 'respuestas': {
+      const nombre = args[0];
+      const disponibles = listarPlantillas('respuestas');
+      if (!nombre) {
+        console.log('\nRespuestas listas para pegar en WhatsApp Business e Instagram:\n');
+        for (const d of disponibles) console.log('  appos respuestas ' + d);
+        console.log('');
+        break;
+      }
+      if (!disponibles.includes(nombre)) {
+        console.log(`No existe la respuesta "${nombre}". Disponibles: ${disponibles.join(', ')}`);
+        break;
+      }
+      console.log('\n' + cargarPlantilla('respuestas', nombre));
       break;
     }
 
