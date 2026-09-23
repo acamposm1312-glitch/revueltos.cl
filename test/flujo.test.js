@@ -95,7 +95,7 @@ describe('cola de trabajo', () => {
     const cola = colaDeHoy();
     const recompra = cola.find((t) => t.tipo === 'recompra_papel');
     assert.ok(recompra, 'debe existir la tarea de recompra');
-    assert.match(recompra.mensaje, /papel termico/i);
+    assert.match(recompra.mensaje, /papel térmico/i);
     assert.match(recompra.mensaje, /rollos/i);
   });
 });

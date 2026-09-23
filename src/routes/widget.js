@@ -16,7 +16,7 @@ export function renderWidgetJs(base) {
     .map(([clave, r]) => `<option value="${clave}">${r.nombre}</option>`)
     .join('');
 
-  const saludo = 'Hola, vengo desde appos.cl y quiero informacion sobre las maquinas TUU';
+  const saludo = 'Hola, vengo desde appos.cl y quiero información sobre las máquinas TUU';
 
   return `/* Widget de asesoria de ${config.negocio.nombre}. Generado por el servidor. */
 (function () {
@@ -40,19 +40,19 @@ export function renderWidgetJs(base) {
   ].join('');
 
   var HTML = [
-    '<h3>No sabes cual te sirve?</h3>',
-    '<p class="intro">Somos distribuidor oficial TUU. Cuentanos tu rubro y te decimos con franqueza que equipo necesitas, aunque sea el mas barato.</p>',
+    '<h3>\u00bfNo sabes cu\u00e1l te sirve?</h3>',
+    '<p class="intro">Somos distribuidor oficial TUU. Cu\u00e9ntanos tu rubro y te decimos con franqueza qu\u00e9 equipo necesitas, aunque sea el m\u00e1s barato.</p>',
     '<form novalidate>',
     '<input type="text" name="nombre" placeholder="Tu nombre" autocomplete="name">',
     '<input type="tel" name="telefono" placeholder="WhatsApp (9 1234 5678)" autocomplete="tel" inputmode="tel">',
     '<input type="email" name="email" placeholder="Correo (opcional)" autocomplete="email">',
-    '<select name="rubro"><option value="">Que tipo de negocio tienes?</option>${opciones}</select>',
-    '<textarea name="mensaje" rows="2" placeholder="Que necesitas resolver? (opcional)"></textarea>',
+    '<select name="rubro"><option value="">\u00bfQu\u00e9 tipo de negocio tienes?</option>${opciones}</select>',
+    '<textarea name="mensaje" rows="2" placeholder="\u00bfQu\u00e9 necesitas resolver? (opcional)"></textarea>',
     '<input type="text" name="sitio_web" tabindex="-1" autocomplete="off" aria-hidden="true" class="trampa">',
     '<button type="submit">Quiero que me asesoren</button>',
     '<p class="estado" role="status"></p>',
     '</form>',
-    '<a class="wa" target="_blank" rel="noopener">O escribenos directo por WhatsApp</a>'
+    '<a class="wa" target="_blank" rel="noopener">O escr\u00edbenos directo por WhatsApp</a>'
   ].join('');
 
   function origenActual() {
@@ -98,13 +98,13 @@ export function renderWidgetJs(base) {
 
       if (!datos.telefono && !datos.email) {
         estado.className = 'estado error';
-        estado.textContent = 'Dejanos un WhatsApp o un correo para poder responderte.';
+        estado.textContent = 'D\u00e9janos un WhatsApp o un correo para poder responderte.';
         return;
       }
 
       boton.disabled = true;
       estado.className = 'estado';
-      estado.textContent = 'Enviando...';
+      estado.textContent = 'Enviando\u2026';
 
       fetch(API + '/api/lead', {
         method: 'POST',
@@ -116,10 +116,10 @@ export function renderWidgetJs(base) {
       }).then(function () {
         form.reset();
         estado.className = 'estado ok';
-        estado.textContent = 'Listo. Te escribimos por WhatsApp dentro de las proximas horas.';
+        estado.textContent = 'Listo. Te escribimos por WhatsApp dentro de las pr\u00f3ximas horas.';
       }).catch(function () {
         estado.className = 'estado error';
-        estado.textContent = 'No pudimos enviarlo. Escribenos por WhatsApp y lo vemos al tiro.';
+        estado.textContent = 'No pudimos enviarlo. Escr\u00edbenos por WhatsApp y lo vemos al tiro.';
       }).then(function () {
         boton.disabled = false;
       });

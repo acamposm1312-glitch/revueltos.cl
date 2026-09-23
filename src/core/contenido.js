@@ -21,33 +21,33 @@ export const HASHTAGS = {
 /** Contenido educativo: es lo que genera confianza y posiciona a APPOS como el que sabe. */
 export const PILDORAS_EDUCATIVAS = [
   {
-    titulo: 'Sin firma electronica no hay boleta',
-    cuerpo: 'Mucha gente compra la maquina y se queda pegada el primer dia. El SII exige firma electronica simple para emitir documentos tributarios electronicos. Sin ella el equipo cobra, pero no emite boleta.\n\nLa firma se compra aparte y dura 1, 2 o 3 anos. Si no la tienes, te la agrego a la compra y llegas con todo listo.',
+    titulo: 'Sin firma electrónica no hay boleta',
+    cuerpo: 'Mucha gente compra la máquina y se queda pegada el primer día. El SII exige firma electrónica simple para emitir documentos tributarios electrónicos. Sin ella el equipo cobra, pero no emite boleta.\n\nLa firma se compra aparte y dura 1, 2 o 3 años. Si no la tienes, te la agrego a la compra y llegas con todo listo.',
     productos: ['firma-electronica-simple-1-anio'],
   },
   {
-    titulo: 'Boleta electronica no es lo mismo que voucher',
-    cuerpo: 'El voucher es el comprobante de que la tarjeta se cobro. La boleta es el documento tributario que exige el SII.\n\nSon dos cosas distintas y te pueden cursar una multa por no entregar la segunda. Las maquinas TUU emiten las dos en la misma impresion.',
+    titulo: 'La boleta electrónica no es lo mismo que el voucher',
+    cuerpo: 'El voucher es el comprobante de que la tarjeta se cobró. La boleta es el documento tributario que exige el SII.\n\nSon dos cosas distintas, y te pueden cursar una multa por no entregar la segunda. Las máquinas TUU emiten las dos en la misma impresión.',
     productos: ['pro-2'],
   },
   {
-    titulo: 'Cuanto papel termico gastas realmente',
-    cuerpo: 'Un negocio con 40 ventas al dia se come un rollo cada dos o tres dias. Un pack de 20 rollos rinde mes y medio.\n\nQuedarse sin papel es quedarse sin poder entregar boleta, y eso te para la venta. Conviene tener el pack de repuesto antes de que se acabe.',
+    titulo: 'Cuánto papel térmico gastas realmente',
+    cuerpo: 'Un negocio con 40 ventas al día se come un rollo cada dos o tres días. Un pack de 20 rollos rinde mes y medio.\n\nQuedarse sin papel es quedarse sin poder entregar boleta, y eso te para la venta. Conviene tener el pack de repuesto antes de que se acabe.',
     productos: ['50-rollos-papel-termico-tuu'],
   },
   {
-    titulo: 'Comprar con distribuidor oficial no te cuesta mas caro',
-    cuerpo: 'El precio es el mismo que comprando directo. La diferencia es que quedas con alguien a quien preguntarle.\n\nYo te ingreso, hago la compra a tu nombre, TUU despacha y te acompana en la activacion. Y si despues algo no te resulta, me escribes a mi, no a una fila de soporte.',
+    titulo: 'Comprar con distribuidor oficial no te cuesta más caro',
+    cuerpo: 'El precio es el mismo que comprando directo. La diferencia es que quedas con alguien a quien preguntarle.\n\nYo te ingreso, hago la compra a tu nombre, TUU despacha y te acompaña en la activación. Y si después algo no te resulta, me escribes a mí, no a una fila de soporte.',
     productos: [],
   },
   {
-    titulo: 'Tres errores al elegir tu primera maquina',
-    cuerpo: '1. Comprar la mas cara sin necesitarla. Si no escaneas codigo de barras, no necesitas el modelo con lector.\n2. Olvidar la firma electronica y no poder emitir boleta el primer dia.\n3. No cargar los productos con precio, y terminar tecleando cada monto a mano.\n\nCuentame tu rubro y te digo cual te sirve, aunque sea la mas barata.',
+    titulo: 'Tres errores al elegir tu primera máquina',
+    cuerpo: '1. Comprar la más cara sin necesitarla. Si no escaneas código de barras, no necesitas el modelo con lector.\n2. Olvidar la firma electrónica y no poder emitir boleta el primer día.\n3. No cargar los productos con precio, y terminar tecleando cada monto a mano.\n\nCuéntame tu rubro y te digo cuál te sirve, aunque sea la más barata.',
     productos: [],
   },
   {
     titulo: 'El cierre de caja que nadie te explica',
-    cuerpo: 'Al final del dia el equipo te muestra cuanto vendiste, cuanto fue efectivo y cuanto tarjeta. Si no lo revisas, la diferencia aparece recien a fin de mes y ya no sabes de donde salio.\n\nTomate dos minutos al cerrar. Es la costumbre que mas plata le ha salvado a mis clientes.',
+    cuerpo: 'Al final del día el equipo te muestra cuánto vendiste, cuánto fue efectivo y cuánto tarjeta. Si no lo revisas, la diferencia aparece recién a fin de mes y ya no sabes de dónde salió.\n\nTómate dos minutos al cerrar. Es la costumbre que más plata le ha salvado a mis clientes.',
     productos: [],
   },
 ];
@@ -91,9 +91,9 @@ function copyProducto(producto, rng) {
       '',
       `${producto.titulo}: ${clp(producto.precio)}`,
       '',
-      `Somos distribuidor oficial TUU. Te ingresamos, TUU despacha a tu domicilio y te acompana en la activacion.`,
+      `Somos distribuidor oficial TUU. Te ingresamos, TUU despacha a tu domicilio y te acompaña en la activación.`,
       '',
-      `Escribenos por WhatsApp o entra a ${urlProducto(producto.handle, config.negocio.sitio)}`,
+      `Escríbenos por WhatsApp o entra a ${urlProducto(producto.handle, config.negocio.sitio)}`,
     ].join('\n'),
     hashtags: hashtagsPara(rubro),
   };
@@ -108,7 +108,7 @@ function copyEducativo(pildora) {
       '',
       pildora.cuerpo,
       '',
-      producto ? `${producto.titulo}: ${clp(producto.precio)} en ${config.negocio.sitio}` : `Mas en ${config.negocio.sitio}`,
+      producto ? `${producto.titulo}: ${clp(producto.precio)} en ${config.negocio.sitio}` : `Más en ${config.negocio.sitio}`,
       '',
       'Consultas por WhatsApp, te respondo yo.',
     ].join('\n'),
@@ -122,16 +122,16 @@ function copyRubro(claveRubro, rng) {
   const complemento = buscarProducto(rubro.complementos[0]);
   const angulo = equipo?.angulos[Math.floor(rng() * equipo.angulos.length)] ?? '';
   return {
-    titulo: `Que le sirve a un ${rubro.nombre.toLowerCase()}`,
+    titulo: `Qué le sirve a un ${rubro.nombre.toLowerCase()}`,
     copy: [
-      `${rubro.nombre.toUpperCase()}: que equipo TUU te conviene`,
+      `${rubro.nombre.toUpperCase()}: qué equipo TUU te conviene`,
       '',
       angulo,
       '',
       equipo ? `Recomendado: ${equipo.titulo} - ${clp(equipo.precio)}` : '',
       complemento ? `Complemento util: ${complemento.titulo} - ${clp(complemento.precio)}` : '',
       '',
-      'Cuentame tu caso por WhatsApp y te digo con franqueza cual necesitas, aunque sea la opcion mas barata.',
+      'Cuéntame tu caso por WhatsApp y te digo con franqueza cuál necesitas, aunque sea la opción más barata.',
     ].filter(Boolean).join('\n'),
     hashtags: hashtagsPara(claveRubro),
   };
