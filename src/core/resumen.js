@@ -47,6 +47,9 @@ export const GRUPOS = [
 
 const identificar = (lead) => lead.nombre || formatearTelefono(lead.telefono) || lead.email || 'sin nombre';
 
+/** Concuerda la palabra con el numero: "1 pendiente", "3 pendientes". */
+export const plural = (n, singular, plural_) => (Math.abs(n) === 1 ? singular : plural_);
+
 /**
  * Arma el resumen del dia a partir de la cola de trabajo.
  * @returns {{total:number, urgentes:number, grupos:Array, texto:string}}
@@ -101,7 +104,10 @@ export async function enviarResumenDiario({ referencia = new Date(), forzar = fa
 
   const { asunto, cuerpo } = mensajeEmail('resumen_diario', {}, {
     total: resumen.total,
-    sufijo_urgente: resumen.urgentes ? ` (${resumen.urgentes} urgentes)` : '',
+    palabra_pendientes: plural(resumen.total, 'pendiente', 'pendientes'),
+    sufijo_urgente: resumen.urgentes
+      ? ` (${resumen.urgentes} ${plural(resumen.urgentes, 'urgente', 'urgentes')})`
+      : '',
     resumen: resumen.texto,
     enlace_panel: panel,
     hora_rutina: config.servidor.horaRutina,

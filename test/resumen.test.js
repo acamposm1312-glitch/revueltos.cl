@@ -58,7 +58,7 @@ describe('resumen diario', () => {
     leadCon('Ana', '922222222', 'ingresar_tuu');
     leadCon('Rosa', '933333333', 'recompra_papel');
     const r = await enviarResumenDiario({ forzar: true, simular: true });
-    assert.match(r.asunto, /2 pendientes para hoy \(1 urgentes\)/);
+    assert.match(r.asunto, /2 pendientes para hoy \(1 urgente\)/);
     assert.doesNotMatch(r.cuerpo, /\{\{/, 'no deben quedar variables sin reemplazar');
   });
 
@@ -154,5 +154,44 @@ describe('por que no se envio el resumen', () => {
     const { enviarResumenDiario } = await import('../src/core/resumen.js');
     const r = await enviarResumenDiario({ forzar: true });
     assert.equal(r.motivo, 'sin pendientes');
+  });
+});
+
+describe('concordancia de numero', () => {
+  test('un solo pendiente va en singular', async () => {
+    const { enviarResumenDiario } = await import('../src/core/resumen.js');
+    const { guardarLead } = await import('../src/core/leads.js');
+    const { crearTarea } = await import('../src/core/tareas.js');
+    const { lead } = guardarLead({ nombre: 'Ana', telefono: '987654321' });
+    crearTarea({ leadId: lead.id, tipo: 'sla_nuevo', titulo: 'x' });
+
+    const r = await enviarResumenDiario({ forzar: true, simular: true });
+    assert.equal(r.asunto, '1 pendiente para hoy (1 urgente)');
+  });
+
+  test('varios pendientes van en plural', async () => {
+    const { enviarResumenDiario } = await import('../src/core/resumen.js');
+    const { guardarLead } = await import('../src/core/leads.js');
+    const { crearTarea } = await import('../src/core/tareas.js');
+    for (const t of ['911111111', '922222222', '933333333']) {
+      const { lead } = guardarLead({ nombre: 'X' + t, telefono: t });
+      crearTarea({ leadId: lead.id, tipo: 'sla_nuevo', titulo: 'x' });
+    }
+    const r = await enviarResumenDiario({ forzar: true, simular: true });
+    assert.equal(r.asunto, '3 pendientes para hoy (3 urgentes)');
+  });
+
+  test('un urgente entre varios pendientes concuerda por separado', async () => {
+    const { enviarResumenDiario } = await import('../src/core/resumen.js');
+    const { guardarLead } = await import('../src/core/leads.js');
+    const { crearTarea } = await import('../src/core/tareas.js');
+    const a = guardarLead({ nombre: 'Urgente', telefono: '911111111' }).lead;
+    crearTarea({ leadId: a.id, tipo: 'sla_nuevo', titulo: 'x' });
+    for (const t of ['922222222', '933333333']) {
+      const { lead } = guardarLead({ nombre: 'X' + t, telefono: t });
+      crearTarea({ leadId: lead.id, tipo: 'recompra_papel', titulo: 'x' });
+    }
+    const r = await enviarResumenDiario({ forzar: true, simular: true });
+    assert.equal(r.asunto, '3 pendientes para hoy (1 urgente)');
   });
 });
