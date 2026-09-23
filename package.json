@@ -4,12 +4,18 @@
   "private": true,
   "description": "Automatizacion de publicaciones, ventas y contacto con clientes para APPOS (distribuidor oficial TUU)",
   "type": "module",
-  "engines": { "node": ">=22.5.0" },
-  "bin": { "appos": "./bin/appos.js" },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "bin": {
+    "appos": "./bin/appos.js"
+  },
   "scripts": {
     "start": "node src/server.js",
     "cli": "node bin/appos.js",
     "test": "node --test \"test/**/*.test.js\""
   },
-  "dependencies": {}
+  "devDependencies": {
+    "playwright-core": "^1.63.0"
+  }
 }

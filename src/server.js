@@ -11,6 +11,7 @@ import { renderDiagnostico } from './routes/diagnostico.js';
 import { renderWidgetJs } from './routes/widget.js';
 import { renderComision } from './routes/comision.js';
 import { renderLead } from './routes/lead.js';
+import { renderRespuestas } from './routes/respuestas.js';
 import { manifiesto, paginaNoAutorizado } from './routes/comunes.js';
 import { generarIcono } from './core/icono.js';
 import { iniciarProgramador, correrRutinaDiaria } from './core/programador.js';
@@ -320,6 +321,12 @@ async function manejar(req, res) {
     if (!panelAutorizado(req, url)) return sinLlave(res, url);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(renderLead(Number(fichaLead[1]), url.searchParams.get('token') ?? ''));
+  }
+
+  if (ruta === '/respuestas' && req.method === 'GET') {
+    if (!panelAutorizado(req, url)) return sinLlave(res, url);
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    return res.end(renderRespuestas(url.searchParams.get('token') ?? ''));
   }
 
   if (ruta === '/comision' && req.method === 'GET') {

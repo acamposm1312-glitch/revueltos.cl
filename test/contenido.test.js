@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { baseEnMemoria } from '../src/core/db.js';
 import { generarCalendario, guardarCalendario, listarPublicaciones, exportarCSV, DIAS_PUBLICACION } from '../src/core/contenido.js';
 import { mensajeWhatsapp, mensajeEmail, render, nombreCorto } from '../src/core/plantillas.js';
-import { PRODUCTOS, clp, recomendarPara, buscarProducto } from '../src/core/catalogo.js';
+import { PRODUCTOS, clp, recomendarPara, buscarProducto, RUBROS } from '../src/core/catalogo.js';
 
 beforeEach(() => { baseEnMemoria(); });
 
@@ -108,5 +108,21 @@ describe('catalogo', () => {
     assert.equal(clp(39900), '$39.900');
     assert.equal(clp(419900), '$419.900');
     assert.equal(clp(8500), '$8.500');
+  });
+});
+
+describe('redaccion de las piezas', () => {
+  test('ningun titulo antepone un articulo a un rubro', () => {
+    // "Que le sirve a un Feria / ambulante / delivery" era el bug: los nombres
+    // de rubro son categorias, varias femeninas, y no admiten "un" delante.
+    const piezas = generarCalendario({ desde: new Date('2026-10-01T12:00:00Z'), cantidad: 30 });
+    const nombres = Object.values(RUBROS).map((r) => r.nombre);
+    for (const pieza of piezas) {
+      for (const nombre of nombres) {
+        const suelto = new RegExp(`\\b(un|una|el|la)\\s+${nombre.split(' /')[0]}\\b`, 'i');
+        assert.ok(!suelto.test(pieza.titulo),
+          `"${pieza.titulo}" antepone un articulo al rubro "${nombre}"`);
+      }
+    }
   });
 });
