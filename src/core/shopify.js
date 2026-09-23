@@ -151,6 +151,22 @@ function procesarCliente(payload) {
     origen: 'shopify',
     shopify_customer_id: String(payload.id ?? ''),
   });
+
+  // La tarea de primer contacto se crea de inmediato, igual que con el
+  // formulario de la tienda. Antes, un lead llegado por Shopify esperaba a que
+  // venciera su plazo para aparecer en la cola, mientras que el mismo lead
+  // llegado por el formulario aparecia al instante. No habia razon para esa
+  // diferencia: en ambos casos hay alguien esperando respuesta.
+  if (creado) {
+    crearTarea({
+      leadId: lead.id,
+      tipo: 'sla_nuevo',
+      canal: lead.telefono ? 'whatsapp' : 'email',
+      titulo: 'Cliente nuevo en la tienda: escribirle y calificar el rubro',
+      mensaje: lead.telefono ? mensajeWhatsapp('primer_contacto', lead) : '',
+    });
+  }
+
   return { accion: creado ? 'cliente_nuevo' : 'cliente_actualizado', leadId: lead.id };
 }
 

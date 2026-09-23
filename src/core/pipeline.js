@@ -8,7 +8,10 @@
  * de que el sistema lo saque a la cola de trabajo del dia.
  */
 export const ETAPAS = [
-  { clave: 'nuevo', nombre: 'Nuevo', slaHoras: 2, siguiente: 'contactado', accion: 'Escribirle por WhatsApp y calificar el rubro', plantilla: 'primer_contacto' },
+  // Media hora, no dos: en venta de equipos el que responde primero se queda
+  // con el cliente, y la competencia es la pagina del proveedor abierta en otra
+  // pestana. De todos modos la tarea se crea apenas entra el lead.
+  { clave: 'nuevo', nombre: 'Nuevo', slaHoras: 0.5, siguiente: 'contactado', accion: 'Escribirle por WhatsApp y calificar el rubro', plantilla: 'primer_contacto' },
   { clave: 'contactado', nombre: 'Contactado', slaHoras: 24, siguiente: 'cotizado', accion: 'Enviar recomendacion de equipo y precio', plantilla: 'cotizacion' },
   { clave: 'cotizado', nombre: 'Cotizado', slaHoras: 48, siguiente: 'pagado', accion: 'Seguimiento de la cotizacion', plantilla: 'seguimiento_cotizacion' },
   { clave: 'pagado', nombre: 'Pagado', slaHoras: 4, siguiente: 'ingresado_tuu', accion: 'Ingresar al cliente en la plataforma de partners TUU y comprar por el', plantilla: 'confirmacion_compra' },

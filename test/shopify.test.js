@@ -165,3 +165,23 @@ describe('observabilidad y acceso', () => {
     }
   });
 });
+
+describe('un cliente nuevo entra a la cola de inmediato', () => {
+  test('la tarea de primer contacto no espera a que venza el plazo', () => {
+    const r = procesarWebhook('customers/create', {
+      id: 991, email: 'nuevo@correo.cl', first_name: 'Rosa', last_name: 'Díaz', phone: '+56 9 8765 4321',
+    });
+    assert.equal(r.accion, 'cliente_nuevo');
+
+    const cola = colaDeHoy();
+    assert.equal(cola.length, 1, 'debe estar en la cola ya mismo, no en dos horas');
+    assert.match(cola[0].mensaje, /Hola Rosa/);
+    assert.match(cola[0].enlace, /^https:\/\/wa\.me\/56987654321/);
+  });
+
+  test('un cliente que ya existia no genera otra tarea', () => {
+    procesarWebhook('customers/create', { id: 991, email: 'rosa@correo.cl', first_name: 'Rosa', phone: '987654321' });
+    procesarWebhook('customers/create', { id: 991, email: 'rosa@correo.cl', first_name: 'Rosa', phone: '987654321' });
+    assert.equal(colaDeHoy().length, 1);
+  });
+});
