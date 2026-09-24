@@ -62,9 +62,16 @@ export const config = {
     token: env('WHATSAPP_TOKEN', ''),
   },
   instagram: {
-    // Opcional: cuenta Instagram Business vinculada a una pagina de Facebook
+    // Opcional: cuenta Instagram profesional vinculada a una pagina de Facebook
     igUserId: env('IG_USER_ID', ''),
     token: env('IG_TOKEN', ''),
+    // Meta tiene dos sabores de esta API y no usan el mismo servidor. Se deja
+    // configurable para poder cambiar sin tocar codigo si el token resulta ser
+    // del otro tipo: graph.facebook.com con inicio de sesion de Facebook,
+    // graph.instagram.com con inicio de sesion de Instagram.
+    base: env('IG_API_BASE', 'https://graph.instagram.com/v21.0'),
+    // Publicar es hacia afuera: no arranca solo porque haya token.
+    autoPublicar: env('IG_AUTOPUBLICAR', '0') === '1',
   },
   servidor: {
     puerto: Number(env('PORT', '3000')),
