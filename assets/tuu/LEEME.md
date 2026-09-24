@@ -54,3 +54,17 @@ del anterior con esos ocho valores cambiados y nada más.
 
 Para volver atrás se publica **Horizon - WhatsApp flotante**, que quedó sin
 publicar y con su contenido original intacto.
+
+## Logo de la cabecera
+
+`appos-logo-tuu.png`, 1600x520, en los archivos de la tienda. Reemplaza a
+`IMG_4076.png` en el tema **Horizon - logo APPOS**.
+
+Lo genera `bin/logo.js` en su variante `lockup`: es el lockup oficial de TUU
+con "TUU Chile" reemplazado por "APPOS Chile". **Es una marca de TUU alterada**,
+y usarla fue una decisión del negocio tomada con la advertencia sobre la mesa.
+La variante `propia`, que no toca ninguna pieza gráfica de TUU, sigue
+disponible en el mismo comando.
+
+El fondo azul del archivo no estorba porque la cabecera usa el esquema
+`scheme-tuu-vibrant-blue`, o sea el mismo `#1731ef`.
