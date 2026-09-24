@@ -1,5 +1,5 @@
-{{saludo}}, ¿te llegó el equipo TUU?
+{{saludo}}, ¿te llegó el equipo?
 
-Si ya lo tienes, dime y te ayudo con la primera configuración: cargar tus productos, dejar lista la boleta electrónica y hacer una venta de prueba.
+Si ya lo tienes, dime y te acompaño con la primera configuración: cargar tus productos, dejar lista la boleta y hacer una venta de prueba.
 
-Si aún no llega, avísame y lo reviso con TUU.
+Si todavía no llega, avísame y lo reviso con TUU.

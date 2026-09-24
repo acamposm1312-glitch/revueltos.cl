@@ -1,8 +1,7 @@
 {{saludo}}, ya llevas unos días con la máquina. ¿Cómo te ha ido?
 
-Te dejo las tres cosas que más preguntan al principio:
-1) Que la firma electrónica quede vigente. Si no, el equipo no emite boleta
-2) Cargar los productos con precio para cobrar más rápido
-3) Revisar el cierre de caja al final del día
+Lo que más preguntan al principio es esto: que la firma electrónica esté vigente, porque sin eso el equipo no emite boleta, y cargar los productos con precio para cobrar más rápido.
 
-Si algo no te está resultando, me escribes y lo vemos juntos.
+Y un consejo que no viene en el manual: revisa el cierre de caja todos los días antes de irte. Es la costumbre que más plata le ha salvado a mis clientes.
+
+Si algo no te resulta, me escribes y lo vemos.

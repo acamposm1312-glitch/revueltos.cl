@@ -62,9 +62,16 @@ export const config = {
     token: env('WHATSAPP_TOKEN', ''),
   },
   instagram: {
-    // Opcional: cuenta Instagram Business vinculada a una pagina de Facebook
+    // Opcional: cuenta Instagram profesional vinculada a una pagina de Facebook
     igUserId: env('IG_USER_ID', ''),
     token: env('IG_TOKEN', ''),
+    // Meta tiene dos sabores de esta API y no usan el mismo servidor. Se deja
+    // configurable para poder cambiar sin tocar codigo si el token resulta ser
+    // del otro tipo: graph.facebook.com con inicio de sesion de Facebook,
+    // graph.instagram.com con inicio de sesion de Instagram.
+    base: env('IG_API_BASE', 'https://graph.instagram.com/v21.0'),
+    // Publicar es hacia afuera: no arranca solo porque haya token.
+    autoPublicar: env('IG_AUTOPUBLICAR', '0') === '1',
   },
   servidor: {
     puerto: Number(env('PORT', '3000')),
@@ -78,6 +85,14 @@ export const config = {
     panelUrl: env('PANEL_URL', ''),
     // Poner en '0' para no recibir el correo resumen de cada manana.
     resumenDiario: env('RESUMEN_DIARIO', '1') !== '0',
+  },
+  // Generacion de video para los reels. Es opcional: si no hay llave, la pagina
+  // /reels lo dice y no se llama a nadie. Se cobra por llamada, asi que el tope
+  // existe para que un error en bucle no termine en una cuenta sorpresa.
+  runapi: {
+    llave: env('RUNAPI_API_KEY', ''),
+    base: env('RUNAPI_BASE', 'https://runapi.ai/api/v1'),
+    topeDiario: Number(env('RUNAPI_TOPE_DIARIO', '5')),
   },
   db: {
     ruta: env('DB_PATH', resolve(ROOT, 'data', 'appos.db')),

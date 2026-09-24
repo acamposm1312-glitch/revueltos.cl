@@ -2,7 +2,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# El proyecto no tiene dependencias: se copia tal cual.
+# El proyecto no tiene dependencias de ejecucion: se copia tal cual. La unica
+# dependencia (playwright-core) es de desarrollo, solo para generar imagenes,
+# y por eso no se instala nada aqui.
 COPY package.json ./
 COPY bin ./bin
 COPY src ./src

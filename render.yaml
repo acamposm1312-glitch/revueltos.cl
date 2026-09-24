@@ -54,5 +54,19 @@ services:
         sync: false
       - key: EMAIL_API_KEY
         sync: false
+      # Opcional: solo para generar reels en /reels. Sin ella esa pagina
+      # explica como conseguirla y no llama a ningun servicio.
+      - key: RUNAPI_API_KEY
+        sync: false
+      # Publicacion en Instagram. Sin estas dos, /instagram explica como
+      # conseguirlas y no llama a Meta.
+      - key: IG_USER_ID
+        sync: false
+      - key: IG_TOKEN
+        sync: false
+      # Interruptor de la publicacion automatica. Se deja en 0 a proposito:
+      # publicar es hacia afuera y no debe empezar solo porque haya token.
+      - key: IG_AUTOPUBLICAR
+        value: "0"
       - key: PANEL_TOKEN
         generateValue: true   # Render inventa una clave segura

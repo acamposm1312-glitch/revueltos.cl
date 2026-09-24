@@ -1,5 +1,7 @@
-{{saludo}}, listo: ya quedaste ingresado y TUU despachó tu equipo.
+{{saludo}}, listo. Ya quedaste ingresado y TUU despachó tu equipo.
 
-Te va a llegar a la dirección que me diste, y el equipo viene configurado a tu nombre. TUU te contacta para la activación, y cualquier cosa que no entiendas me la preguntas a mí directamente, no tienes que esperar al soporte.
+Va a la dirección que me diste y viene configurado a tu nombre. TUU te contacta para la activación.
+
+Cualquier cosa que no entiendas me la preguntas a mí directamente. No tienes que esperar al soporte.
 
 Te aviso apenas tenga el seguimiento.

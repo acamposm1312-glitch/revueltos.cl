@@ -122,14 +122,16 @@ function copyRubro(claveRubro, rng) {
   const complemento = buscarProducto(rubro.complementos[0]);
   const angulo = equipo?.angulos[Math.floor(rng() * equipo.angulos.length)] ?? '';
   return {
-    titulo: `Qué le sirve a un ${rubro.nombre.toLowerCase()}`,
+    // Sin articulo delante del rubro: los nombres son categorias, no personas,
+    // y varios son femeninos o plurales ("a un Feria / ambulante / delivery").
+    titulo: `${rubro.nombre}: qué equipo te sirve`,
     copy: [
       `${rubro.nombre.toUpperCase()}: qué equipo TUU te conviene`,
       '',
       angulo,
       '',
       equipo ? `Recomendado: ${equipo.titulo} - ${clp(equipo.precio)}` : '',
-      complemento ? `Complemento util: ${complemento.titulo} - ${clp(complemento.precio)}` : '',
+      complemento ? `Complemento útil: ${complemento.titulo} - ${clp(complemento.precio)}` : '',
       '',
       'Cuéntame tu caso por WhatsApp y te digo con franqueza cuál necesitas, aunque sea la opción más barata.',
     ].filter(Boolean).join('\n'),

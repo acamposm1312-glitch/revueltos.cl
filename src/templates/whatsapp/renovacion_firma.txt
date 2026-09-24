@@ -1,6 +1,6 @@
-{{saludo}}, tu firma electrónica simple está por vencer.
+{{saludo}}, tu firma electrónica está por vencer.
 
-Sin firma vigente el equipo deja de emitir boleta electrónica, así que conviene renovarla antes de que caiga.
+Sin firma vigente el equipo deja de emitir boleta, así que conviene renovarla antes de que caiga y no después.
 
 {{recomendacion}}
 

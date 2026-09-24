@@ -35,6 +35,12 @@ export async function correrRutinaDiaria({ referencia = new Date(), forzar = fal
   const tareas = generarTareas(referencia);
   const correos = await correrSecuencias({ referencia });
 
+  // Publicar en Instagram viene apagado y no depende de forzar la rutina: que
+  // alguien apriete "correr ahora" en el panel no deberia mandar una foto al
+  // muro sin haberlo decidido antes con IG_AUTOPUBLICAR.
+  const { publicarPendientes } = await import('./instagram.js');
+  const instagram = await publicarPendientes({ referencia });
+
   // Se importa aqui y no arriba porque resumen.js depende de este modulo.
   const { enviarResumenDiario } = await import('./resumen.js');
   const resumen = await enviarResumenDiario({ referencia, forzar });
@@ -48,6 +54,7 @@ export async function correrRutinaDiaria({ referencia = new Date(), forzar = fal
     correosEnviados: correos.filter((c) => c.enviado).length,
     correosPendientes: correos.filter((c) => !c.enviado && !c.simulado).length,
     resumen: { enviado: resumen.enviado, motivo: resumen.motivo, pendientes: resumen.total ?? 0 },
+    instagram: { publicadas: instagram.publicadas, motivo: instagram.motivo },
   };
 }
 

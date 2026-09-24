@@ -1,6 +1,6 @@
-{{saludo}}, según la fecha de tu compra ya deberías andar corto de papel térmico.
+{{saludo}}, por la fecha de tu compra ya debes andar corto de papel.
 
-Quedarse sin rollos es quedarse sin poder entregar boleta, así que mejor adelantarse.
+Quedarse sin rollos es quedarse sin poder entregar boleta, y eso te para la venta. Mejor adelantarse.
 
 {{recomendacion}}
 
