@@ -51,6 +51,7 @@ recalcular todas las rentabilidades y los pedidos mínimos.
 | Nueva Imperial | 32 | Saavedra | 82 | Lanco | 100 |
 | Pitrufquén | 34 | Curacautín | 85 | Pucón | 110 |
 | Galvarino | 45 | Villarrica | 87 | Angol | 110 |
+| Renaico | 105 | | | | |
 | Gorbea | 47 | Purén | 115 | Panguipulli | 128 |
 | Perquenco | 47 | Curarrehue | 145 | Los Ángeles | 165 |
 | Cunco | 48 | Traiguén | 60 | | |
@@ -90,6 +91,7 @@ Lo que necesita facturar un cliente para que su visita se pague sola, asumiendo 
 | Cunco · Nueva Imperial | $4.267 | Lumaco · Melipeuco · Traiguén | $24.000 |
 | Teodoro Schmidt · Victoria | $6.700 | **Purén** | **$46.000** |
 | Villarrica | $9.943 | Panguipulli | $51.200 |
+| Renaico | $84.000 | | |
 | Toltén · Collipulli | $12.000 | Los Ángeles | $132.000 |
 
 Recalcula estos pisos cuando cambie el número de clientes de una comuna: el denominador se mueve.

@@ -81,7 +81,7 @@ ORDEN_RUTA = {
    ['Vilcun', 'Cunco', 'Melipeuco', 'Curarrehue', 'Pucon', 'Villarrica', 'Panguipulli']),
  'Norte': ('cada 4 semanas',
    ['Lautaro', 'Victoria', 'Curacautin', 'Ercilla', 'Traiguen', 'Lumaco', 'Puren',
-    'Los Sauces', 'Angol', 'Los Angeles']),
+    'Los Sauces', 'Angol', 'Renaico', 'Los Angeles']),
  'Costa/Poniente': ('cada 3 semanas',
    ['Galvarino', 'Nueva Imperial', 'Cholchol', 'Carahue', 'Saavedra', 'Teodoro Schmidt',
     'Perquenco'])}
