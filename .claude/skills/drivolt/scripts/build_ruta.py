@@ -60,6 +60,32 @@ select,input[type=date],input[type=search]{width:100%;padding:9px 10px;border:1p
 select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible{
   outline:2px solid var(--accent);outline-offset:1px}
 
+/* ---------- selector de comunas ---------- */
+.sel{margin-top:9px}
+.sel-head{width:100%;display:flex;align-items:center;gap:8px;padding:9px 11px;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--surface);
+  cursor:pointer;text-align:left}
+.sel-head .txt{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.sel-head .txt.vacio{font-weight:400;color:var(--muted)}
+.sel-head .n{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.sel-head .chev{font-size:10px;color:var(--muted);transition:transform .15s}
+.sel[data-open="1"] .sel-head .chev{transform:rotate(180deg)}
+.sel-panel{margin-top:7px;padding:10px 11px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface)}
+.sel-panel h4{margin:0 0 6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{padding:6px 10px;border:1px solid var(--line);border-radius:99px;
+  background:var(--surface2);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);
+  color:var(--accent-ink);font-weight:600}
+.chips button .cn{opacity:.6;font-size:11px;margin-left:3px}
+.chips.rutas button{font-size:11.5px;padding:5px 9px}
+.sel-panel .sep{height:1px;background:var(--line);margin:10px -11px}
+.sel-panel .limpiar{background:none;border:0;color:var(--accent);font-size:12px;
+  font-weight:600;cursor:pointer;padding:6px 0 0}
+
 /* ---------- barra de avance ---------- */
 .progress{display:flex;align-items:center;gap:10px;margin-top:10px}
 .bar{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
@@ -170,11 +196,26 @@ function fmtLargo(iso){ const [a,m,d] = iso.split('-'); const dt = new Date(+a, 
   return `${DIA[dt.getDay()]} ${+d} de ${MES[+m-1]}`; }
 
 const PAGOS = [['efectivo','Efectivo'], ['fiado','Fiado'], ['transferencia','Transferencia'], ['cheque','Cheque']];
-const COMUNAS = [...new Set(D.clientes.map(c => c.k))].sort((a, b) => a.localeCompare(b, 'es'));
+const KR = [...new Set(D.clientes.map(c => c.kr))];
+const NOMBRE = {}; D.clientes.forEach(c => { NOMBRE[c.kr] = c.k; });
+const CUANTOS = {}; KR.forEach(k => { CUANTOS[k] = D.clientes.filter(c => c.kr === k).length; });
 
 let db = null, unsubV = null, unsubF = null, pend = 0;
-const st = { vista:'ruta', ruta:'R1', fecha:hoyISO(), visitas:{}, facturas:[], q:'' };
-try { const g = localStorage.getItem('drivolt.ruta'); if (g) st.ruta = g; } catch (e) {}
+const st = { vista:'ruta', comunas:[], fecha:hoyISO(), visitas:{}, facturas:[], q:'', abierto:false };
+// Orden canónico: como van quedando en el recorrido, no alfabético.
+const ORDEN = D.rutas.flatMap(r => r.ck);
+const ordenar = ks => ks.slice().sort((a, b) => {
+  const ia = ORDEN.indexOf(a), ib = ORDEN.indexOf(b);
+  return (ia < 0 ? 1e6 : ia) - (ib < 0 ? 1e6 : ib);
+});
+st.comunas = ordenar(D.rutas[0].ck.filter(k => D.clientes.some(c => c.kr === k)));
+try {
+  const g = JSON.parse(localStorage.getItem('drivolt.comunas') || 'null');
+  if (Array.isArray(g) && g.length) st.comunas = ordenar(g);
+} catch (e) {}
+function guardarSel(){
+  try { localStorage.setItem('drivolt.comunas', JSON.stringify(st.comunas)); } catch (e) {}
+}
 
 /* ---------- estado de guardado ---------- */
 let t_sync;
@@ -195,21 +236,30 @@ async function guardar(ref, cuerpo){
 function pintarCtl(){
   const c = $('#ctl');
   if (st.vista === 'ruta'){
+    const n = D.clientes.filter(x => st.comunas.includes(x.kr)).length;
     c.innerHTML = `<div class="pickers">
-      <label><span>Dónde vas</span><select id="selRuta">
-        <optgroup label="Una comuna">${COMUNAS.map(k =>
-          `<option value="K:${esc(k)}"${'K:' + k === st.ruta ? ' selected' : ''}>${esc(k)} (${D.clientes.filter(c => c.k === k).length})</option>`).join('')}</optgroup>
-        <optgroup label="Ruta completa">${D.rutas.map(r =>
-          `<option value="${r.id}"${r.id === st.ruta ? ' selected' : ''}>${esc(r.id)} · ${esc(r.n)}</option>`).join('')}</optgroup>
-      </select></label>
-      <label><span>Fecha</span><input type="date" id="selFecha" value="${st.fecha}"></label>
+      <label><span>Fecha de la corrida</span><input type="date" id="selFecha" value="${st.fecha}"></label>
+    </div>
+    <div class="sel" data-open="${st.abierto ? 1 : 0}">
+      <button type="button" class="sel-head" id="btnSel" aria-expanded="${st.abierto}">
+        <span class="txt${st.comunas.length ? '' : ' vacio'}">${st.comunas.length
+          ? esc(st.comunas.map(k => NOMBRE[k] || k).join(' · ')) : 'Elige dónde vas hoy'}</span>
+        <span class="n">${n} ${n === 1 ? 'cliente' : 'clientes'}</span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="sel-panel" id="panelSel"${st.abierto ? '' : ' hidden'}>
+        <h4>Comunas — toca las que vas a recorrer</h4>
+        <div class="chips" id="chipsK">${ordenar(KR).map(k =>
+          `<button type="button" data-k="${esc(k)}" aria-pressed="${st.comunas.includes(k)}">${
+            esc(NOMBRE[k] || k)}<span class="cn">${CUANTOS[k]}</span></button>`).join('')}</div>
+        <div class="sep"></div>
+        <h4>O carga una ruta entera</h4>
+        <div class="chips rutas" id="chipsR">${D.rutas.filter(r => r.id !== 'RX').map(r =>
+          `<button type="button" data-r="${r.id}">${esc(r.id)} · ${esc(r.n)}</button>`).join('')}</div>
+        <button type="button" class="limpiar" id="limpiarSel">Quitar todas</button>
+      </div>
     </div>
     <div class="progress"><div class="bar"><i id="barra" style="width:0%"></i></div><b id="avance">0 de 0</b></div>`;
-    $('#selRuta').onchange = e => {
-      st.ruta = e.target.value;
-      try { localStorage.setItem('drivolt.ruta', st.ruta); } catch (err) {}
-      pintarRuta();
-    };
     $('#selFecha').onchange = e => { st.fecha = e.target.value; escucharVisitas(); pintarRuta(); };
   } else if (st.vista === 'clientes'){
     c.innerHTML = `<label class="pickers"><input type="search" id="q" placeholder="Buscar cliente o comuna" value="${esc(st.q)}"></label>`;
@@ -221,22 +271,17 @@ function pintarCtl(){
 }
 
 /* ---------- vista: ruta ---------- */
-function clientesDe(rid){
-  if (rid.startsWith('K:')){          // una comuna suelta
-    const k = rid.slice(2);
-    const ls = D.clientes.filter(c => c.k === k).sort((a,b) => b.v - a.v);
-    return ls.length ? [[k, k, ls]] : [];
-  }
-  const r = D.rutas.find(x => x.id === rid);
-  const out = [];
-  r.ck.forEach(k => {
+function gruposSel(){
+  return st.comunas.map(k => {
     const ls = D.clientes.filter(c => c.kr === k).sort((a,b) => b.v - a.v);
-    if (ls.length) out.push([k, r.comunas[r.ck.indexOf(k)] || k, ls]);
-  });
-  return out;
+    return ls.length ? [k, NOMBRE[k] || k, ls] : null;
+  }).filter(Boolean);
+}
+function rutaDe(c){
+  return (D.rutas.find(r => r.ck.includes(c.kr)) || {id:'—'}).id;
 }
 function pintarRuta(){
-  const grupos = clientesDe(st.ruta);
+  const grupos = gruposSel();
   const total = grupos.reduce((n,g) => n + g[2].length, 0);
   let hechos = 0;
   const html = grupos.map(([kr, k, ls]) => {
@@ -262,8 +307,8 @@ function pintarRuta(){
     return `<div class="comuna"><h2>${esc(k)}</h2><em>${ls.length} ${ls.length === 1 ? 'cliente' : 'clientes'}</em></div>${filas}`;
   }).join('');
   $('#vRuta').innerHTML = total
-    ? `<p class="nota">${fmtLargo(st.fecha)} · marca cada cliente al salir de su puerta. Se guarda solo.</p>${html}`
-    : `<div class="vacio">Esta ruta no tiene clientes cargados.</div>`;
+    ? `<p class="nota">${fmtLargo(st.fecha)} · ${grupos.length === 1 ? 'una comuna' : grupos.length + ' comunas'} · marca cada cliente al salir de su puerta. Se guarda solo.</p>${html}`
+    : `<div class="vacio">Toca <b>Elige dónde vas hoy</b> y marca una o varias comunas.</div>`;
   const b = $('#barra'), a = $('#avance');
   if (b){ b.style.width = total ? (hechos / total * 100) + '%' : '0%'; a.textContent = `${hechos} de ${total}`; }
 }
@@ -301,7 +346,7 @@ function pintarClientes(){
   const q = st.q.trim().toLowerCase();
   const ls = (q ? D.clientes.filter(c => (c.n + ' ' + c.k).toLowerCase().includes(q)) : D.clientes)
     .slice().sort((a,b) => b.v - a.v).slice(0, 60);
-  const ruta = c => (D.rutas.find(r => r.ck.includes(c.kr)) || {id:'—'}).id;
+  const ruta = c => rutaDe(c);
   $('#vClientes').innerHTML = `<p class="nota">${D.clientes.length} clientes en la cartera. Escribe para filtrar; se muestran los 60 más grandes de la búsqueda.</p>` +
     (ls.length ? ls.map(c => `<article class="c">
       <h3>${esc(c.n)}</h3>
@@ -330,13 +375,31 @@ document.addEventListener('click', e => {
     window.scrollTo(0, 0);
     return;
   }
+  if (e.target.closest('#btnSel')){
+    st.abierto = !st.abierto; pintarCtl(); return;
+  }
+  const ck = e.target.closest('#chipsK button');
+  if (ck){
+    const k = ck.dataset.k;
+    st.comunas = st.comunas.includes(k)
+      ? st.comunas.filter(x => x !== k) : ordenar(st.comunas.concat(k));
+    guardarSel(); pintarCtl(); pintarRuta(); return;
+  }
+  const cr = e.target.closest('#chipsR button');
+  if (cr){
+    const r = D.rutas.find(x => x.id === cr.dataset.r);
+    st.comunas = ordenar(r.ck.filter(k => CUANTOS[k]));
+    guardarSel(); pintarCtl(); pintarRuta(); return;
+  }
+  if (e.target.closest('#limpiarSel')){
+    st.comunas = []; guardarSel(); pintarCtl(); pintarRuta(); return;
+  }
   const bv = e.target.closest('.acts button');
   if (bv){
     const card = bv.closest('.c'), id = card.dataset.id;
     const c = D.clientes.find(x => x.id === id);
     const valor = card.dataset.v === bv.dataset.v ? '' : bv.dataset.v;
-    const rutaReal = st.ruta.startsWith('K:')
-      ? (D.rutas.find(r => r.ck.includes(c.kr)) || {id:st.ruta}).id : st.ruta;
+    const rutaReal = rutaDe(c);
     const obs = card.querySelector('textarea').value;
     if (valor) card.dataset.v = valor; else delete card.dataset.v;
     card.querySelector('textarea').hidden = !valor;
@@ -366,8 +429,7 @@ document.addEventListener('input', e => {
     clearTimeout(t_obs[id]);
     t_obs[id] = setTimeout(() => {
       const c = D.clientes.find(x => x.id === id);
-      const rr = st.ruta.startsWith('K:')
-        ? (D.rutas.find(r => r.ck.includes(c.kr)) || {id:st.ruta}).id : st.ruta;
+      const rr = rutaDe(c);
       const cuerpo = { fecha:st.fecha, rut:id, cliente:c.n, comuna:c.k, ruta:rr,
                        visitado:card.dataset.v || '', obs:ta.value, ts:new Date().toISOString() };
       st.visitas[id] = cuerpo;
