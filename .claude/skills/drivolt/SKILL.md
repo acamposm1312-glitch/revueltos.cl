@@ -51,6 +51,20 @@ La página lleva los 203 clientes embebidos, agrupados en las 11 rutas. **Cuando
 nuevo o cambia una dirección hay que republicarla**, porque ese lado es estático: se regenera
 con `build_ruta.py` a partir del array `CLIENTS` del panel.
 
+**Alejandro abre una sola cosa: el panel.** Cada artefacto tiene su propia base de datos y una
+página no puede leer la de otra, así que el puente lo hace esta skill. En cada actualización del
+panel, después de cargar las facturas:
+
+```
+ArtifactData list facturas --out_dir terreno/     (url de Ruta Drivolt)
+ArtifactData list visitas  --out_dir terreno/
+python scripts/vista_terreno.py Panel_Control_DRIVOLT.html terreno/ --hoy DD-mes-AAAA
+```
+
+Eso reescribe la vista **Terreno** del panel con lo que Nicolás marcó. No es en vivo y la propia
+vista lo dice: muestra el estado del último volcado. Si Alejandro pregunta «¿ya informó?», se
+vuelve a correr y se republica.
+
 ## El ciclo cuando llegan facturas
 
 Sigue estos pasos en orden. Los primeros dos son los que evitan cargar basura al panel.
