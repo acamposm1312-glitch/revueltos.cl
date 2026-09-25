@@ -47,7 +47,23 @@ def cargar(carpeta, col):
     return out
 
 
-def vista(facturas, visitas, hoy):
+def clientes_panel(h):
+    """El array maestro del panel, para saber quién más había en la comuna."""
+    import json
+    a = h.find('const CLIENTS')
+    a = h.find('[', a)
+    d = 0
+    for i in range(a, len(h)):
+        if h[i] == '[':
+            d += 1
+        elif h[i] == ']':
+            d -= 1
+            if d == 0:
+                return json.loads(h[a:i + 1])
+    return []
+
+
+def vista(facturas, visitas, hoy, clientes):
     sin = sorted([f for f in facturas if not f.get('pago')],
                  key=lambda f: -int(f.get('folio') or 0))
     con = sorted([f for f in facturas if f.get('pago')],
@@ -116,23 +132,57 @@ def vista(facturas, visitas, hoy):
           '</div></div>' % (len(con), ''.join(fila_f(f) for f in con)))
 
     if ult:
-        rutas = sorted({v.get('ruta', '') for v in dia_v})
-        filas = ''.join(
-          '<tr><td class="fw-600">%s</td><td>%s</td><td>%s</td><td>%s</td></tr>'
-          % (esc(v.get('cliente', '—')), esc(v.get('comuna', '—')), esc(v.get('ruta', '—')),
-             '<span class="badge badge-%s">%s</span>%s'
-             % ('green' if v.get('visitado') == 'si' else 'gold',
-                'Visitado' if v.get('visitado') == 'si' else 'No estaba',
-                (' <span style="color:var(--muted);font-size:11px">%s</span>' % esc(v['obs']))
-                if (v.get('obs') or '').strip() else ''))
-          for v in sorted(dia_v, key=lambda v: (v.get('visitado') != 'no', v.get('cliente', ''))))
-        bloques.append(
-          '<div class="card"><div class="card-header"><h3>🚚 Última corrida marcada</h3>'
-          '<span class="tag">%s · ruta %s · %d marcados · %d con observación</span></div>'
-          '<div class="card-body" style="padding:0"><table><thead><tr><th>Cliente</th>'
-          '<th>Comuna</th><th>Ruta</th><th>Estado</th></tr></thead><tbody>%s</tbody></table>'
-          '</div></div>' % (dia(ult), ', '.join(r for r in rutas if r) or '—',
-                            len(dia_v), len(obs), filas))
+        # La comuna completa, no sólo los marcados: lo que interesa es quién quedó fuera.
+        marca = {v.get('rut'): v for v in dia_v}
+        comunas = sorted({v.get('comuna') for v in dia_v if v.get('comuna')})
+        sin_marcar = []
+        secciones = []
+        for k in comunas:
+            en_k = [c for c in clientes if len(c) > 10 and c[10] == k]
+            en_k.sort(key=lambda c: -int(str(c[2]).replace('$', '').replace('.', '') or 0))
+            filas = []
+            for c in en_k:
+                v = marca.get(c[0])
+                if v is None:
+                    et, col = 'Sin marcar', 'red'
+                    sin_marcar.append(c)
+                elif v.get('visitado') == 'si':
+                    et, col = ('Compró', 'green') if 'factura' in (v.get('obs') or '') \
+                        else ('Visitado, sin venta', 'blue')
+                elif v.get('visitado') == 'no':
+                    et, col = 'No estaba', 'gold'
+                else:
+                    et, col = 'Sin marcar', 'red'
+                    sin_marcar.append(c)
+                nota = ''
+                if v and (v.get('obs') or '').strip():
+                    nota = (' <span style="color:var(--muted);font-size:11px">%s</span>'
+                            % esc(v['obs']))
+                filas.append(
+                  '<tr><td class="fw-600">%s</td><td>%s</td><td class="num">%s</td>'
+                  '<td class="num">%s</td><td><span class="badge badge-%s">%s</span>%s</td></tr>'
+                  % (esc(c[1]), dia(c[7]), c[9] if len(c) > 9 else '—',
+                     mon(str(c[2]).replace('$', '').replace('.', '') or 0), col, et, nota))
+            secciones.append(
+              '<div class="card"><div class="card-header"><h3>🚚 %s — la corrida del %s</h3>'
+              '<span class="tag">%d de %d con venta</span></div>'
+              '<div class="card-body" style="padding:0"><table><thead><tr><th>Cliente</th>'
+              '<th>Última compra</th><th class="num">Días</th><th class="num">Venta histórica</th>'
+              '<th>Qué pasó</th></tr></thead><tbody>%s</tbody></table></div></div>'
+              % (esc(k), dia(ult),
+                 sum(1 for c in en_k if 'factura' in ((marca.get(c[0]) or {}).get('obs') or '')),
+                 len(en_k), ''.join(filas)))
+        if sin_marcar:
+            dormida = sum(int(str(c[2]).replace('$', '').replace('.', '') or 0)
+                          for c in sin_marcar)
+            secciones.insert(0,
+              '<div class="alert-box alert-danger"><b>%d %s de la comuna quedaron sin '
+              'explicación.</b> No compraron y Nicolás todavía no marca si pasó por ahí. '
+              'Suman <b>%s</b> de venta histórica: %s. Eso es lo que hay que preguntarle — '
+              'o esperar a que lo marque en su app.</div>'
+              % (len(sin_marcar), 'clientes' if len(sin_marcar) != 1 else 'cliente',
+                 mon(dormida), esc(', '.join(c[1] for c in sin_marcar))))
+        bloques.extend(secciones)
     else:
         bloques.append(
           '<div class="card"><div class="card-header"><h3>🚚 Última corrida marcada</h3>'
@@ -161,9 +211,8 @@ def main():
     facturas = cargar(a.carpeta, 'facturas')
     visitas = cargar(a.carpeta, 'visitas')
     sello = a.hoy or datetime.date.today().isoformat()
-    cuerpo = vista(facturas, visitas, sello)
-
     h = open(a.panel, encoding='utf-8').read()
+    cuerpo = vista(facturas, visitas, sello, clientes_panel(h))
     marca = '<div class="view" id="view-terreno">'
     if marca in h:
         i = h.find(marca) + len(marca)

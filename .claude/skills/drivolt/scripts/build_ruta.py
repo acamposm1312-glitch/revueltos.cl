@@ -170,9 +170,11 @@ function fmtLargo(iso){ const [a,m,d] = iso.split('-'); const dt = new Date(+a, 
   return `${DIA[dt.getDay()]} ${+d} de ${MES[+m-1]}`; }
 
 const PAGOS = [['efectivo','Efectivo'], ['fiado','Fiado'], ['transferencia','Transferencia'], ['cheque','Cheque']];
+const COMUNAS = [...new Set(D.clientes.map(c => c.k))].sort((a, b) => a.localeCompare(b, 'es'));
 
 let db = null, unsubV = null, unsubF = null, pend = 0;
 const st = { vista:'ruta', ruta:'R1', fecha:hoyISO(), visitas:{}, facturas:[], q:'' };
+try { const g = localStorage.getItem('drivolt.ruta'); if (g) st.ruta = g; } catch (e) {}
 
 /* ---------- estado de guardado ---------- */
 let t_sync;
@@ -194,12 +196,20 @@ function pintarCtl(){
   const c = $('#ctl');
   if (st.vista === 'ruta'){
     c.innerHTML = `<div class="pickers">
-      <label><span>Ruta</span><select id="selRuta">${D.rutas.map(r =>
-        `<option value="${r.id}"${r.id === st.ruta ? ' selected' : ''}>${esc(r.id)} · ${esc(r.n)}</option>`).join('')}</select></label>
+      <label><span>Dónde vas</span><select id="selRuta">
+        <optgroup label="Una comuna">${COMUNAS.map(k =>
+          `<option value="K:${esc(k)}"${'K:' + k === st.ruta ? ' selected' : ''}>${esc(k)} (${D.clientes.filter(c => c.k === k).length})</option>`).join('')}</optgroup>
+        <optgroup label="Ruta completa">${D.rutas.map(r =>
+          `<option value="${r.id}"${r.id === st.ruta ? ' selected' : ''}>${esc(r.id)} · ${esc(r.n)}</option>`).join('')}</optgroup>
+      </select></label>
       <label><span>Fecha</span><input type="date" id="selFecha" value="${st.fecha}"></label>
     </div>
     <div class="progress"><div class="bar"><i id="barra" style="width:0%"></i></div><b id="avance">0 de 0</b></div>`;
-    $('#selRuta').onchange = e => { st.ruta = e.target.value; pintarRuta(); };
+    $('#selRuta').onchange = e => {
+      st.ruta = e.target.value;
+      try { localStorage.setItem('drivolt.ruta', st.ruta); } catch (err) {}
+      pintarRuta();
+    };
     $('#selFecha').onchange = e => { st.fecha = e.target.value; escucharVisitas(); pintarRuta(); };
   } else if (st.vista === 'clientes'){
     c.innerHTML = `<label class="pickers"><input type="search" id="q" placeholder="Buscar cliente o comuna" value="${esc(st.q)}"></label>`;
@@ -212,6 +222,11 @@ function pintarCtl(){
 
 /* ---------- vista: ruta ---------- */
 function clientesDe(rid){
+  if (rid.startsWith('K:')){          // una comuna suelta
+    const k = rid.slice(2);
+    const ls = D.clientes.filter(c => c.k === k).sort((a,b) => b.v - a.v);
+    return ls.length ? [[k, k, ls]] : [];
+  }
   const r = D.rutas.find(x => x.id === rid);
   const out = [];
   r.ck.forEach(k => {
@@ -320,10 +335,12 @@ document.addEventListener('click', e => {
     const card = bv.closest('.c'), id = card.dataset.id;
     const c = D.clientes.find(x => x.id === id);
     const valor = card.dataset.v === bv.dataset.v ? '' : bv.dataset.v;
+    const rutaReal = st.ruta.startsWith('K:')
+      ? (D.rutas.find(r => r.ck.includes(c.kr)) || {id:st.ruta}).id : st.ruta;
     const obs = card.querySelector('textarea').value;
     if (valor) card.dataset.v = valor; else delete card.dataset.v;
     card.querySelector('textarea').hidden = !valor;
-    const cuerpo = { fecha:st.fecha, rut:id, cliente:c.n, comuna:c.k, ruta:st.ruta,
+    const cuerpo = { fecha:st.fecha, rut:id, cliente:c.n, comuna:c.k, ruta:rutaReal,
                      visitado:valor, obs, ts:new Date().toISOString() };
     st.visitas[id] = cuerpo;
     if (db) guardar(db.doc(`visitas/${st.fecha}__${id}`), cuerpo);
@@ -349,7 +366,9 @@ document.addEventListener('input', e => {
     clearTimeout(t_obs[id]);
     t_obs[id] = setTimeout(() => {
       const c = D.clientes.find(x => x.id === id);
-      const cuerpo = { fecha:st.fecha, rut:id, cliente:c.n, comuna:c.k, ruta:st.ruta,
+      const rr = st.ruta.startsWith('K:')
+        ? (D.rutas.find(r => r.ck.includes(c.kr)) || {id:st.ruta}).id : st.ruta;
+      const cuerpo = { fecha:st.fecha, rut:id, cliente:c.n, comuna:c.k, ruta:rr,
                        visitado:card.dataset.v || '', obs:ta.value, ts:new Date().toISOString() };
       st.visitas[id] = cuerpo;
       if (db) guardar(db.doc(`visitas/${st.fecha}__${id}`), cuerpo);
