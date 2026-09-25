@@ -24,10 +24,32 @@ contrato de esta skill: si algo no cuadra, se dice; si algo se actualiza, se act
 | Cobertura comuna por comuna | `https://claude.ai/code/artifact/1c3532fe-4473-4d57-b391-8d7181fee665` |
 | Pauta de definiciones para Nicolás | `https://claude.ai/code/artifact/28ce565c-5890-462c-b429-0f46937c5442` |
 | Expediente del Agente Comercial | `https://claude.ai/code/artifact/64a3d66a-c4cb-499d-8512-ce435a5fff9a` |
+| **Ruta Drivolt** — la app de terreno de Nicolás | `https://claude.ai/artifact/Ep3EeUQosYPGqxynbym2RR` |
 
 El panel es un HTML de ~290 KB con los datos embebidos. Se republica con `Artifact` pasando
 la misma `url` para conservar el enlace. Antes de escribir hay que **descargar la versión viva**
 y trabajar sobre ella: el archivo local puede estar viejo. Ver `references/panel.md`.
+
+## Ruta Drivolt — lo que informa Nicolás
+
+Desde el 25-sep-2026 Nicolás tiene su propia página, aparte del panel: **Ruta Drivolt**
+(`https://claude.ai/artifact/Ep3EeUQosYPGqxynbym2RR`). No ve costos, márgenes, saldos ni punto
+de equilibrio — sólo sus clientes por ruta, sus visitas y la forma de pago. Guarda en la base de
+datos del artefacto, que se lee y escribe con `ArtifactData` pasando esa url.
+
+**`facturas/{folio}`** — `{folio (número), fecha, cliente, monto, pago, cheque, obs}`.
+`pago` es `""`, `efectivo`, `fiado`, `transferencia` o `cheque`; `cheque` guarda la fecha de
+cobro cuando corresponde. **Al cargar facturas nuevas al panel hay que sembrar acá una fila por
+cada una con `pago: ""`**, para que le aparezcan en «Por informar». Y **antes de preguntarle a
+Alejandro cómo se pagó una factura, se lee esta colección**: para eso existe.
+
+**`visitas/{fecha}__{rut}`** — `{fecha, rut, cliente, comuna, ruta, visitado, obs, ts}`.
+`visitado` es `si` o `no`. Sirve para saber quién quedó sin atender en una corrida y por qué,
+sin preguntarle nada.
+
+La página lleva los 203 clientes embebidos, agrupados en las 11 rutas. **Cuando entra un cliente
+nuevo o cambia una dirección hay que republicarla**, porque ese lado es estático: se regenera
+con `build_ruta.py` a partir del array `CLIENTS` del panel.
 
 ## El ciclo cuando llegan facturas
 
