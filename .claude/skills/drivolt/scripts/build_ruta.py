@@ -162,8 +162,15 @@ select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-vis
 .chips button .cn{opacity:.6;font-size:11px;margin-left:3px}
 .chips.rutas button{font-size:11.5px;padding:5px 9px}
 .sel-panel .sep{height:1px;background:var(--line);margin:10px -11px}
-.sel-panel .limpiar{background:none;border:0;color:var(--accent);font-size:12px;
-  font-weight:600;cursor:pointer;padding:6px 0 0}
+.sel-pie{display:flex;align-items:center;gap:10px;margin-top:12px;margin-bottom:2px}
+.sel-pie .limpiar{background:none;border:0;color:var(--muted);font-size:12.5px;
+  font-weight:600;cursor:pointer;padding:8px 0}
+.sel-pie .limpiar:hover{color:var(--accent)}
+.sel-pie .listo{margin-left:auto;padding:10px 20px;border:0;border-radius:var(--r);
+  background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:700;
+  cursor:pointer}
+.sel-pie .listo:active{transform:translateY(1px)}
+.sel-pie .listo[disabled]{background:var(--line);color:var(--muted);cursor:default}
 
 /* ---------- barra de avance ---------- */
 .progress{display:flex;align-items:center;gap:10px;margin-top:10px}
@@ -344,11 +351,15 @@ function pintarCtl(){
         <div class="chips" id="chipsK">${ordenar(KR).map(k =>
           `<button type="button" data-k="${esc(k)}" aria-pressed="${st.comunas.includes(k)}">${
             esc(NOMBRE[k] || k)}<span class="cn">${CUANTOS[k]}</span></button>`).join('')}</div>
+        <div class="sel-pie">
+          <button type="button" class="limpiar" id="limpiarSel">Quitar todas</button>
+          <button type="button" class="listo" id="okSel"${st.comunas.length ? '' : ' disabled'}>Listo${
+            st.comunas.length ? ` · ${n} ${n === 1 ? 'cliente' : 'clientes'}` : ''}</button>
+        </div>
         <div class="sep"></div>
         <h4>O carga una ruta entera</h4>
         <div class="chips rutas" id="chipsR">${D.rutas.filter(r => r.id !== 'RX').map(r =>
           `<button type="button" data-r="${r.id}">${esc(r.id)} · ${esc(r.n)}</button>`).join('')}</div>
-        <button type="button" class="limpiar" id="limpiarSel">Quitar todas</button>
       </div>
     </div>
     <div class="progress"><div class="bar"><i id="barra" style="width:0%"></i></div><b id="avance">0 de 0</b></div>`;
@@ -481,10 +492,14 @@ document.addEventListener('click', e => {
   if (cr){
     const r = D.rutas.find(x => x.id === cr.dataset.r);
     st.comunas = ordenar(r.ck.filter(k => CUANTOS[k]));
+    st.abierto = false;
     guardarSel(); pintarCtl(); pintarRuta(); return;
   }
   if (e.target.closest('#limpiarSel')){
     st.comunas = []; guardarSel(); pintarCtl(); pintarRuta(); return;
+  }
+  if (e.target.closest('#okSel')){
+    st.abierto = false; pintarCtl(); return;
   }
   const bv = e.target.closest('.acts button');
   if (bv){
