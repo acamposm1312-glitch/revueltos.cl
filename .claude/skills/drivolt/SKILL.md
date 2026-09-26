@@ -43,6 +43,12 @@ cobro cuando corresponde. **Al cargar facturas nuevas al panel hay que sembrar a
 cada una con `pago: ""`**, para que le aparezcan en «Por informar». Y **antes de preguntarle a
 Alejandro cómo se pagó una factura, se lee esta colección**: para eso existe.
 
+**`data/users/<id>/ajustes`** — `{comunas, ts}`: las comunas que cada quien dejó elegidas.
+Va en el subárbol privado de cada usuario, así que la selección de Nicolás y la de Alejandro no
+se pisan. Estuvo en `localStorage` y se perdía entre visitas: dentro del visor —y más con el
+acceso directo del teléfono— el almacenamiento local no sobrevive. Por eso la app declara
+`user` junto a `db`.
+
 **`visitas/{fecha}__{rut}`** — `{fecha, rut, cliente, comuna, ruta, visitado, obs, ts}`.
 `visitado` es `si` o `no`. Sirve para saber quién quedó sin atender en una corrida y por qué,
 sin preguntarle nada.

@@ -279,8 +279,9 @@ const KR = [...new Set(D.clientes.map(c => c.kr))];
 const NOMBRE = {}; D.clientes.forEach(c => { NOMBRE[c.kr] = c.k; });
 const CUANTOS = {}; KR.forEach(k => { CUANTOS[k] = D.clientes.filter(c => c.kr === k).length; });
 
-let db = null, unsubV = null, unsubF = null, pend = 0;
-const st = { vista:'ruta', comunas:[], fecha:hoyISO(), visitas:{}, facturas:[], q:'', abierto:false };
+let db = null, unsubV = null, unsubF = null, pend = 0, prefRef = null;
+const st = { vista:'ruta', comunas:[], fecha:hoyISO(), visitas:{}, facturas:[], q:'',
+             abierto:false, tocado:false };
 // Orden canónico: como van quedando en el recorrido, no alfabético.
 const ORDEN = D.rutas.flatMap(r => r.ck);
 const ordenar = ks => ks.slice().sort((a, b) => {
@@ -292,8 +293,20 @@ try {
   const g = JSON.parse(localStorage.getItem('drivolt.comunas') || 'null');
   if (Array.isArray(g) && g.length) st.comunas = ordenar(g);
 } catch (e) {}
+// El teléfono es el lugar frágil: dentro del visor, y sobre todo en iPhone por el acceso
+// directo, el almacenamiento local se pierde entre visitas. Se escribe en los dos lados —
+// el local para que la página abra al instante, la base de datos para que sobreviva— y en
+// un rincón privado del vendedor, que nadie más ve.
+let t_pref;
 function guardarSel(){
+  st.tocado = true;
   try { localStorage.setItem('drivolt.comunas', JSON.stringify(st.comunas)); } catch (e) {}
+  if (!prefRef) return;
+  clearTimeout(t_pref);
+  const copia = st.comunas.slice();
+  t_pref = setTimeout(() => {
+    prefRef.set({ comunas: copia, ts: new Date().toISOString() }).catch(() => {});
+  }, 400);
 }
 
 /* ---------- estado de guardado ---------- */
@@ -561,6 +574,23 @@ async function arrancar(){
   }
   sync('ok', 'al día');
   escucharVisitas(); escucharFacturas();
+
+  // Los ajustes viven bajo data/users/<id>, que es privado de cada quien.
+  try {
+    const usuario = await claude.use('user');
+    const uid = usuario ? await usuario.id() : null;
+    if (uid){
+      prefRef = db.doc(`data/users/${uid}/ajustes`);
+      const snap = await prefRef.get();
+      const guardado = snap.exists ? snap.data() : null;
+      if (!st.tocado && guardado && Array.isArray(guardado.comunas) && guardado.comunas.length){
+        st.comunas = ordenar(guardado.comunas.filter(k => CUANTOS[k]));
+        pintarCtl(); pintarRuta();
+      } else if (!snap.exists && st.comunas.length){
+        guardarSel();          // deja sembrada la selección con que abrió
+      }
+    }
+  } catch (e) { /* sin ajustes guardados: queda el local */ }
 }
 arrancar();
 </script>
