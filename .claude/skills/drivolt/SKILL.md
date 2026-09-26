@@ -47,9 +47,13 @@ Alejandro cómo se pagó una factura, se lee esta colección**: para eso existe.
 `visitado` es `si` o `no`. Sirve para saber quién quedó sin atender en una corrida y por qué,
 sin preguntarle nada.
 
-La página lleva los 203 clientes embebidos, agrupados en las 11 rutas. **Cuando entra un cliente
-nuevo o cambia una dirección hay que republicarla**, porque ese lado es estático: se regenera
-con `build_ruta.py` a partir del array `CLIENTS` del panel.
+La página lleva la cartera embebida, agrupada en las 11 rutas, y ese lado es estático:
+**cada vez que entre un cliente nuevo o cambie una dirección hay que regenerarla y
+republicarla**, en la misma tanda en que se carga la factura. Se arma con
+`python scripts/build_ruta.py Panel_Control_DRIVOLT.html`, que lee el array `CLIENTS` del panel
+en el momento — no hay JSON intermedio. Ya pasó una vez lo contrario: la app se quedó con 203
+clientes mientras el panel iba en 205, y Gorbea mostraba 6 de sus 8. Si Alejandro dice que a una
+comuna le faltan clientes, es esto.
 
 **Alejandro abre una sola cosa: el panel.** Cada artefacto tiene su propia base de datos y una
 página no puede leer la de otra, así que el puente lo hace esta skill. En cada actualización del

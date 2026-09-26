@@ -1,5 +1,84 @@
-import json, io
-DATOS = io.open('ruta_data.json', encoding='utf-8').read()
+#!/usr/bin/env python3
+"""Arma la app de terreno de Nicolás leyendo el array CLIENTS del panel.
+
+La lista de clientes se extrae del panel en cada corrida, a propósito: la primera versión
+la leía de un JSON aparte y ese archivo se quedó viejo — dos clientes nuevos de Gorbea
+entraron al panel y la app siguió mostrando 6 donde había 8. Una sola fuente, un solo paso.
+
+    python build_ruta.py [Panel_Control_DRIVOLT.html]
+"""
+import io, json, sys, urllib.parse
+
+PANEL = sys.argv[1] if len(sys.argv) > 1 else 'Panel_Control_DRIVOLT.html'
+
+ACENTOS = {'Vilcun': 'Vilcún', 'Pucon': 'Pucón', 'Curacautin': 'Curacautín',
+           'Traiguen': 'Traiguén', 'Puren': 'Purén', 'Tolten': 'Toltén',
+           'Pitrufquen': 'Pitrufquén', 'Cholchol': 'Chol Chol',
+           'Los Angeles': 'Los Ángeles', 'Vina Del Mar': 'Viña del Mar'}
+
+RUTAS = [('R1', 'Sur cercano', ['Padre Las Casas', 'Freire', 'Pitrufquen', 'Gorbea'], 96),
+         ('R2', 'Sur lejano', ['Loncoche', 'Lanco', 'Panguipulli'], 235),
+         ('R3', 'Costa sur', ['Teodoro Schmidt', 'Tolten'], 187),
+         ('R4', 'Costa poniente', ['Carahue', 'Saavedra'], 169),
+         ('R5', 'Chol Chol', ['Cholchol', 'Galvarino', 'Nueva Imperial'], 122),
+         ('R6', 'Malleco poniente',
+          ['Traiguen', 'Lumaco', 'Puren', 'Los Sauces', 'Angol'], 278),
+         ('R7', 'Lagos', ['Villarrica', 'Pucon', 'Curarrehue'], 292),
+         ('R8', 'Cordillera', ['Vilcun', 'Cunco', 'Melipeuco'], 194),
+         ('R9', 'Norte Ruta 5',
+          ['Perquenco', 'Victoria', 'Ercilla', 'Collipulli', 'Renaico'], 205),
+         ('R10', 'Lautaro y Curacautín', ['Lautaro', 'Curacautin'], 170),
+         ('R11', 'Temuco urbano', ['Temuco'], 35)]
+
+
+def clientes_del_panel(html):
+    a = html.find('const CLIENTS')
+    a = html.find('[', a)
+    d = 0
+    for i in range(a, len(html)):
+        if html[i] == '[':
+            d += 1
+        elif html[i] == ']':
+            d -= 1
+            if d == 0:
+                return json.loads(html[a:i + 1])
+    sys.exit('no se encontró el array CLIENTS en ' + PANEL)
+
+
+def maps(direccion, comuna):
+    if direccion in ('', '-', 'S/D', None) or comuna in ('', '-', 'Sin dirección', None):
+        return ''
+    q = urllib.parse.quote('%s, %s, Chile' % (direccion, ACENTOS.get(comuna, comuna)), safe='')
+    return 'https://www.google.com/maps/search/?api=1&query=' + q
+
+
+def datos():
+    html = io.open(PANEL, encoding='utf-8').read()
+    cl = []
+    for c in clientes_del_panel(html):
+        cl.append({'id': c[0], 'n': c[1], 'k': ACENTOS.get(c[10], c[10]), 'kr': c[10],
+                   'd': '' if c[11] in ('S/D', '-', '') else c[11],
+                   'm': maps(c[11], c[10]), 'a': 1 if c[8] == 'Activo' else 0,
+                   'u': c[7] if c[7] not in ('-', '') else '',
+                   'v': int(str(c[2]).replace('$', '').replace('.', '') or 0),
+                   'dd': c[9] if isinstance(c[9], int) else 0})
+    rutas = [{'id': r, 'n': n, 'km': km,
+              'comunas': [ACENTOS.get(x, x) for x in cs], 'ck': cs} for r, n, cs, km in RUTAS]
+    en_ruta = {k for _, _, cs, _ in RUTAS for k in cs}
+    fuera = sorted({c['kr'] for c in cl if c['kr'] not in en_ruta})
+    if fuera:
+        rutas.append({'id': 'RX', 'n': 'Fuera de ruta', 'km': 0,
+                      'comunas': [ACENTOS.get(x, x) for x in fuera], 'ck': fuera})
+    huerfanas = [k for k in fuera]
+    if huerfanas:
+        print('aviso · comunas sin ruta asignada:', ', '.join(huerfanas))
+    print('%d clientes · %d comunas · %d rutas' %
+          (len(cl), len({c['kr'] for c in cl}), len(rutas)))
+    return json.dumps({'rutas': rutas, 'clientes': cl}, ensure_ascii=False,
+                      separators=(',', ':'))
+
+
+DATOS = datos()
 
 HTML = r'''<title>Ruta Drivolt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
